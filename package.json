@@ -11,9 +11,11 @@
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
     "@tanstack/react-query": "^5.62.14",
+    "autoprefixer": "^10.4.20",
     "axios": "^1.7.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "D": "^1.0.0",
     "lucide-react": "^0.469.0",
     "next": "14.2.22",
     "react": "^18",
