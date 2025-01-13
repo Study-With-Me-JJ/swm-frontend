@@ -1,19 +1,30 @@
 import axiosInstance from '@/lib/api/axios'; 
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 interface StudyRoom {
-  id: number;
-  name: string;
-  description: string;
-  image: string;
-  category: string;
-  createdAt: string;
-  updatedAt: string;
+  studyRoomId: number;
+  title: string;
+  thumbnail: string;
+  locality: string;
+  likeCount: number;
+  reviewCount: number;
+  entireMinPricePerHour: number;
+  entireMaxHeadcount: number;
+  starAvg: number;
+  studyBookmarkId: number;
+  tags: {
+    studyRoomTagId: number;
+    tag: string;
+  }[];
+}
+
+interface StudyRoomResponse {
+  data: StudyRoom[];
 }
 
 const getStudyRooms = async (): Promise<StudyRoom[]> => {
   try {
-    const response = await axiosInstance.get<StudyRoom[]>(API_ENDPOINTS.STUDY_ROOM.LIST);
-    return response.data;
+    const response = await axiosInstance.get<StudyRoomResponse>(API_ENDPOINTS.STUDY_ROOM.LIST);
+    return response.data.data;
   } catch (error) {
     console.error(error);
     return [];
