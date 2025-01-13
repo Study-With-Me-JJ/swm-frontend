@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - 'dev'
+      - 'feat/SWM-128'
 
 jobs:
   build-and-push:
