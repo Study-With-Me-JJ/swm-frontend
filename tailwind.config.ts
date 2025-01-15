@@ -23,6 +23,7 @@ const config: Config = {
   			input: 'hsl(var(--input))',
   			gray: {
 				'default': '#565656',
+				'light': '#a5a5a5',
   			},
   		},
   		borderRadius: {

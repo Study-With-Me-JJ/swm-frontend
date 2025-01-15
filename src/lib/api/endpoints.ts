@@ -6,4 +6,8 @@ export const API_ENDPOINTS = {
       UPDATE: (id: number | string) => `/api/v1/studyroom/${id}`,
       DELETE: (id: number | string) => `/api/v1/studyroom/${id}`,
     }, 
+    EXTERNAL_STUDY_ROOMS: {
+        LIST: '/api/v1/external-study-rooms',
+    },
   } as const;
+ 
