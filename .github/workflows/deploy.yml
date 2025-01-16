@@ -25,6 +25,9 @@ jobs:
         run: npm install
         
       - name: Build
+        NODE_ENV: development
+        NEXT_PUBLIC_BASE_URL: ${{ secrets.NEXT_PUBLIC_BASE_URL }}
+        NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
         run: npm run build
         
       - name: Configure AWS Credentials
