@@ -6,6 +6,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination'; 
 import { useRef } from 'react';
+import Image from 'next/image';
  
 
 interface StudyRoom {  
@@ -26,10 +27,10 @@ interface StudyRoom {
 
 interface SlideItemProps {  
     slideData: StudyRoom[];
-    useSlider?:boolean;
+    useSlider?: boolean;
 }
-
-export default function SlideItem({ slideData, useSlider=false }: SlideItemProps) {
+ 
+export default function ListItem({ slideData, useSlider=false }: SlideItemProps) {
     // console.log('slideData type:', typeof slideData, 'value:', slideData);
 
     const prevRef = useRef(null);
@@ -41,16 +42,29 @@ export default function SlideItem({ slideData, useSlider=false }: SlideItemProps
 
     if(slideData.length === 0) {
         return <div>표시할 데이터가 없습니다.</div>;
+    } 
+
+    interface ItemContentProps {
+        item: StudyRoom;  
     }
 
-   const ItemContent = ({slideData}:SlideItemProps) => {
+    const ItemContent = ({item}:ItemContentProps) => {
         return (
             <>
-                {slideData.map((item, index) => (
-                    <div key={`item-${index}`}>
-                        <div>{item.title}</div>
+                <div>
+                    <div className="rounded-[8px] relative w-full aspect-[4/1.55] overflow-hidden">
+                        {item.thumbnail ? (
+                            // <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
+                            <Image src={'/no-image.png'} alt={item.title} fill className="object-cover" />
+                        ) : (
+                            <Image src={'/no-image.png'} alt={item.title} fill className="object-cover" />
+                        )}
                     </div>
-                ))}
+                    <div className="pt-[25px]">
+                        <div>{item.title}</div>
+                        <div>{item.locality}</div>
+                    </div>
+                </div>
             </>
         );
     }
@@ -82,9 +96,9 @@ export default function SlideItem({ slideData, useSlider=false }: SlideItemProps
                     }
                 }}
             >
-                {slideData.map((index) => (
+                {slideData.map((item, index) => (
                     <SwiperSlide key={`slide-${index}`}>          
-                        <ItemContent slideData={slideData} />
+                        <ItemContent item={item} />
                     </SwiperSlide>  
                 ))}
             </Swiper>
@@ -95,7 +109,11 @@ export default function SlideItem({ slideData, useSlider=false }: SlideItemProps
         </div>
     ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-screen-xl w-full">
-            <ItemContent slideData={slideData} />
+            {slideData.map((item, index) => (
+                <div key={`item-${index}`}>
+                    <div>{item.title}</div>
+                </div>
+            ))}
         </div>
     )
 }   
