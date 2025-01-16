@@ -21,16 +21,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children, 
-  studyRecruit,
-  studyRoom,
-  externalStudyRooms, 
-  externalStudies
 }: Readonly<{
-  children: React.ReactNode; 
-  studyRecruit: React.ReactNode;
-  studyRoom: React.ReactNode;
-  externalStudyRooms: React.ReactNode;
-  externalStudies: React.ReactNode;
+  children: React.ReactNode;  
 }>) {
   return (
     <html lang="ko">
@@ -39,11 +31,7 @@ export default function RootLayout({
       >
         <RootProvider>
           <Header />
-          {children} 
-          {studyRecruit}
-          {studyRoom}
-          {externalStudyRooms}
-          {externalStudies}
+          {children}  
         </RootProvider>
       </body>
     </html>
