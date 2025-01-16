@@ -6,10 +6,10 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import Image from 'next/image';
+import { useRef } from 'react';
  
 
-interface StudyRoom {
-    id: number;
+interface StudyRoom {  
     title: string;
     thumbnail: string;
     locality: string;
@@ -18,7 +18,7 @@ interface StudyRoom {
     entireMinPricePerHour: number;
     entireMaxHeadcount: number;
     starAvg: number;
-    studyBookmarkId: number;
+    studyBookmarkId: number | null;
     tags: {
         studyRoomTagId: number;
         tag: string;
@@ -26,21 +26,20 @@ interface StudyRoom {
 }
 
 interface SlideItemProps {  
-    slideData: {
-        data: StudyRoom[];
-    }
+    slideData: StudyRoom[];
 }
 
 export default function SlideItem({ slideData }: SlideItemProps) {
-    // console.log('slideData type:', typeof slideData.data, 'value:', slideData.data);
+    // console.log('slideData type:', typeof slideData, 'value:', slideData);
 
-    const slides = Array.isArray(slideData) ? slideData : Object.values(slideData.data); 
+    const prevRef = useRef(null);
+    const nextRef = useRef(null);
 
-    if(!slideData.data) {
+    if(!slideData) {
         return <div>데이터가 없습니다.</div>;
     }
 
-    if(slideData.data.length === 0) {
+    if(slideData.length === 0) {
         return <div>표시할 데이터가 없습니다.</div>;
     }
     
@@ -51,7 +50,10 @@ export default function SlideItem({ slideData }: SlideItemProps) {
                 modules={[Navigation, Autoplay]}
                 loop={true}  
                 spaceBetween={20}   
-                navigation={true}  
+                navigation={{
+                    prevEl: prevRef.current,
+                    nextEl: nextRef.current,
+                }}
                 slidesPerView="auto"
                 // autoplay={{
                 //     delay: 2500,
@@ -72,14 +74,18 @@ export default function SlideItem({ slideData }: SlideItemProps) {
                     }
                 }}
             >
-                {slides.map((slide: StudyRoom, index: number) => (
+                {slideData.map((item, index) => (
                     <SwiperSlide key={`slide-${index}`}>          
                         <div>
-                            <div>{slide.title}</div> 
+                            <div>{item.title}</div> 
                         </div>
                     </SwiperSlide>  
                 ))}
             </Swiper>
+            <div className="swiper-navigation">
+                <button ref={prevRef} className="swiper-button-prev"> </button>
+                <button ref={nextRef} className="swiper-button-next"></button>
+            </div>
         </div>
     )
 }   

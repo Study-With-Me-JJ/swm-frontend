@@ -9,7 +9,6 @@ import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 
 interface StudyRoom {
-  id: number;
   title: string;
   thumbnail: string;
   locality: string;
@@ -18,7 +17,7 @@ interface StudyRoom {
   entireMinPricePerHour: number;
   entireMaxHeadcount: number;
   starAvg: number;
-  studyBookmarkId: number;
+  studyBookmarkId: number | null;
   tags: {
     studyRoomTagId: number;
     tag: string;
@@ -26,20 +25,38 @@ interface StudyRoom {
 }
 
 interface StudyRoomResponse {
-  data: StudyRoom[];
-} 
+    data: StudyRoom[];
+    numberOfElements: number;
+    totalPages: number;
+    totalElements: number;
+    hasNext: boolean;
+}
 
-export default function Home() {   
-  const [studyRooms, setStudyRooms] = useState<StudyRoom[]>([]);
+export default function Home() {
+  const [studyRooms, setStudyRooms] = useState<StudyRoomResponse>({
+    data: [], 
+    numberOfElements: 0,
+    totalPages: 0,
+    totalElements: 0,
+    hasNext: false
+  });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchStudyRooms = async () => {
       try {
-        const response = await axiosInstance.get<StudyRoomResponse>(API_ENDPOINTS.STUDY_ROOM.LIST);
-        setStudyRooms(response.data.data);
+        const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST); 
+        // console.log('API 응답:', response.data); 
+        setStudyRooms({
+          data: response.data.data.data,
+          numberOfElements: response.data.data.numberOfElements,
+          totalPages: response.data.data.totalPages,
+          totalElements: response.data.data.totalElements,
+          hasNext: response.data.data.hasNext
+        });
         setIsLoading(false);
+        
       } catch (error) {
         if(error instanceof AxiosError) {
           console.error(error.response?.data);
@@ -52,7 +69,7 @@ export default function Home() {
     fetchStudyRooms();
   }, []);
 
-  // console.log('console',studyRooms);
+  // console.log('console',studyRooms.data);
 
   const categories = ['프론트엔드', '백엔드', '앱', '디자인', '머신러닝'];
 
@@ -81,8 +98,10 @@ export default function Home() {
               <div>로딩 중...</div>
             ) : error ? (
               <div>{error}</div>
+            ) : studyRooms.data.length > 0 ? (
+              <SlideItem slideData={studyRooms.data} />
             ) : (
-              <SlideItem slideData={studyRooms} />
+              <div>스터디룸이 없습니다.</div>
             )}
           </div>
         </article>
