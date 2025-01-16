@@ -103,7 +103,10 @@ body {
   }
 
   .swiper-navigation {
-    @apply flex items-center justify-center gap-[20px];
+    @apply flex items-center justify-center gap-[5px];
+    position: absolute;
+    top: 0;
+    right: 0;
   } 
 
   .swiper-button-prev,

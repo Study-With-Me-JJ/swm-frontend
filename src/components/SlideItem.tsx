@@ -82,8 +82,8 @@ export default function SlideItem({ slideData }: SlideItemProps) {
                     </SwiperSlide>  
                 ))}
             </Swiper>
-            <div className="swiper-navigation">
-                <button ref={prevRef} className="swiper-button-prev"> </button>
+            <div className="swiper-navigation top-4">
+                <button ref={prevRef} className="swiper-button-prev"></button>
                 <button ref={nextRef} className="swiper-button-next"></button>
             </div>
         </div>

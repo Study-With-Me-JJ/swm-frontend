@@ -85,13 +85,12 @@ export default function Home() {
         </div> 
     </div>
     <section className='pt-[100px] pb-[200px] max-w-screen-xl px-5 xl:px-0 mx-auto flex flex-col gap-[100px]'> 
-        <article>
+        <article className='relative'>
           <div className='flex items-center justify-between mb-[40px]'>
             <div className='flex items-center gap-[20px] '>
               <h3 className='text-left text-2xl font-semibold text-black'>요즘 뜨는 스터디룸</h3>
               <Link href='/studyroom' className='flex items-center gap-[6px] text-base font-semibold text-gray-light'>전체보기 <Image src="/icons/icon_gry_18_back.svg" alt="arrow-right" width={14} height={14}/></Link>
             </div>
-            <div>슬라이드이동버튼</div>
           </div>
           <div className='flex items-center gap-[20px]'>
           {isLoading ? (
