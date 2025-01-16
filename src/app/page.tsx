@@ -98,7 +98,7 @@ export default function Home() {
             ) : error ? (
               <div>{error}</div>
             ) : studyRooms.data.length > 0 ? (
-              <SlideItem slideData={studyRooms.data} />
+              <SlideItem slideData={studyRooms.data} useSlider={true}/>
             ) : (
               <div>스터디룸이 없습니다.</div>
             )}

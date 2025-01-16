@@ -27,9 +27,10 @@ interface StudyRoom {
 
 interface SlideItemProps {  
     slideData: StudyRoom[];
+    useSlider?:boolean;
 }
 
-export default function SlideItem({ slideData }: SlideItemProps) {
+export default function SlideItem({ slideData, useSlider=false }: SlideItemProps) {
     // console.log('slideData type:', typeof slideData, 'value:', slideData);
 
     const prevRef = useRef(null);
@@ -42,8 +43,20 @@ export default function SlideItem({ slideData }: SlideItemProps) {
     if(slideData.length === 0) {
         return <div>표시할 데이터가 없습니다.</div>;
     }
-    
-    return (
+
+   const ItemContent = ({slideData}:SlideItemProps) => {
+        return (
+            <>
+                {slideData.map((item, index) => (
+                    <div key={`item-${index}`}>
+                        <div>{item.title}</div>
+                    </div>
+                ))}
+            </>
+        );
+    }
+     
+    return useSlider ? (
         <div className="swiper-container max-w-screen-xl">
             <Swiper  
                 className="my-swiper"
@@ -76,9 +89,7 @@ export default function SlideItem({ slideData }: SlideItemProps) {
             >
                 {slideData.map((item, index) => (
                     <SwiperSlide key={`slide-${index}`}>          
-                        <div>
-                            <div>{item.title}</div> 
-                        </div>
+                        <ItemContent slideData={slideData} />
                     </SwiperSlide>  
                 ))}
             </Swiper>
@@ -86,6 +97,12 @@ export default function SlideItem({ slideData }: SlideItemProps) {
                 <button ref={prevRef} className="swiper-button-prev"></button>
                 <button ref={nextRef} className="swiper-button-next"></button>
             </div>
+        </div>
+    ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-screen-xl w-full">
+            {slideData.map((item, index) => (
+                <ItemContent slideData={slideData} />
+            ))} 
         </div>
     )
 }   
