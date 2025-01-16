@@ -4,7 +4,7 @@ import axiosInstance from '@/lib/api/axios';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import SlideItem from '@/components/SlideItem';
+import ListItem from '@/components/ListItem';
 import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 
@@ -84,7 +84,7 @@ export default function Home() {
             ))}  
         </div> 
     </div>
-    <section className='pt-[100px] pb-[200px] max-w-screen-xl px-5 xl:px-0 mx-auto flex flex-col gap-[100px]'> 
+    <section className='pt-[100px] pb-[200px] max-w-screen-xl px-5 xl:px-0 mx-auto flex flex-col gap-[80px]'> 
         <article className='relative'>
           <div className='flex items-center justify-between mb-[40px]'>
             <div className='flex items-center gap-[20px] '>
@@ -98,7 +98,7 @@ export default function Home() {
             ) : error ? (
               <div>{error}</div>
             ) : studyRooms.data.length > 0 ? (
-              <SlideItem slideData={studyRooms.data} useSlider={true}/>
+              <ListItem slideData={studyRooms.data} useSlider={true}/>
             ) : (
               <div>스터디룸이 없습니다.</div>
             )}
