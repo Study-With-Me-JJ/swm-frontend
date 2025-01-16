@@ -16,6 +16,22 @@ export default function Header() {
     { name: '외부 스터디', href: '/external-studies' },
   ];
 
+  const logoOnlyPaths = ['/login/', '/join/', '/find-id/', '/find-password/'];
+
+  if (logoOnlyPaths.includes(path)) {
+    return (
+      <div className='border-b-2 border-border'>
+        <div className='flex justify-between items-center py-5 max-w-screen-xl px-5 xl:px-0 mx-auto'>
+          <h2 className='font-semibold text-2xl text-black w-[197px]'>
+            <Link href='/'>
+              <Image src={logo} alt='study with me logo' width={182} height={28} />
+            </Link>
+          </h2>
+        </div>
+      </div>
+    );
+  }
+
   return (
    <div className='border-b-2 border-border'>
       <div className='flex justify-between items-center py-5 max-w-screen-xl px-5 xl:px-0 mx-auto'>
