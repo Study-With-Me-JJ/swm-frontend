@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination'; 
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import Image from 'next/image';
  
 
@@ -35,6 +35,8 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
 
     const prevRef = useRef(null);
     const nextRef = useRef(null);
+
+    const [swiperLoaded, setSwiperLoaded] = useState(false);
 
     if(!slideData) {
         return <div>데이터가 없습니다.</div>;
@@ -80,6 +82,16 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
                     prevEl: prevRef.current,
                     nextEl: nextRef.current,
                 }}
+                onSwiper={(swiper) => { 
+                    if (!swiper.navigation) return;
+                    setTimeout(() => {
+                        if (prevRef.current && nextRef.current && swiper.navigation) {
+                            swiper.navigation.init();
+                            swiper.navigation.update();
+                        }
+                    });
+                    setSwiperLoaded(true);
+                }}
                 slidesPerView="auto" 
                 breakpoints={{  
                     320: {
@@ -102,10 +114,12 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
                     </SwiperSlide>  
                 ))}
             </Swiper>
-            <div className="swiper-navigation top-4">
-                <button ref={prevRef} className="swiper-button-prev"></button>
-                <button ref={nextRef} className="swiper-button-next"></button>
-            </div>
+            {swiperLoaded && (
+                <div className="swiper-navigation top-4">
+                    <button ref={prevRef} className="swiper-button-prev"></button>
+                    <button ref={nextRef} className="swiper-button-next"></button>
+                </div>
+            )}
         </div>
     ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-screen-xl w-full">
