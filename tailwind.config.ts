@@ -29,6 +29,9 @@ const config: Config = {
 			blue: {
 				'example': '#4998E9',
 			},
+			red: {
+				'error': '#E0143C'
+			}
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
