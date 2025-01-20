@@ -6,6 +6,17 @@ export interface ApiErrorResponse {
   status: boolean;
 }
 
+export function isApiErrorResponse(error: unknown): error is ApiErrorResponse {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    'message' in error &&
+    'path' in error &&
+    'status' in error
+  );
+}
+
 export interface HttpError extends Error {
   statusCode: number;
 }
