@@ -5,7 +5,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination'; 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Image from 'next/image'; 
 import { NavigationOptions } from 'swiper/types';
 import { Swiper as SwiperType } from 'swiper';
@@ -34,15 +34,23 @@ interface SlideItemProps {
  
 export default function ListItem({ slideData, useSlider=false }: SlideItemProps) {
     // console.log('slideData type:', typeof slideData, 'value:', slideData);
+
+    const [pageLoaded, setPageLoaded] = useState(false);
   
+    useEffect(() => { 
+        setPageLoaded(true);
+    }, []);  
+
     useEffect(() => {
-        // Swiper 인스턴스가 생성된 후에 실행됩니다
-        const swiperElement = document.querySelector('.swiper');
-        const swiper =(swiperElement as unknown as { swiper: SwiperType })?.swiper;
-        if (swiper) {
-            swiper.update(); // Swiper 업데이트
+        if (typeof window !== 'undefined') {
+            const swiperElement = document.querySelector('.swiper');
+            const swiper = (swiperElement as unknown as { swiper: SwiperType })?.swiper;
+            if (swiper) {
+                swiper.update(); 
+                swiper.navigation.update();
+            }
         }
-      }, [slideData]); // slideData가 변경될 때마다 실행
+    }, [slideData, pageLoaded]);
 
     const prevRef = useRef<HTMLButtonElement>(null);
     const nextRef = useRef<HTMLButtonElement>(null); 
@@ -106,6 +114,7 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
     if (useSlider) {
         return (
             <div className="swiper-container max-w-screen-xl">
+                {pageLoaded && (
                 <Swiper  
                     className="my-swiper"
                     modules={[Navigation]}
@@ -117,6 +126,7 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
                     navigation={{
                         prevEl: prevRef.current,
                         nextEl: nextRef.current,
+                        enabled: true,
                     } as NavigationOptions}
                     onSwiper={(swiper) => {
                         setTimeout(() => {
@@ -152,8 +162,9 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
                     <SwiperSlide key={`slide-${index}`}>          
                         <ItemContent item={item} />
                     </SwiperSlide>  
-                ))}
+                    ))}
                 </Swiper>
+                )}
             <div className="swiper-navigation top-4">
                 <button ref={prevRef} className="swiper-button-prev"></button>
                 <button ref={nextRef} className="swiper-button-next"></button>
