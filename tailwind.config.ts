@@ -25,6 +25,9 @@ const config: Config = {
 				'default': '#565656',
 				'light': '#a5a5a5',
   			},
+			link: {
+				'default': '#4998E9',
+			}
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

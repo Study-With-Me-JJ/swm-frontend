@@ -9,6 +9,7 @@ import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 
 interface StudyRoom {
+  studyRoomId: number;
   title: string;
   thumbnail: string;
   locality: string;
@@ -47,9 +48,13 @@ export default function Home() {
     const fetchStudyRooms = async () => {
       try {
         const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST); 
-        // console.log('API 응답:', response.data); 
+        // console.log('API 응답:', response.data);
+        
+        const sortedData = response.data.data.data.sort((a, b) => b.likeCount - a.likeCount);
+        // console.log('sortedData',sortedData);
+
         setStudyRooms({
-          data: response.data.data.data,
+          data: sortedData,
           numberOfElements: response.data.data.numberOfElements,
           totalPages: response.data.data.totalPages,
           totalElements: response.data.data.totalElements,
