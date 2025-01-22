@@ -176,7 +176,7 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 max-w-screen-xl w-full">
                 {slideData.map((item, index) => (
                     <div key={`item-${index}`}>
-                        <div>{item.title}</div>
+                        <ItemContent item={item} />
                     </div>
                 ))}
             </div>
