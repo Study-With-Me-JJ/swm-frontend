@@ -9,7 +9,9 @@ import { useEffect, useRef } from 'react';
 import Image from 'next/image'; 
 import { NavigationOptions } from 'swiper/types';
 import { Swiper as SwiperType } from 'swiper';
+import Link from 'next/link';
 interface StudyRoom {  
+    studyRoomId: number;
     title: string;
     thumbnail: string;
     locality: string;
@@ -58,20 +60,43 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
     }
 
     const ItemContent = ({item}:ItemContentProps) => {
+        const handleCopy = (phoneNumber: string) => {
+            navigator.clipboard.writeText(phoneNumber)
+            .then(()=> { 
+                alert('복사되었습니다.');
+            })
+            .catch(()=> {
+                alert('복사에 실패했습니다.');
+            })
+        }
         return (
             <>
                 <div>
                     <div className="rounded-[8px] relative w-full aspect-[4/1.55] overflow-hidden">
+                        <Link href={`/studyroom/${item.studyRoomId}`}>
                         {item.thumbnail ? (
                             // <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
                             <Image src={'/no-image.png'} alt={item.title} fill className="object-cover" />
                         ) : (
                             <Image src={'/no-image.png'} alt={item.title} fill className="object-cover" />
                         )}
+                        </Link>
                     </div>
                     <div className="pt-[25px]">
-                        <div>{item.title}</div>
-                        <div>{item.locality}</div>
+                        <div className='flex items-center justify-between gap-1'>
+                            <Link href={`/studyroom/${item.studyRoomId}`} className='text-[20px] font-bold text-black'>{item.title}</Link>
+                            <div className='flex items-center gap-[10px]'>
+                                <button className='text-[12px] font-semibold text-link-default px-[10px] py-[6px] rounded-[4px] border border-link-default'>홈페이지</button>
+                                <button className='text-[12px] font-semibold text-link-default px-[10px] py-[6px] rounded-[4px] border border-link-default'>지도에서 보기</button>
+                            </div>                            
+                        </div>          
+                        <div className='pt-[16px] flex gap-[6px] flex-col'>
+                            <p className='flex items-center gap-[4px] text-[14px] font-regular text-black'><Image src={'/icons/icon_pin.svg'} alt="location" width={20} height={20}/>{item.locality}</p>
+                            <p className='flex items-center gap-[4px] text-[14px] font-regular text-black'><Image src={'/icons/icon_call.svg'} alt="call" width={20} height={20}/>000-000-0000 <button onClick={()=> handleCopy('000-000-0000')}><Image src={'/icons/icon_blue_18_copy.svg'} alt="복사하기" width={20} height={20}/></button></p>
+                        </div>
+                        <div className='pt-[16px]'>
+                            <p className='text-[12px] font-regular text-[#828282]'>종로3가 5번출구로 나오셔서 낙원동 98-1로 찾아오시면됩니다. 약 70m</p>
+                        </div>
                     </div>
                 </div>
             </>

@@ -30,7 +30,10 @@ const config: Config = {
 				'example': '#4998E9',
 			},
 			red: {
-				'error': '#E0143C'
+				'error': '#E0143C',
+			},
+			link: {
+				'default': '#4998E9',
 			}
   		},
   		borderRadius: {
