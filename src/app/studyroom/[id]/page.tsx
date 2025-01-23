@@ -2,62 +2,79 @@
 import { axiosInstance } from "@/lib/api/axios";
 import { API_ENDPOINTS } from "@/lib/api/endpoints"; 
 
-interface StudyRoomListItem {
+interface StudyRoom {
     studyRoomId: number;
-    title: string; 
+    title: string;
+    thumbnail: string;
+    locality: string;
+    likeCount: number;
+    reviewCount: number;
+    entireMinPricePerHour: number;
+    entireMaxHeadcount: number;
+    starAvg: number;
+    studyBookmarkId: number | null;
+    tags: {
+        studyRoomTagId: number;
+        tag: string;
+    }[];
 }
 
-export async function generateStaticParams() {  
-    try {   
-        const response = await axiosInstance.get(API_ENDPOINTS.STUDY_ROOM.LIST);
-        const studyRooms = Array.isArray(response.data) ? response.data as StudyRoomListItem[] : response.data.content as StudyRoomListItem[] || [];
+interface StudyRoomResponse {
+    data: StudyRoom[];
+    numberOfElements: number;
+    totalPages: number;
+    totalElements: number;
+    hasNext: boolean;
+}
 
-        if (studyRooms.length === 0) {
-            console.warn('스터디룸 목록이 비어있습니다.');
-            return [];
+
+const getAllStudyRooms = async () => {
+    const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST);
+    return response.data.data.data;
+}
+
+interface StudyRoomListItem {
+    studyRoomId: number;
+    title: string;
+}
+
+export async function generateStaticParams() {
+    try {
+        const studyRoomsData = await getAllStudyRooms();
+        console.log('생성될 정적 경로:', studyRoomsData);
+
+        if (!Array.isArray(studyRoomsData) || studyRoomsData.length === 0) {
+            console.warn('스터디룸 데이터가 없습니다. 기본 경로만 생성합니다.');
+            return []; 
         }
 
-        const params = studyRooms
-            .filter((item: any) => item.studyRoomId != null)
-            .map((item: any) => ({ 
-                id: item.studyRoomId.toString()  
-            }));
+        const params = studyRoomsData.map((room: StudyRoomListItem) => ({
+            id: room.studyRoomId.toString()
+        }));
 
+        console.log('최종 생성된 params:', params);
         return params;
+        
     } catch (error) {
-        console.error('Error generating static params:', error);
-        return [ ];
+        console.error('정적 경로 생성 실패:', error);
+        throw error;
     }
 }
 
 interface StudyRoom {
-    studyRoomId: number;
-    title: string; 
+    title: string;
 }
 
 export default async function StudyRoomDetailPage({ params }: { params: { id: string } }) {
-    try {
-        const response = await axiosInstance.get(API_ENDPOINTS.STUDY_ROOM.DETAIL(Number(params.id)));
-        const studyRoom: StudyRoom = response.data; 
+    const response = await axiosInstance.get(API_ENDPOINTS.STUDY_ROOM.DETAIL(Number(params.id)));
+    const studyRoom: StudyRoom = response.data; 
 
-        if (!studyRoom) {
-            throw new Error('스터디룸을 찾을 수 없습니다.');
-        }
-
-        return (
-            <div>
-                <h1>StudyRoomDetailPage</h1>
-                <p>{params.id}</p>
-                <p>{studyRoom.title}</p>
-            </div>
-        );
-    } catch (error) {
-        console.error('스터디룸 상세 정보를 불러오는데 실패했습니다:', error);
-        return (
-            <div>
-                <h1>에러가 발생했습니다</h1>
-                <p>스터디룸 정보를 불러오는데 실패했습니다. 잠시 후 다시 시도해주세요.</p>
-            </div>
-        );
-    }
+    return (
+        <div>
+            <h1>StudyRoomDetailPage</h1>
+            <p>{params.id}</p>
+            <p>{studyRoom.title}</p>
+        </div>
+    );
+    
 }
