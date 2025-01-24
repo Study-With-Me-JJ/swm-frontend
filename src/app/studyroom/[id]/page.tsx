@@ -19,36 +19,20 @@ interface StudyRoom {
     }[];
 }
 
-interface StudyRoomResponse {
-    data: StudyRoom[];
-    numberOfElements: number;
-    totalPages: number;
-    totalElements: number;
-    hasNext: boolean;
-}
+// interface StudyRoomResponse {
+//     data: StudyRoom[];
+//     numberOfElements: number;
+//     totalPages: number;
+//     totalElements: number;
+//     hasNext: boolean;
+// }
 
 
 export async function generateStaticParams() {
     try {
-        const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST,{
-            headers: {
-                'Cache-Control': 'no-cache',
-                'Pragma': 'no-cache',
-                'Expires': '0'
-            }
-        });
-        const studyRooms = response.data.data.data;
-
-        if (!studyRooms || studyRooms.length === 0) {
-            console.warn('스터디룸 데이터가 비어있습니다.');
-            return [];
-        }
-
-        const params = studyRooms.map((room: StudyRoom) => ({
-            id: room.studyRoomId.toString()
-        }));        
-        console.log('Generated params:', params); 
-        return params;
+        return [
+            { id: '287' },
+        ]
     } catch (error) {
         console.error('스터디룸 목록 가져오기 실패:', error);
         return [];
