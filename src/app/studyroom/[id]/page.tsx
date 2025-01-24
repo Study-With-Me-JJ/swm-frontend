@@ -1,7 +1,7 @@
 
 import { axiosInstance } from "@/lib/api/axios";
-import { API_ENDPOINTS } from "@/lib/api/endpoints"; 
-
+import { API_ENDPOINTS } from "@/lib/api/endpoints";    
+import { notFound } from "next/navigation";
 interface StudyRoom {
     studyRoomId: number;
     title: string;
@@ -30,7 +30,13 @@ interface StudyRoomResponse {
 
 export async function generateStaticParams() {
     try {
-        const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST);
+        const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST,{
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        });
         const studyRooms = response.data.data.data;
 
         if (!studyRooms || studyRooms.length === 0) {
@@ -53,6 +59,10 @@ export default async function StudyRoomDetailPage({ params }: { params: { id: st
     try {
         const response = await axiosInstance.get<{message: string, data: StudyRoom}>(API_ENDPOINTS.STUDY_ROOM.DETAIL.replace(':studyRoomId', params.id)); 
         const studyRoom = response.data.data;
+
+        if (!studyRoom) {
+            notFound();
+        }
 
         return (
             <div>
