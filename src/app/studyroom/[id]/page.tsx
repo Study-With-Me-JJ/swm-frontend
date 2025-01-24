@@ -51,8 +51,7 @@ export async function generateStaticParams() {
 
 export default async function StudyRoomDetailPage({ params }: { params: { id: string } }) {
     try {
-        const response = await axiosInstance.get<{message: string, data: StudyRoom}>(API_ENDPOINTS.STUDY_ROOM.DETAIL(Number(params.id))
-        );
+        const response = await axiosInstance.get<{message: string, data: StudyRoom}>(API_ENDPOINTS.STUDY_ROOM.DETAIL.replace(':studyRoomId', params.id)); 
         const studyRoom = response.data.data;
 
         return (

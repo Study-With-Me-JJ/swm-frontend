@@ -73,14 +73,12 @@ export default function Home() {
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const [studyRoomsResponse, externalStudyResponse] = await Promise.all([
-          axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST),
-          axiosInstance.get<{message: string, data: ExternalStudyResponse}>(API_ENDPOINTS.EXTERNAL_STUDY.LIST)
-        ]);
-
-        const sortedData = studyRoomsResponse.data.data.data.sort((a, b) => b.likeCount - a.likeCount);
+      try { 
+        const studyRoomsResponse = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(
+          API_ENDPOINTS.STUDY_ROOM.LIST
+        );
         
+        const sortedData = studyRoomsResponse.data.data.data.sort((a, b) => b.likeCount - a.likeCount);
         setStudyRooms({
           data: sortedData,
           numberOfElements: studyRoomsResponse.data.data.numberOfElements,
@@ -88,29 +86,42 @@ export default function Home() {
           totalElements: studyRoomsResponse.data.data.totalElements,
           hasNext: studyRoomsResponse.data.data.hasNext
         });
-
-        console.log('외부 스터디 응답:', externalStudyResponse.data);
-        
-        if (externalStudyResponse.data?.data) {
-          setExternalStudy(externalStudyResponse.data.data);
-        } else {
-          console.error('외부 스터디 데이터 구조가 예상과 다릅니다:', externalStudyResponse.data);
+ 
+        try {
+          const externalStudyResponse = await axiosInstance.get<{message: string, data: ExternalStudyResponse}>(
+            API_ENDPOINTS.EXTERNAL_STUDY.LIST
+          );
+          
+          console.log('외부 스터디 요청 URL:', API_ENDPOINTS.EXTERNAL_STUDY.LIST);
+          console.log('외부 스터디 응답 전체:', externalStudyResponse);
+          
+          if (externalStudyResponse.data?.data) {
+            setExternalStudy(externalStudyResponse.data.data);
+          } else {
+            console.error('외부 스터디 데이터 구조:', externalStudyResponse.data);
+            setError('외부 스터디 데이터 구조가 올바르지 않습니다.');
+          }
+        } catch (externalError) {
+          console.error('외부 스터디 API 에러:', externalError);
+          if (externalError instanceof AxiosError) {
+            console.error('외부 스터디 상세 에러:', {
+              status: externalError.response?.status,
+              data: externalError.response?.data,
+              config: externalError.config
+            });
+          }
           setError('외부 스터디 데이터를 불러오는데 실패했습니다.');
         }
+
       } catch (error) {
-        if(error instanceof AxiosError) {
-          console.error('API 에러:', error.response?.data);
-        } else {
-          setError('데이터를 불러오는 중 오류가 발생했습니다.');
-        }
-      }
-      finally {
+        console.error('외부 스터디 데이터 불러오기 오류:', error);
+        setError('외부 스터디 데이터를 불러오는데 실패했습니다.');
+      } finally {
         setIsLoading(false);
       }
-    }
+    };
 
     fetchData();
-
   }, []);
 
   // console.log('console',studyRooms.data);
