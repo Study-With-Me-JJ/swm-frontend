@@ -29,14 +29,19 @@ interface StudyRoomResponse {
 
 export async function generateStaticParams() {
     try {
-        // 모든 스터디룸 ID 목록을 가져오는 API 호출
         const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST);
         const studyRooms = response.data.data.data;
-        
-        // 각 스터디룸의 ID를 params로 변환
-        return studyRooms.map((room: StudyRoom) => ({
+
+        if (!studyRooms || studyRooms.length === 0) {
+            console.warn('스터디룸 데이터가 비어있습니다.');
+            return [];
+        }
+
+        const params = studyRooms.map((room: StudyRoom) => ({
             id: room.studyRoomId.toString()
-        }));
+        }));        
+        console.log('Generated params:', params); 
+        return params;
     } catch (error) {
         console.error('스터디룸 목록 가져오기 실패:', error);
         return [];
