@@ -4,11 +4,12 @@ import axiosInstance from '@/lib/api/axios';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import Link from 'next/link';
 import Image from 'next/image'; 
-import ListItem from '@/components/ListItem';
+import StudyroomItem from '@/components/StudyroomItem';
+import ExternalStudyItem from '@/components/ExternalStudyItem';
 import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
 
-interface StudyRoom {
+export interface StudyRoom {
   studyRoomId: number;
   title: string;
   thumbnail: string;
@@ -32,8 +33,26 @@ interface StudyRoomResponse {
     totalElements: number;
     hasNext: boolean;
 }
+export interface ExternalStudy {
+  title: string;
+  id: string;
+  link:string;
+  roles: string[];
+  technologies: string[];
+  deadlineDate: [],
+}
+
+interface ExternalStudyResponse {
+  externalStudies: {
+    content: ExternalStudy[];
+    deadlineDate: [];
+  }
+};
+
+
 
 export default function Home() {
+  //스터디룸
   const [studyRooms, setStudyRooms] = useState<StudyRoomResponse>({
     data: [], 
     numberOfElements: 0,
@@ -41,6 +60,15 @@ export default function Home() {
     totalElements: 0,
     hasNext: false
   });
+
+  //외부스터디
+  const [externalStudy, setExternalStudy] = useState<ExternalStudyResponse>({
+    externalStudies: {
+      content: [],
+      deadlineDate: [],
+    }
+  });
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,7 +99,24 @@ export default function Home() {
         setIsLoading(false);
       }
     };
+
+    const fetchExternalStudy = async () => {
+      try {
+        const response = await axiosInstance.get<{message: string, data: ExternalStudyResponse}>(API_ENDPOINTS.EXTERNAL_STUDY.LIST);
+        console.log('response',response.data.data.externalStudies);
+        setExternalStudy(response.data.data);
+        setIsLoading(false);
+      } catch (error) {
+        if(error instanceof AxiosError) {
+          console.error(error.response?.data);
+        } else {
+          setError('외부스터디 데이터를 불러오는 중 오류가 발생했습니다.');
+        }
+        setIsLoading(false);
+      }
+    };
     fetchStudyRooms();
+    fetchExternalStudy();
   }, []);
 
   // console.log('console',studyRooms.data);
@@ -103,16 +148,29 @@ export default function Home() {
             ) : error ? (
               <div>{error}</div>
             ) : studyRooms.data.length > 0 ? (
-              <ListItem slideData={studyRooms.data} useSlider={true}/>
+              <StudyroomItem slideData={studyRooms.data} useSlider={true}/>
             ) : (
               <div>스터디룸이 없습니다.</div>
             )}
           </div>
         </article>
-        <article>
-          <h3 className='text-left text-2xl font-semibold text-black mb-[40px]'>곧 마감되는 스터디</h3>
+        <article className='relative'>
+          <div className='flex items-center justify-between mb-[40px]'>
+            <div className='flex items-center gap-[20px] '>
+              <h3 className='text-left text-2xl font-semibold text-black'>곧 마감되는 스터디</h3>
+              <Link href='/external-studies' className='flex items-center gap-[6px] text-base font-semibold text-gray-light'>전체보기 <Image src="/icons/icon_gry_18_back.svg" alt="arrow-right" width={14} height={14}/></Link>
+            </div>
+          </div>
           <div className='flex items-center gap-[20px]'>
-            <div className=' '></div>
+            {isLoading ? (
+              <div>로딩 중...</div>
+            ) : error ? (
+              <div>{error}</div>
+            ) : externalStudy.externalStudies.content && externalStudy.externalStudies.content.length > 0 ? (
+              <ExternalStudyItem slideData={externalStudy.externalStudies.content} useSlider={true}/>
+            ) : (
+              <div>스터디가 없습니다.</div>
+            )}
           </div>
         </article>
     </section>

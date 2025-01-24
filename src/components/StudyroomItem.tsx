@@ -1,7 +1,8 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
+import Link from 'next/link';
+import { useEffect, useRef, useState } from 'react';
 import { Swiper as SwiperType } from 'swiper';
 import 'swiper/css';
 import 'swiper/css/navigation';
@@ -10,52 +11,42 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { NavigationOptions } from 'swiper/types';
 
-interface StudyRoom {
-  studyRoomId: number;
-  title: string;
-  thumbnail: string;
-  locality: string;
-  likeCount: number;
-  reviewCount: number;
-  entireMinPricePerHour: number;
-  entireMaxHeadcount: number;
-  starAvg: number;
-  studyBookmarkId: number | null;
-  tags: {
-    studyRoomTagId: number;
-    tag: string;
-  }[];
-}
+import { StudyRoom } from '@/types/api/study-rooms';
 
-interface SlideItemProps {
+export interface SlideItemProps {
   slideData: StudyRoom[];
   useSlider?: boolean;
 }
 
-export default function ListItem({
+export default function StudyroomItem({
   slideData,
   useSlider = false,
 }: SlideItemProps) {
-  // console.log('slideData type:', typeof slideData, 'value:', slideData);
+  // console.log('slideData type ff:', typeof slideData, 'value:', slideData);
+
+  const [pageLoaded, setPageLoaded] = useState(false);
 
   useEffect(() => {
-    // Swiper 인스턴스가 생성된 후에 실행됩니다
-    const swiperElement = document.querySelector('.swiper');
-    const swiper = (swiperElement as unknown as { swiper: SwiperType })?.swiper;
-    if (swiper) {
-      swiper.update(); // Swiper 업데이트
+    setPageLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const swiperElement = document.querySelector('.swiper');
+      const swiper = (swiperElement as unknown as { swiper: SwiperType })
+        ?.swiper;
+      if (swiper) {
+        swiper.update();
+        swiper.navigation.update();
+      }
     }
-  }, [slideData]); // slideData가 변경될 때마다 실행
+  }, [slideData, pageLoaded]);
 
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
 
   if (!slideData) {
     return <div>데이터가 없습니다.</div>;
-  }
-
-  if (slideData.length === 0) {
-    return <div>표시할 데이터가 없습니다.</div>;
   }
 
   interface ItemContentProps {
@@ -130,8 +121,8 @@ export default function ListItem({
                   width={20}
                   height={20}
                 />
-                000-000-0000{' '}
-                <button onClick={() => handleCopy('000-000-0000')}>
+                {item.phoneNumber}
+                <button onClick={() => handleCopy(item.phoneNumber)}>
                   <Image
                     src={'/icons/icon_blue_18_copy.svg'}
                     alt="복사하기"
@@ -156,56 +147,59 @@ export default function ListItem({
   if (useSlider) {
     return (
       <div className="swiper-container max-w-screen-xl">
-        <Swiper
-          className="my-swiper"
-          modules={[Navigation]}
-          loop={true}
-          spaceBetween={20}
-          observer={true}
-          observeParents={true}
-          watchOverflow={true}
-          navigation={
-            {
-              prevEl: prevRef.current,
-              nextEl: nextRef.current,
-            } as NavigationOptions
-          }
-          onSwiper={(swiper) => {
-            setTimeout(() => {
-              swiper.update();
-            }, 100);
-          }}
-          onBeforeInit={(swiper) => {
-            if (typeof swiper.params.navigation !== 'boolean') {
-              const nav = swiper.params.navigation;
-              if (nav) {
-                nav.prevEl = prevRef.current;
-                nav.nextEl = nextRef.current;
-              }
+        {pageLoaded && (
+          <Swiper
+            className="my-swiper"
+            modules={[Navigation]}
+            loop={true}
+            spaceBetween={20}
+            observer={true}
+            observeParents={true}
+            watchOverflow={true}
+            navigation={
+              {
+                prevEl: prevRef.current,
+                nextEl: nextRef.current,
+                enabled: true,
+              } as NavigationOptions
             }
-          }}
-          slidesPerView="auto"
-          breakpoints={{
-            320: {
-              slidesPerView: 1,
-              spaceBetween: 20,
-            },
-            768: {
-              slidesPerView: 2,
-              spaceBetween: 20,
-            },
-            1024: {
-              slidesPerView: 3,
-              spaceBetween: 20,
-            },
-          }}
-        >
-          {slideData.map((item, index) => (
-            <SwiperSlide key={`slide-${index}`}>
-              <ItemContent item={item} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+            onSwiper={(swiper) => {
+              setTimeout(() => {
+                swiper.update();
+              }, 100);
+            }}
+            onBeforeInit={(swiper) => {
+              if (typeof swiper.params.navigation !== 'boolean') {
+                const nav = swiper.params.navigation;
+                if (nav) {
+                  nav.prevEl = prevRef.current;
+                  nav.nextEl = nextRef.current;
+                }
+              }
+            }}
+            slidesPerView="auto"
+            breakpoints={{
+              320: {
+                slidesPerView: 1,
+                spaceBetween: 20,
+              },
+              768: {
+                slidesPerView: 2,
+                spaceBetween: 20,
+              },
+              1024: {
+                slidesPerView: 3,
+                spaceBetween: 20,
+              },
+            }}
+          >
+            {slideData.map((item, index) => (
+              <SwiperSlide key={`slide-${index}`}>
+                <ItemContent item={item} />
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        )}
         <div className="swiper-navigation top-4">
           <button ref={prevRef} className="swiper-button-prev"></button>
           <button ref={nextRef} className="swiper-button-next"></button>
@@ -217,7 +211,7 @@ export default function ListItem({
       <div className="grid w-full max-w-screen-xl grid-cols-1 gap-5 md:grid-cols-2 lg:grid-cols-3">
         {slideData.map((item, index) => (
           <div key={`item-${index}`}>
-            <div>{item.title}</div>
+            <ItemContent item={item} />
           </div>
         ))}
       </div>
