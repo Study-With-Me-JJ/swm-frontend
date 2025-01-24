@@ -10,29 +10,14 @@ import Image from 'next/image';
 import { NavigationOptions } from 'swiper/types';
 import { Swiper as SwiperType } from 'swiper';
 import Link from 'next/link';
-interface StudyRoom {  
-    studyRoomId: number;
-    title: string;
-    thumbnail: string;
-    locality: string;
-    likeCount: number;
-    reviewCount: number;
-    entireMinPricePerHour: number;
-    entireMaxHeadcount: number;
-    starAvg: number;
-    studyBookmarkId: number | null;
-    tags: {
-        studyRoomTagId: number;
-        tag: string;
-    }[];
-}
+import { ExternalStudy } from '@/app/page';
 
 interface SlideItemProps {  
-    slideData: StudyRoom[];
+    slideData: ExternalStudy[];
     useSlider?: boolean;
 }
  
-export default function ListItem({ slideData, useSlider=false }: SlideItemProps) {
+export default function ExternalStudyItem({ slideData, useSlider=false }: SlideItemProps) {
     // console.log('slideData type:', typeof slideData, 'value:', slideData);
 
     const [pageLoaded, setPageLoaded] = useState(false);
@@ -64,48 +49,28 @@ export default function ListItem({ slideData, useSlider=false }: SlideItemProps)
     } 
 
     interface ItemContentProps {
-        item: StudyRoom;  
+        item: ExternalStudy;  
     }
 
     const ItemContent = ({item}:ItemContentProps) => {
-        const handleCopy = (phoneNumber: string) => {
-            navigator.clipboard.writeText(phoneNumber)
-            .then(()=> { 
-                alert('복사되었습니다.');
-            })
-            .catch(()=> {
-                alert('복사에 실패했습니다.');
-            })
-        }
+        
         return (
             <>
-                <div>
-                    <div className="rounded-[8px] relative w-full aspect-[4/1.55] overflow-hidden">
-                        <Link href={`/studyroom/${item.studyRoomId}`}>
-                        {item.thumbnail ? (
-                            // <Image src={item.thumbnail} alt={item.title} fill className="object-cover" />
-                            <Image src={'/no-image.png'} alt={item.title} fill className="object-cover" />
-                        ) : (
-                            <Image src={'/no-image.png'} alt={item.title} fill className="object-cover" />
-                        )}
-                        </Link>
-                    </div>
-                    <div className="pt-[25px]">
-                        <div className='flex items-center justify-between gap-1'>
-                            <Link href={`/studyroom/${item.studyRoomId}`} className='text-[20px] font-bold text-black'>{item.title}</Link>
-                            <div className='flex items-center gap-[10px]'>
-                                <button className='text-[12px] font-semibold text-link-default px-[10px] py-[6px] rounded-[4px] border border-link-default'>홈페이지</button>
-                                <button className='text-[12px] font-semibold text-link-default px-[10px] py-[6px] rounded-[4px] border border-link-default'>지도에서 보기</button>
-                            </div>                            
-                        </div>          
-                        <div className='pt-[16px] flex gap-[6px] flex-col'>
-                            <p className='flex items-center gap-[4px] text-[14px] font-regular text-black'><Image src={'/icons/icon_pin.svg'} alt="location" width={20} height={20}/>{item.locality}</p>
-                            <p className='flex items-center gap-[4px] text-[14px] font-regular text-black'><Image src={'/icons/icon_call.svg'} alt="call" width={20} height={20}/>000-000-0000 <button onClick={()=> handleCopy('000-000-0000')}><Image src={'/icons/icon_blue_18_copy.svg'} alt="복사하기" width={20} height={20}/></button></p>
+                <div className='px-[24px] py-[26px] bg-[#f9f9f9] rounded-[8px]'>
+                    <div className='flex items-start justify-between gap-[8px]'>
+                        <div className='flex-shrink-0'>
+                            <span className='bg-blue-example h-[30px] box-border rounded-[16px] px-[13px] py-[9px] text-[14px] font-bold text-white'>{String(item.deadlineDate).replace(/,/g, '.') + ' 마감'}</span>
                         </div>
-                        <div className='pt-[16px]'>
-                            <p className='text-[12px] font-regular text-[#828282]'>종로3가 5번출구로 나오셔서 낙원동 98-1로 찾아오시면됩니다. 약 70m</p>
+                        <div className='flex items-center gap-[8px] flex-wrap justify-end'>
+                            {item.roles.length > 0 && item.roles.map((role, index) => (
+                                <span key={`role-${index}`} className='text-[12px] font-medium text-gray-default bg-[#e9e9e9] rounded-[4px] px-[7px] py-[5px]'>{role}</span>
+                            ))}
                         </div>
                     </div>
+                    <p className='mt-[16px] text-[20px] font-semibold text-black line-clamp-2 min-h-[60px]'>{item.title}</p>
+                    <Link href={item.link} target='_blank' className='block mt-[43px]'>
+                        <span className='flex items-center gap-[4px] text-[14px] font-bold text-blue-example'>HOLA에서 보기 <Image src='/icons/icon_blue_18_right.svg' alt='arrow-right' width={18} height={18} /></span>
+                    </Link>
                 </div>
             </>
         );

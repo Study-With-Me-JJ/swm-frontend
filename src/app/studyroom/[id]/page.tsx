@@ -27,6 +27,7 @@ interface StudyRoomResponse {
     hasNext: boolean;
 }
 
+
 export async function generateStaticParams() {
     try {
         const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST);
