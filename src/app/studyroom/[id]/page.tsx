@@ -20,9 +20,6 @@ interface StudyRoom {
 }
 
 
-
-
-
 export async function generateStaticParams() {
     return []
 }
