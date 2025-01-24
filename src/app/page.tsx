@@ -50,7 +50,6 @@ interface ExternalStudyResponse {
 };
 
 
-
 export default function Home() {
   //스터디룸
   const [studyRooms, setStudyRooms] = useState<StudyRoomResponse>({
@@ -73,50 +72,38 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchStudyRooms = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST); 
-        // console.log('API 응답:', response.data);
-        
-        const sortedData = response.data.data.data.sort((a, b) => b.likeCount - a.likeCount);
-        // console.log('sortedData',sortedData);
+        const [studyRoomsResponse, externalStudyResponse] = await Promise.all([
+          axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST),
+          axiosInstance.get<{message: string, data: ExternalStudyResponse}>(API_ENDPOINTS.EXTERNAL_STUDY.LIST)
+        ]);
 
+        const sortedData = studyRoomsResponse.data.data.data.sort((a, b) => b.likeCount - a.likeCount);
+        
         setStudyRooms({
           data: sortedData,
-          numberOfElements: response.data.data.numberOfElements,
-          totalPages: response.data.data.totalPages,
-          totalElements: response.data.data.totalElements,
-          hasNext: response.data.data.hasNext
+          numberOfElements: studyRoomsResponse.data.data.numberOfElements,
+          totalPages: studyRoomsResponse.data.data.totalPages,
+          totalElements: studyRoomsResponse.data.data.totalElements,
+          hasNext: studyRoomsResponse.data.data.hasNext
         });
-        setIsLoading(false);
-        
-      } catch (error) {
-        if(error instanceof AxiosError) {
-          console.error(error.response?.data);
-        } else {
-          setError('스터디룸 데이터를 불러오는 중 오류가 발생했습니다.');
-        }
-        setIsLoading(false);
-      }
-    };
 
-    const fetchExternalStudy = async () => {
-      try {
-        const response = await axiosInstance.get<{message: string, data: ExternalStudyResponse}>(API_ENDPOINTS.EXTERNAL_STUDY.LIST);
-        console.log('response',response.data.data.externalStudies);
-        setExternalStudy(response.data.data);
-        setIsLoading(false);
+        setExternalStudy(externalStudyResponse.data.data);
       } catch (error) {
         if(error instanceof AxiosError) {
           console.error(error.response?.data);
         } else {
-          setError('외부스터디 데이터를 불러오는 중 오류가 발생했습니다.');
+          setError('데이터를 불러오는 중 오류가 발생했습니다.');
         }
+      }
+      finally {
         setIsLoading(false);
       }
-    };
-    fetchStudyRooms();
-    fetchExternalStudy();
+    }
+
+    fetchData();
+
   }, []);
 
   // console.log('console',studyRooms.data);
