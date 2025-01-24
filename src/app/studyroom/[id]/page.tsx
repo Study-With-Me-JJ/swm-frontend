@@ -28,27 +28,35 @@ interface StudyRoomResponse {
 }
 
 
-const getAllStudyRooms = async () => {
-    const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST);
-    return response.data.data.data;
+const getAllStudyRooms = async (): Promise<StudyRoomResponse> => {
+    try {
+        const response = await axiosInstance.get<{message: string, data: StudyRoomResponse}>(API_ENDPOINTS.STUDY_ROOM.LIST);
+        return response.data.data; // StudyRoomResponse 타입 반환
+    } catch (error) {
+        console.error('스터디룸 데이터 가져오기 실패:', error);
+        return {
+            data: [],
+            numberOfElements: 0,
+            totalPages: 0,
+            totalElements: 0,
+            hasNext: false
+        }; // 빈 StudyRoomResponse 객체 반환
+    }
 }
 
-interface StudyRoomListItem {
-    studyRoomId: number;
-    title: string;
-}
+
 
 export async function generateStaticParams() {
     try {
         const studyRoomsData = await getAllStudyRooms();
         console.log('생성될 정적 경로:', studyRoomsData);
 
-        if (!Array.isArray(studyRoomsData) || studyRoomsData.length === 0) {
-            console.warn('스터디룸 데이터가 없습니다. 기본 경로만 생성합니다.');
-            return []; 
+        if (!studyRoomsData || !Array.isArray(studyRoomsData.data)) {
+            console.warn('스터디룸 데이터가 없거나 올바르지 않은 형식입니다.');
+            return [];
         }
 
-        const params = studyRoomsData.map((room: StudyRoomListItem) => ({
+        const params = studyRoomsData.data.map((room: StudyRoom) => ({
             id: room.studyRoomId.toString()
         }));
 
@@ -57,17 +65,16 @@ export async function generateStaticParams() {
         
     } catch (error) {
         console.error('정적 경로 생성 실패:', error);
-        throw error;
+        return [];
     }
 }
 
-interface StudyRoom {
-    title: string;
-}
 
 export default async function StudyRoomDetailPage({ params }: { params: { id: string } }) {
-    const response = await axiosInstance.get(API_ENDPOINTS.STUDY_ROOM.DETAIL(Number(params.id)));
-    const studyRoom: StudyRoom = response.data; 
+    const response = await axiosInstance.get<{message: string, data: StudyRoom}>(
+        API_ENDPOINTS.STUDY_ROOM.DETAIL(Number(params.id))
+    );
+    const studyRoom = response.data.data; 
 
     return (
         <div>
