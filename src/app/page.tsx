@@ -89,10 +89,17 @@ export default function Home() {
           hasNext: studyRoomsResponse.data.data.hasNext
         });
 
-        setExternalStudy(externalStudyResponse.data.data);
+        console.log('외부 스터디 응답:', externalStudyResponse.data);
+        
+        if (externalStudyResponse.data?.data) {
+          setExternalStudy(externalStudyResponse.data.data);
+        } else {
+          console.error('외부 스터디 데이터 구조가 예상과 다릅니다:', externalStudyResponse.data);
+          setError('외부 스터디 데이터를 불러오는데 실패했습니다.');
+        }
       } catch (error) {
         if(error instanceof AxiosError) {
-          console.error(error.response?.data);
+          console.error('API 에러:', error.response?.data);
         } else {
           setError('데이터를 불러오는 중 오류가 발생했습니다.');
         }
