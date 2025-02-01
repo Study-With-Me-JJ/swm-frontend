@@ -11,6 +11,7 @@ export default function Providers({ children }: PropsWithChildren) {
         defaultOptions: {
           queries: {
             staleTime: 60 * 1000,
+            throwOnError: true,
           },
         },
       })

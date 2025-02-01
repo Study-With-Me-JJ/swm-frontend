@@ -11,6 +11,7 @@ export const StudyRoomService = {
       options: queryParams.options?.join(',')
     };
 
+    // TODO: util 함수로 빼기
     const cleanParams = Object.entries(params).reduce((acc, [key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
         acc[key] = value;

@@ -1,10 +1,11 @@
 import { ApiResponse, CursorPageData } from ".";
 
-export type SortCriteria = 
-  | 'STARS'           // 평점순
-  | 'LIKES'          // 좋아요순
-  | 'REVIEWS'        // 후기순
-  | 'PRICE';          // 가격순
+export enum SortCriteria {
+  STARS = 'STARS',
+  LIKES = 'LIKES',
+  REVIEWS = 'REVIEWS',
+  PRICE = 'PRICE'
+}
   
 
   export type StudyRoomOption = 
