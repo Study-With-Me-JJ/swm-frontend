@@ -1,8 +1,10 @@
+'use client';
+
 import { devLog } from "@/utils/dev-log";
-import { useStudyRoomQuery } from "@/queries/useStudyRoomQuery";
-import { useStudyRoomModel } from "@/hooks/models/useStudyRoomModel";
-import { StudyRoomFilter } from "@/components/study-room/study-room-filter";
-import { StudyRoomList } from "@/components/study-room/study-room-list";
+import { useStudyRoomQuery } from "@/queries";
+import { useStudyRoomModel } from "@/hooks/models";
+import { StudyRoomFilter } from "@/components/study-room/filter/study-room-filter";
+import { StudyRoomList } from "@/components/study-room/list/study-room-list";
 
 export function StudyRoomContainer() {
   const { filters, handleFilterChange } = useStudyRoomModel();

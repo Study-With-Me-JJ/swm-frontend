@@ -1,7 +1,7 @@
 import { StudyRoomListResponse } from '@/types/api';
 import { InfiniteData } from '@tanstack/react-query';
 
-interface StudyRoomListProps {
+export interface StudyRoomListProps {
   data: InfiniteData<StudyRoomListResponse> | undefined;
   hasNextPage: boolean;
   fetchNextPage: () => void;

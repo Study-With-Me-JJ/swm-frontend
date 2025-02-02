@@ -1,4 +1,4 @@
-import { useSuspenseInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { StudyRoomService } from '@/lib/api/services';
 import { StudyRoomListParams } from '@/types/api';
 
@@ -7,7 +7,7 @@ export const studyRoomQueryKey = {
 };
 
 export const useStudyRoomQuery = (filters: Partial<StudyRoomListParams>) => {
-  return useSuspenseInfiniteQuery({
+  return useInfiniteQuery({
     queryKey: studyRoomQueryKey.list(filters),
     queryFn: async ({ pageParam }: { pageParam: Pick<StudyRoomListParams, 'lastStudyRoomId' | 'lastAverageRatingValue'> | null }) => {
       const response = await StudyRoomService.getStudyRoomList({ 

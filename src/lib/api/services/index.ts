@@ -1,1 +1,1 @@
-export * from './study-room';
+export { StudyRoomService } from './study-room';

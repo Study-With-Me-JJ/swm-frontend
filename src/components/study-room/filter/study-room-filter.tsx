@@ -1,6 +1,6 @@
 import { StudyRoomListParams, SortCriteria } from '@/types/api';        
 
-interface StudyRoomFilterProps {
+export interface StudyRoomFilterProps {
   filters: Partial<StudyRoomListParams>;
   onFilterChange: (filters: Partial<StudyRoomListParams>) => void;
 }
