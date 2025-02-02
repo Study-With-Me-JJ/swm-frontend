@@ -8,48 +8,8 @@ import StudyroomItem from '@/components/StudyroomItem';
 import ExternalStudyItem from '@/components/ExternalStudyItem';
 import { AxiosError } from 'axios';
 import { useState, useEffect } from 'react';
-
-export interface StudyRoom {
-  studyRoomId: number;
-  title: string;
-  thumbnail: string;
-  locality: string;
-  phoneNumber: string;
-  likeCount: number;
-  reviewCount: number;
-  entireMinPricePerHour: number;
-  entireMaxHeadcount: number;
-  starAvg: number;
-  studyBookmarkId: number | null;
-  tags: {
-    studyRoomTagId: number;
-    tag: string;
-  }[];
-}
-
-interface StudyRoomResponse {
-    data: StudyRoom[];
-    numberOfElements: number;
-    totalPages: number;
-    totalElements: number;
-    hasNext: boolean;
-}
-export interface ExternalStudy {
-  title: string;
-  id: string;
-  link:string;
-  roles: string[];
-  technologies: string[];
-  deadlineDate: [],
-}
-
-interface ExternalStudyResponse {
-  externalStudies: {
-    content: ExternalStudy[];
-    deadlineDate: [];
-  }
-};
-
+import { StudyRoomResponse } from '@/types/api/study-rooms';
+import { ExternalStudyResponse } from '@/types/api/external-study';
 
 export default function Home() {
   //스터디룸

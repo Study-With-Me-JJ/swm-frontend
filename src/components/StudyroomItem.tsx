@@ -1,4 +1,4 @@
-'use client'
+    'use client'
  
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react'; 
@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { NavigationOptions } from 'swiper/types';
 import { Swiper as SwiperType } from 'swiper';
 import Link from 'next/link';
-import { StudyRoom } from '@/app/page';
+import { StudyRoom } from '@/types/api/study-rooms';
 
 interface SlideItemProps {  
     slideData: StudyRoom[];

@@ -10,7 +10,7 @@ import Image from 'next/image';
 import { NavigationOptions } from 'swiper/types';
 import { Swiper as SwiperType } from 'swiper';
 import Link from 'next/link';
-import { ExternalStudy } from '@/app/page';
+import { ExternalStudy } from '@/types/api/external-study';
 
 interface SlideItemProps {  
     slideData: ExternalStudy[];
