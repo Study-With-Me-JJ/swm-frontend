@@ -14,6 +14,7 @@ export interface StudyRoom {
   title: string;
   thumbnail: string;
   locality: string;
+  phoneNumber: string;
   likeCount: number;
   reviewCount: number;
   entireMinPricePerHour: number;
