@@ -85,7 +85,7 @@ export default function StudyroomItem({ slideData, useSlider=false }: SlideItemP
                         </div>          
                         <div className='pt-[16px] flex gap-[6px] flex-col'>
                             <p className='flex items-center gap-[4px] text-[14px] font-regular text-black'><Image src={'/icons/icon_pin.svg'} alt="location" width={20} height={20}/>{item.locality}</p>
-                            <p className='flex items-center gap-[4px] text-[14px] font-regular text-black'><Image src={'/icons/icon_call.svg'} alt="call" width={20} height={20}/>000-000-0000 <button onClick={()=> handleCopy('000-000-0000')}><Image src={'/icons/icon_blue_18_copy.svg'} alt="복사하기" width={20} height={20}/></button></p>
+                            <p className='flex items-center gap-[4px] text-[14px] font-regular text-black'><Image src={'/icons/icon_call.svg'} alt="call" width={20} height={20}/>{item.phoneNumber}<button onClick={()=> handleCopy(item.phoneNumber)}><Image src={'/icons/icon_blue_18_copy.svg'} alt="복사하기" width={20} height={20}/></button></p>
                         </div>
                         <div className='pt-[16px]'>
                             <p className='text-[12px] font-regular text-[#828282]'>종로3가 5번출구로 나오셔서 낙원동 98-1로 찾아오시면됩니다. 약 70m</p>
