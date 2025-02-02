@@ -1,4 +1,4 @@
-    'use client'
+'use client'
  
 import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react'; 
@@ -10,15 +10,15 @@ import Image from 'next/image';
 import { NavigationOptions } from 'swiper/types';
 import { Swiper as SwiperType } from 'swiper';
 import Link from 'next/link';
-import { StudyRoom } from '@/types/api/study-rooms';
+import { StudyRoom } from '@/types/api/study-rooms';   
 
-interface SlideItemProps {  
+export interface SlideItemProps {  
     slideData: StudyRoom[];
     useSlider?: boolean;
 }
- 
+
 export default function StudyroomItem({ slideData, useSlider=false }: SlideItemProps) {
-    // console.log('slideData type:', typeof slideData, 'value:', slideData);
+    // console.log('slideData type ff:', typeof slideData, 'value:', slideData);
 
     const [pageLoaded, setPageLoaded] = useState(false);
   
@@ -43,11 +43,7 @@ export default function StudyroomItem({ slideData, useSlider=false }: SlideItemP
     if(!slideData) {
         return <div>데이터가 없습니다.</div>;
     }
-
-    if(slideData.length === 0) {
-        return <div>표시할 데이터가 없습니다.</div>;
-    } 
-
+ 
     interface ItemContentProps {
         item: StudyRoom;  
     }
