@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation'; 
 import HeaderUser from './HeaderUser';
 import Image from 'next/image';
+import { useSelectedLayoutSegment } from 'next/navigation';
 export default function Header() {
   const path = usePathname();
-
+  const segment = useSelectedLayoutSegment();
+  console.log(segment);
   const logo = '/icons/swm_logo.svg';
 
   const navList = [
