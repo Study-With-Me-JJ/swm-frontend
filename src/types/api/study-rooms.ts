@@ -1,3 +1,8 @@
+export interface ApiResponse<T> {
+  message: string;
+  data: PaginatedResponse<T>;
+}
+
 export interface StudyRoom {
     studyRoomId: number;
     title: string;
@@ -16,10 +21,12 @@ export interface StudyRoom {
     }[];
   }
   
-  export interface StudyRoomResponse {
-      data: StudyRoom[];
-      numberOfElements: number;
-      totalPages: number;
-      totalElements: number;
-      hasNext: boolean;
-  }
+  export type StudyRoomResponse = ApiResponse<StudyRoom>;
+  
+  export interface PaginatedResponse<T> {
+    numberOfElements: number;
+    totalPages: number;
+    totalElements: number;
+    hasNext: boolean;
+    data: T[];
+}

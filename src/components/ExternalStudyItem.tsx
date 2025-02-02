@@ -18,7 +18,8 @@ interface SlideItemProps {
 }
  
 export default function ExternalStudyItem({ slideData, useSlider=false }: SlideItemProps) {
-    // console.log('slideData type:', typeof slideData, 'value:', slideData);
+    console.log('slideData type:', typeof slideData, 'value:', slideData);
+
 
     const [pageLoaded, setPageLoaded] = useState(false);
   
@@ -43,11 +44,7 @@ export default function ExternalStudyItem({ slideData, useSlider=false }: SlideI
     if(!slideData) {
         return <div>데이터가 없습니다.</div>;
     }
-
-    if(slideData.length === 0) {
-        return <div>표시할 데이터가 없습니다.</div>;
-    } 
-
+ 
     interface ItemContentProps {
         item: ExternalStudy;  
     }
