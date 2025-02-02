@@ -3,12 +3,10 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'; 
 import HeaderUser from './HeaderUser';
-import Image from 'next/image';
-import { useSelectedLayoutSegment } from 'next/navigation';
+import Image from 'next/image'; 
+
 export default function Header() {
-  const path = usePathname();
-  const segment = useSelectedLayoutSegment();
-  console.log(segment);
+  const path = usePathname();  
   const logo = '/icons/swm_logo.svg';
 
   const navList = [
@@ -41,7 +39,7 @@ export default function Header() {
           <h2 className='font-semibold text-2xl text-black w-[197px]'><Link href='/'><Image src={logo} alt='study with me logo' width={182} height={28} /></Link></h2> 
           <ul className='flex items-center'>
             {navList.map((nav, index) => (
-              <li key={index} className='px-4'><Link href={nav.href} className={`text-base font-medium text-gray-default ${path === nav.href ? "text-primary-default" : ""}`}>{nav.name}</Link></li>
+              <li key={index} className='px-4'><Link href={nav.href} className={`text-base font-medium text-gray-default ${path?.startsWith(nav.href) ? "text-primary-default" : ""}`}>{nav.name}</Link></li>
             ))} 
             </ul>
         </div>
