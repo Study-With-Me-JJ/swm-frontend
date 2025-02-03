@@ -18,7 +18,7 @@ interface SlideItemProps {
 }
  
 export default function ExternalStudyItem({ slideData, useSlider=false }: SlideItemProps) {
-    console.log('slideData type:', typeof slideData, 'value:', slideData);
+    // console.log('slideData type:', typeof slideData, 'value:', slideData);
 
 
     const [pageLoaded, setPageLoaded] = useState(false);
