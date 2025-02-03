@@ -15,7 +15,7 @@ export default function StudyRoomList() {
         gcTime: 1000 * 60 * 60 * 24,  
     });
     const studyRoomsData = studyRooms?.data;
-    console.log('studyRoomsData type:', typeof studyRoomsData, 'value:', studyRoomsData);
+    // console.log('studyRoomsData type:', typeof studyRoomsData, 'value:', studyRoomsData);
     if (isLoading) return <div>로딩중...</div>;
     if (error) return <div>에러가 발생했습니다</div>;
     if (!studyRoomsData) return null;

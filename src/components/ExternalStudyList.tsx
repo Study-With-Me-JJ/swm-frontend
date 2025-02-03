@@ -15,7 +15,7 @@ export default function ExternalStudyList() {
         gcTime: 1000 * 60 * 60 * 24,  
     });
     const externalStudyData = externalStudy?.data.externalStudies;  
-    console.log('externalStudyData type:', typeof externalStudyData, 'value:', externalStudyData);
+    // console.log('externalStudyData type:', typeof externalStudyData, 'value:', externalStudyData);
     if (isLoading) return <div>로딩중...</div>;
     if (error) return <div>에러가 발생했습니다</div>;
     if (!externalStudyData) return null;
