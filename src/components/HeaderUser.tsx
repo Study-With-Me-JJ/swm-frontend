@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "@/app/_lib/getUserInfo";
+
 export default function HeaderUser() {  
     const [isLoggedIn, setIsLoggedIn] = useState(false); 
     const router = useRouter(); 
@@ -22,12 +23,12 @@ export default function HeaderUser() {
         router.push('/');
     };
 
-    const userInfo = useQuery({
+    const { data } = useQuery({
         queryKey: ['userInfo'],
         queryFn: () => getUserInfo(),
     });
 
-    console.log('userInfo', userInfo);
+    console.log('userInfo', data);
 
     return (
         <div className='flex gap-2 items-center'>
@@ -39,8 +40,8 @@ export default function HeaderUser() {
             ) : (
                 <>
                     <div className='flex items-center gap-2 text-sm font-regular text-gray-default'>
-                        <p><Image src='/images/profile.png' alt='profile' width={18} height={18} /></p>
-                        <Link href='/mypage' className='text-link-default font-bold'>닉네임 님</Link> 환영합니다.
+                        <p><Image src={data?.data.profileImageUrl || '/icons/icon_no_profile.svg'} alt='profile' width={18} height={18} /></p>
+                        <Link href='/mypage' className='text-link-default font-bold'>{data?.data.nickname} 님</Link> 환영합니다.
                     </div>
                     <button className='text-xs font-medium text-gray-default bg-[#e9e9e9] rounded-[4px] py-[6px] px-[12px]' onClick={handleLogout}>로그아웃</button> 
                 </>
