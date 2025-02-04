@@ -28,7 +28,7 @@ export default function HeaderUser() {
         queryFn: () => getUserInfo(),
     });
 
-    console.log('userInfo', data);
+    // console.log('userInfo', data);
 
     return (
         <div className='flex gap-2 items-center'>
@@ -40,8 +40,8 @@ export default function HeaderUser() {
             ) : (
                 <>
                     <div className='flex items-center gap-2 text-sm font-regular text-gray-default'>
-                        <p><Image src={data?.data.profileImageUrl || '/icons/icon_no_profile.svg'} alt='profile' width={18} height={18} /></p>
-                        <Link href='/mypage' className='text-link-default font-bold'>{data?.data.nickname} 님</Link> 환영합니다.
+                        <p><Image src={data?.data?.profileImageUrl || '/icons/icon_no_profile.svg'} alt='profile' width={18} height={18} /></p>
+                        <Link href='/mypage' className='text-link-default font-bold'>{data?.data?.nickname} 님</Link> 환영합니다.
                     </div>
                     <button className='text-xs font-medium text-gray-default bg-[#e9e9e9] rounded-[4px] py-[6px] px-[12px]' onClick={handleLogout}>로그아웃</button> 
                 </>
