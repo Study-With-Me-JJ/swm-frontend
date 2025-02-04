@@ -10,7 +10,8 @@ export const API_ENDPOINTS = {
     USER: {
       LOGIN: '/api/auth/login',
       LOGOUT: '/api/auth/logout',
-      JOIN: '/api/v1/user/custom'
+      JOIN: '/api/v1/user/custom',
+      INFO: '/api/v1/user'
     }
   } as const;
  

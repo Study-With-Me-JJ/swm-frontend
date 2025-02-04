@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation"; 
 import Image from "next/image";
+import { useQuery } from "@tanstack/react-query";
+import { getUserInfo } from "@/app/_lib/getUserInfo";
 export default function HeaderUser() {  
     const [isLoggedIn, setIsLoggedIn] = useState(false); 
     const router = useRouter(); 
@@ -19,6 +21,13 @@ export default function HeaderUser() {
         setIsLoggedIn(false);
         router.push('/');
     };
+
+    const userInfo = useQuery({
+        queryKey: ['userInfo'],
+        queryFn: () => getUserInfo(),
+    });
+
+    console.log('userInfo', userInfo);
 
     return (
         <div className='flex gap-2 items-center'>
