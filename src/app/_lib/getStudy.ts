@@ -5,17 +5,11 @@ import axios from "axios";
 export async function getStudy(): Promise<StudyResponse> {
    
     try {
-        // const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-        // const url = `${baseUrl}${API_ENDPOINTS.STUDY.LIST}`; 
-        // const res = await axios.get<StudyResponse>(url);
-        // console.log('[getStudy] Response:', JSON.stringify(res.data, null, 2));
-        // return res.data;
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
         const url = `${baseUrl}${API_ENDPOINTS.STUDY.LIST}`; 
-        const res = await fetch(url, { next: { revalidate: 3600 } }); // 캐싱 옵션 추가 가능
-        const data = await res.json() as StudyResponse;
-        console.log('[getStudy] Response:', JSON.stringify(data, null, 2));
-        return data;
+        const res = await axios.get<StudyResponse>(url);
+        console.log('[getStudy] Response:', JSON.stringify(res.data, null, 2));
+        return res.data; 
     } catch (error) {
         if (axios.isAxiosError(error)) {
             console.error('Error fetching study rooms:', error.response?.data || error.message);
