@@ -42,7 +42,7 @@ export default function ExternalStudyItem({ slideData, useSlider=false }: SlideI
     const nextRef = useRef<HTMLButtonElement>(null); 
 
     if(!slideData) {
-        return <div>데이터가 없습니다.</div>;
+        return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>데이터가 없습니다.</div>;
     }
  
     interface ItemContentProps {
@@ -75,7 +75,7 @@ export default function ExternalStudyItem({ slideData, useSlider=false }: SlideI
      
     if (useSlider) {
         return (
-            <div className="swiper-container max-w-screen-xl">
+            <div className="swiper-container overflow-hidden ">
                 {pageLoaded && (
                 <Swiper  
                     className="my-swiper"

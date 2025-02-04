@@ -7,6 +7,9 @@ export const API_ENDPOINTS = {
     EXTERNAL_STUDY: {
         LIST: '/api/v1/external/studies', 
     },
+    STUDY: {
+        LIST: '/api/v1/study', 
+    },
     USER: {
       LOGIN: '/api/auth/login',
       LOGOUT: '/api/auth/logout',

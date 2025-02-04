@@ -41,7 +41,7 @@ export default function StudyroomItem({ slideData, useSlider=false }: SlideItemP
     const nextRef = useRef<HTMLButtonElement>(null); 
 
     if(!slideData) {
-        return <div>데이터가 없습니다.</div>;
+        return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>데이터가 없습니다.</div>;
     }
  
     interface ItemContentProps {
@@ -94,7 +94,7 @@ export default function StudyroomItem({ slideData, useSlider=false }: SlideItemP
      
     if (useSlider) {
         return (
-            <div className="swiper-container max-w-screen-xl">
+            <div className="swiper-container overflow-hidden">
                 {pageLoaded && (
                 <Swiper  
                     className="my-swiper"
@@ -103,7 +103,7 @@ export default function StudyroomItem({ slideData, useSlider=false }: SlideItemP
                     spaceBetween={20}   
                     observer={true}
                     observeParents={true}
-                    watchOverflow={true}
+                    watchOverflow={true} 
                     navigation={{
                         prevEl: prevRef.current,
                         nextEl: nextRef.current,
@@ -127,15 +127,15 @@ export default function StudyroomItem({ slideData, useSlider=false }: SlideItemP
                     breakpoints={{  
                         320: {
                             slidesPerView: 1,
-                            spaceBetween: 20
+                            spaceBetween: 20, 
                         },
                         768: {
                             slidesPerView: 2,
-                            spaceBetween: 20
+                            spaceBetween: 20, 
                         },
                         1024: {
                             slidesPerView: 3,
-                            spaceBetween: 20
+                            spaceBetween: 20,
                         }
                     }}
                 >

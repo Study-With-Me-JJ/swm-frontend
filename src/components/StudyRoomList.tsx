@@ -28,8 +28,8 @@ export default function StudyRoomList() {
               <Link href='/studyroom' className='flex items-center gap-[6px] text-base font-semibold text-gray-light'>전체보기 <Image src="/icons/icon_gry_18_back.svg" alt="arrow-right" width={14} height={14}/></Link>
             </div>
           </div>
-          <div className='flex items-center gap-[20px]'>
-          <StudyroomItem slideData={studyRoomsData.data} useSlider={true}/>
+          <div className='flex items-center gap-[20px] max-w-screen-xl w-full'>
+            <StudyroomItem slideData={studyRoomsData.data} useSlider={true}/>
           </div>
         </article>
     </>

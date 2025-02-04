@@ -28,7 +28,7 @@ export default function ExternalStudyList() {
               <Link href='/external-studies' className='flex items-center gap-[6px] text-base font-semibold text-gray-light'>전체보기 <Image src="/icons/icon_gry_18_back.svg" alt="arrow-right" width={14} height={14}/></Link>
             </div>
           </div>
-          <div className='flex items-center gap-[20px]'>
+          <div className='flex items-center gap-[20px] max-w-screen-xl w-full'>
           <ExternalStudyItem slideData={externalStudyData.content} useSlider={true}/>
           </div>
         </article>
