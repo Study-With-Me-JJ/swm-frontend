@@ -26,6 +26,7 @@ export enum SortCriteria {
     lastStudyRoomId?: number;         // 마지막 스터디룸 ID (커서)
     lastSortValue?: number;           // 마지막 정렬 값 (커서)
     lastAverageRatingValue?: number;
+    locality?: string;
 }
 
 export interface StudyRoomListRes {
