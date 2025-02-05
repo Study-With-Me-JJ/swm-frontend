@@ -19,7 +19,7 @@ export enum SortCriteria {
   export interface StudyRoomListParams {
     title?: string;                    // 검색어
     headCount?: number;                // 인원 수
-    minPricePerHour?: number;         // 최소 시간당 가격
+    minPricePerHour?: number;         // 최소 시간당 가격 -> 최소 >= DB에 저장된 값 <= 최대
     maxPricePerHour?: number;         // 최대 시간당 가격
     options?: StudyRoomOption[];       // 옵션들
     sortCriteria?: SortCriteria;      // 정렬 기준
