@@ -19,12 +19,13 @@ export const useStudyRoomQuery = (filters: Partial<StudyRoomListParams>) => {
       });
       return response;
     },
-    initialPageParam: null as Pick<StudyRoomListParams, 'lastStudyRoomId'> | null,
+    initialPageParam: null,
     getNextPageParam: (lastPage) => {
       if (lastPage.data.hasNext && lastPage.data.data.length > 0) {
         const lastItem = lastPage.data.data[lastPage.data.data.length - 1];
         return {
-          lastStudyRoomId: lastItem.studyRoomId
+          lastStudyRoomId: lastItem.studyRoomId,
+          lastAverageRatingValue: lastItem.starAvg
         };
       }
       return null;
