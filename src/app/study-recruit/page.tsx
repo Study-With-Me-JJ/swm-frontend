@@ -3,12 +3,191 @@
 import { useState } from 'react';
 // import { useQuery } from '@tanstack/react-query';
 // import { getStudy } from '@/app/_lib/getStudy';  
-import FilterCategory from '@/components/FilterCategory';
 // import Loading from '@/components/ui/Loading';
 import StudyItem from '@/components/StudyItem';
+import FilterSelect from '@/components/ui/FilterSelect';
+
+// 더미 데이터 추가
+const dummyStudyData = [
+  {
+    userId: '1',
+    studyId: 1,
+    title: '리액트 스터디 모집합니다',
+    content: '리액트 기초부터 심화까지 함께 공부해요',
+    category: 'MACHINELEARNING',
+    position: 'DEVELOPER',
+    thumbnail: 'https://via.placeholder.com/150',
+    likeCount: 0,
+    commentCount: 0,
+    status: '모집중',
+    viewCount: 0,
+    nickname: '김개발',
+    profileImageUrl: 'https://via.placeholder.com/150',
+    studyBookmarkId: null,
+    tagInquiryListResponse: [
+      {
+        studyTagId: 0,
+        name: "리액트"
+      }
+    ],
+  }, 
+  {
+    userId: '2',
+    studyId: 2,
+    title: '자바 스터디 모집합니다',
+    content: '자바 기초부터 심화까지 함께 공부해요',
+    category: 'MACHINELEARNING',
+    position: 'DESIGNER',
+    thumbnail: 'https://via.placeholder.com/150',
+    likeCount: 0,
+    commentCount: 0,
+    status: '모집마감',
+    viewCount: 0,
+    nickname: '김개발',
+    profileImageUrl: 'https://via.placeholder.com/150',
+    studyBookmarkId: 2,
+    tagInquiryListResponse: [
+      {
+        studyTagId: 0,
+        name: "자바"
+      },
+      {
+        studyTagId: 1,
+        name: "스프링"
+      }
+    ],
+  }, 
+  {
+    userId: '3',
+    studyId: 3,
+    title: '파이썬 스터디 모집합니다',
+    content: '파이썬 기초부터 심화까지 함께 공부해요',
+    category: 'ALGORITHM',
+    position: 'DESIGNER',
+    thumbnail: 'https://via.placeholder.com/150',
+    likeCount: 0,
+    commentCount: 0,
+    status: '모집중',
+    viewCount: 0,
+    nickname: '이개발',
+    profileImageUrl: 'https://via.placeholder.com/150',
+    studyBookmarkId: null,
+    tagInquiryListResponse: [
+      {
+        studyTagId: 0,
+        name: "파이썬"
+      }
+    ],
+  },
+  {
+    userId: '4',
+    studyId: 4,
+    title: '파이썬 스터디 모집합니다',
+    content: '파이썬 기초부터 심화까지 함께 공부해요',
+    category: 'DATAANALYSIS',
+    position: 'PLANNER',
+    thumbnail: 'https://via.placeholder.com/150',
+    likeCount: 0,
+    commentCount: 0,
+    status: '모집중',
+    viewCount: 0,
+    nickname: '이개발',
+    profileImageUrl: 'https://via.placeholder.com/150',
+    studyBookmarkId: null,
+    tagInquiryListResponse: [
+      {
+        studyTagId: 0,
+        name: "파이썬"
+      }
+    ],
+  }, 
+];
+ 
+const dummyCategories = [
+  {
+    id:0,
+    value: 'ALL',
+    label: '카테고리 전체'
+  },
+  {
+    id:1,
+    value: 'ALGORITHM',
+    label: '알고리즘'
+  },
+  {
+    id:2,
+    value: 'BIGDATA',
+    label: '빅데이터'
+  },
+  {
+    id:3,
+    value: 'DATAANALYSIS',
+    label: '데이터분석'
+  },
+  {
+    id:4,
+    value: 'MACHINELEARNING',
+    label: '머신러닝'
+  },
+  {
+    id:5,
+    value: 'MOBILE',
+    label: '모바일'
+  }
+] 
+
+const dummyPositions = [
+  {
+    id:0,
+    value: 'ALL',
+    label: '직무 전체'
+  },
+  {
+    id:1,
+    value: 'PLANNER',
+    label: '기획자'
+  },
+  {
+    id:2,
+    value: 'DESIGNER',
+    label: '디자이너'
+  },
+  {
+    id:3,
+    value: 'DEVELOPER',
+    label: '개발자'
+  },
+  {
+    id:4,
+    value: 'MARKETER',
+    label: '마케터'
+  },
+  {
+    id:5,
+    value: 'ETC',
+    label: '기타'
+  }  
+]
 
 export default function StudyRecruit() {
-  const [selectOption,setSelectOption] = useState('카테고리 전체');
+  const [selectCategory,setSelectCategory] = useState<string | string[]>('ALL');
+  const [selectPosition,setSelectPosition] = useState<string | string[]>('ALL');
+
+  const handleCategoryChange = (value: string | string[]) => {
+    setSelectCategory(value || 'ALL');
+  };
+
+  const handlePositionChange = (value: string | string[]) => {
+    if (Array.isArray(value) && value.length === 0) {
+      setSelectPosition(['ALL']);
+      return;
+    }
+    setSelectPosition(value || 'ALL');
+  };
+  // const [selectStatus,setSelectStatus] = useState('모집중');
+
+  const [openSelectId, setOpenSelectId] = useState<string | null>(null);
+
 
   // const { data: study, isLoading, error } = useQuery({
   //   queryKey: ['study'],
@@ -16,77 +195,7 @@ export default function StudyRecruit() {
   //   staleTime: 1000 * 60 * 60,  
   //   gcTime: 1000 * 60 * 60 * 24,  
   // });
-
-  // 더미 데이터 추가
-  const dummyStudyData = [
-    {
-      userId: '1',
-      studyId: 1,
-      title: '리액트 스터디 모집합니다',
-      content: '리액트 기초부터 심화까지 함께 공부해요',
-      category: '프론트엔드',
-      thumbnail: 'https://via.placeholder.com/150',
-      likeCount: 0,
-      commentCount: 0,
-      status: '모집중',
-      viewCount: 0,
-      nickname: '김개발',
-      profileImageUrl: 'https://via.placeholder.com/150',
-      studyBookmarkId: null,
-      tagInquiryListResponse: [
-        {
-          studyTagId: 0,
-          name: "리액트"
-        }
-      ],
-    }, 
-    {
-      userId: '2',
-      studyId: 2,
-      title: '자바 스터디 모집합니다',
-      content: '자바 기초부터 심화까지 함께 공부해요',
-      category: '백엔드',
-      thumbnail: 'https://via.placeholder.com/150',
-      likeCount: 0,
-      commentCount: 0,
-      status: '모집마감',
-      viewCount: 0,
-      nickname: '김개발',
-      profileImageUrl: 'https://via.placeholder.com/150',
-      studyBookmarkId: 2,
-      tagInquiryListResponse: [
-        {
-          studyTagId: 0,
-          name: "자바"
-        },
-        {
-          studyTagId: 1,
-          name: "스프링"
-        }
-      ],
-    }, 
-    {
-      userId: '3',
-      studyId: 3,
-      title: '파이썬 스터디 모집합니다',
-      content: '파이썬 기초부터 심화까지 함께 공부해요',
-      category: '데이터분석',
-      thumbnail: 'https://via.placeholder.com/150',
-      likeCount: 0,
-      commentCount: 0,
-      status: '모집중',
-      viewCount: 0,
-      nickname: '이개발',
-      profileImageUrl: 'https://via.placeholder.com/150',
-      studyBookmarkId: null,
-      tagInquiryListResponse: [
-        {
-          studyTagId: 0,
-          name: "파이썬"
-        }
-      ],
-    }, 
-  ];
+  
   // const studyData = study?.data;
   const studyData = dummyStudyData;
   // console.log('studyData type:', typeof studyData, 'value:', studyData);
@@ -108,11 +217,16 @@ export default function StudyRecruit() {
       <h2 className='text-2xl font-semibold mb-[34px]'>스터디 모집</h2>
       <div className='flex justify-between items-end mb-[34px]'>
         <div className='flex items-center gap-5 justify-start'>
-          <FilterCategory  />
+          <FilterSelect type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
+          onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')}/>
+          <FilterSelect type='button' title='원하는 직무를 골라주세요.' onChange={handlePositionChange} defaultValue={selectPosition} options={dummyPositions.map((position)=> ({id: position.id,value: position.value, label: position.label}))} isOpen={openSelectId === 'select2'}
+          onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')}
+          closeOnSelect={false}
+        />
         </div>
       </div>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'>
-        {studyData.map((item) => (
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
+        {studyData.filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory).filter(item => selectPosition === 'ALL' ? true : selectPosition.includes(item.position)).map((item) => (
           <StudyItem key={item.studyId} data={item} />
         ))}
       </div>

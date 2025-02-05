@@ -1,37 +1,89 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
+import { useEffect, useRef } from 'react';
+import DropDownDefault from './DropDownDefault';
+import DropDownButton from './DropDownButton';
 
-interface SelectProps {
-    options: Array<{ value: string; label: string }>;
-    defaultValue?: string;
-    onChange?: (value: string) => void;
-    className?: string;
-    placeholder?: string;
+interface Option {
+  id: number;
+  value: string;
+  label: string;
+}
+
+interface FilterSelectProps {
+  onChange: (value: string | string[]) => void;
+  defaultValue: string | string[];
+  options: Option[]; 
+  isOpen: boolean;  
+  onToggle: () => void;  
+  type?: 'default' | 'button';
+  title?: string;
+  closeOnSelect?: boolean;
+}
+
+export default function FilterSelect({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true}: FilterSelectProps) { 
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (target.tagName.toLowerCase() === 'button' || 
+          target.closest('button') ||
+          target.closest('.dropdown-button-content')) {
+        return;
+      }
+      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+        if (isOpen) {
+          onToggle();
+        }
+      }
+    };
+
+    document.addEventListener('click', handleClickOutside);
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isOpen, onToggle]); 
+
+  const onClickOption = (value: string | string[]) => {
+      if(type === 'button') { //버튼타입 드롭다운 
+        onChange?.(value as string[]); 
+      } else { //기본타입 드롭다운
+        onChange?.(value as string);  
+        if (closeOnSelect) {   
+            onToggle();
+        }
+      }
+  } 
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  return (
+      <div className='relative' ref={containerRef}>
+          <button className={`w-[220px] flex justify-between gap-1 px-[13px] items-center h-[50px] text-[16px] font-semibold text-gray-default border rounded-[8px] ${
+              isOpen ? 'border-link-default' : 'border-gray-disabled'
+            }`} onClick={(e) => {
+              e.stopPropagation();
+              onToggle();
+            }}>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[calc(100%-40px)]">
+              {Array.isArray(defaultValue) 
+                ? defaultValue.map(value => options.find(option => option.value === value)?.label).join(', ')
+                : options.find(option => option.value === defaultValue)?.label}
+            </span>
+            <Image src={isOpen ? "/icons/icon_select_arrow_up.svg" : "/icons/icon_select_arrow.svg"} alt="arrow-right" width={28} height={28}/>
+          </button> 
+          {isOpen && renderDropDown()}
+      </div>
+  )
+
+  function renderDropDown() {
+      switch(type) {
+          case 'default':
+              return <DropDownDefault options={options} defaultValue={defaultValue as string} onClickOption={onClickOption} onToggle={onToggle}  />
+          case 'button':
+              return <DropDownButton options={options} defaultValue={defaultValue as string[]} onClickOption={onClickOption} title={title} onToggle={onToggle} /> 
+          default:
+              return null;
+      }
   }
-
-export default function FilterSelect({ options, defaultValue, onChange, className, placeholder }: SelectProps) {
-    const [isOpen, setIsOpen] = useState(false);
-
-    return (
-        <div className='relative'>
-            <button className={`min-w-[220px] flex justify-between gap-1 px-[13px] items-center h-[50px] text-[16px] font-semibold text-gray-default border rounded-[8px] ${
-                isOpen ? 'border-link-default' : 'border-gray-disabled'
-              }`} onClick={() => setIsOpen(!isOpen)}>
-              <span>{defaultValue || placeholder}</span>
-              <Image src="/icons/icon_select_arrow.svg" alt="arrow-right" width={28} height={28}/>
-            </button>
-            {isOpen && (
-              <ul className='absolute top-full left-0 w-full h-auto p-1 bg-white rounded-[8px] border border-link-default mt-[10px]' role='listbox'>
-                {options.map((option) => (
-                    <li className='px-[13px] py-[16px] text-[16px] font-semibold text-gray-default' key={option.value} onClick={() => {
-                        onChange?.(option.value);
-                        setIsOpen(false);
-                    }}>{option.label}</li>
-                ))}
-              </ul>
-            )}
-        </div>
-    )
 }

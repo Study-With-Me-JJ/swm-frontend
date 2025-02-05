@@ -4,6 +4,7 @@ import { Study } from '@/types/api/study';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import Tag from './Tag';
 import Toast from './ui/Toast';
 
 export default function StudyItem({data}: {data: Study}) {
@@ -35,7 +36,11 @@ export default function StudyItem({data}: {data: Study}) {
                 </div>
                 <p className='text-sm text-regular text-[#828282] line-clamp-2'>{data.content}</p>
             </div>
-            <div>bottom</div>
+            <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                    <Tag tag={data.tagInquiryListResponse[0].name} />
+                </div>
+            </div>
         </Link>
         <Toast isToast={isToast} message={isBookmark ? '북마크 추가' : '북마크에서 삭제'} />
     </>
