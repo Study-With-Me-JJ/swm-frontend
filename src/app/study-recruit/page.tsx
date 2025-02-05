@@ -19,7 +19,7 @@ const dummyStudyData = [
     thumbnail: 'https://via.placeholder.com/150',
     likeCount: 0,
     commentCount: 0,
-    status: '모집중',
+    status: 'ACTIVE',
     viewCount: 0,
     nickname: '김개발',
     profileImageUrl: 'https://via.placeholder.com/150',
@@ -41,7 +41,7 @@ const dummyStudyData = [
     thumbnail: 'https://via.placeholder.com/150',
     likeCount: 0,
     commentCount: 0,
-    status: '모집마감',
+    status: 'INACTIVE',
     viewCount: 0,
     nickname: '김개발',
     profileImageUrl: 'https://via.placeholder.com/150',
@@ -67,7 +67,7 @@ const dummyStudyData = [
     thumbnail: 'https://via.placeholder.com/150',
     likeCount: 0,
     commentCount: 0,
-    status: '모집중',
+    status: 'ACTIVE',
     viewCount: 0,
     nickname: '이개발',
     profileImageUrl: 'https://via.placeholder.com/150',
@@ -89,7 +89,7 @@ const dummyStudyData = [
     thumbnail: 'https://via.placeholder.com/150',
     likeCount: 0,
     commentCount: 0,
-    status: '모집중',
+    status: 'ACTIVE',
     viewCount: 0,
     nickname: '이개발',
     profileImageUrl: 'https://via.placeholder.com/150',
@@ -169,9 +169,28 @@ const dummyPositions = [
   }  
 ]
 
+const dummyStatus = [
+  {
+    id:0,
+    value: 'ALL',
+    label: '상태전체'
+  },
+  {
+    id:1,
+    value: 'ACTIVE',
+    label: '모집중'
+  },
+  {
+    id:2,
+    value: 'INACTIVE',
+    label: '모집마감'
+  }
+]
+
 export default function StudyRecruit() {
   const [selectCategory,setSelectCategory] = useState<string | string[]>('ALL');
   const [selectPosition,setSelectPosition] = useState<string | string[]>('ALL');
+  const [selectStatus,setSelectStatus] = useState<string | string[]>('ALL');
 
   const handleCategoryChange = (value: string | string[]) => {
     setSelectCategory(value || 'ALL');
@@ -184,7 +203,11 @@ export default function StudyRecruit() {
     }
     setSelectPosition(value || 'ALL');
   };
-  // const [selectStatus,setSelectStatus] = useState('모집중');
+
+  const handleStatusChange = (value: string | string[]) => {
+    setSelectStatus(value || 'ALL');
+  };
+  
 
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
@@ -220,13 +243,13 @@ export default function StudyRecruit() {
           <FilterSelect type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
           onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')}/>
           <FilterSelect type='button' title='원하는 직무를 골라주세요.' onChange={handlePositionChange} defaultValue={selectPosition} options={dummyPositions.map((position)=> ({id: position.id,value: position.value, label: position.label}))} isOpen={openSelectId === 'select2'}
-          onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')}
-          closeOnSelect={false}
-        />
+          onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')} closeOnSelect={false}/>
+          <FilterSelect type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={dummyStatus.map((status)=> ({id: status.id,value: status.value, label: status.label}))} isOpen={openSelectId === 'select3'}
+          onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} />
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
-        {studyData.filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory).filter(item => selectPosition === 'ALL' ? true : selectPosition.includes(item.position)).map((item) => (
+        {studyData.filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory).filter(item => selectPosition === 'ALL' ? true : selectPosition.includes(item.position)).filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus).map((item) => (
           <StudyItem key={item.studyId} data={item} />
         ))}
       </div>
