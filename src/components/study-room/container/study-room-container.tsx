@@ -17,7 +17,8 @@ export function StudyRoomContainer() {
   devLog.info('StudyRoom', data);
 
   return (
-    <div>
+    <div className="max-w-screen-xl py-[40px] xl:px-0 mx-auto">
+      <h3 className="text-[24px] font-[600] text-black mb-[34px]">스터디 룸</h3>
       <StudyRoomFilter 
         filters={filters}
         onFilterChange={handleFilterChange}
