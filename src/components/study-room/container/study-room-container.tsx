@@ -12,6 +12,7 @@ export function StudyRoomContainer() {
     data,
     fetchNextPage,
     hasNextPage,
+    isLoading,
   } = useStudyRoomQuery(filters);
 
   devLog.info('StudyRoom', data);
@@ -27,6 +28,7 @@ export function StudyRoomContainer() {
         data={data}
         hasNextPage={hasNextPage}
         fetchNextPage={fetchNextPage}
+        isLoading={isLoading}
       />
     </div>
   );
