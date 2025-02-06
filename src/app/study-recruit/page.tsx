@@ -1,13 +1,11 @@
 'use client'
 
 import { useState } from 'react';
-// import { useQuery } from '@tanstack/react-query';
-// import { getStudy } from '@/app/_lib/getStudy';  
-// import Loading from '@/components/ui/Loading';
 import StudyItem from '@/components/StudyItem';
 import CategoryFilter from '@/components/filters/CategoryFilter';
 import PositionFilter from '@/components/filters/PositionFilter';
 import StatusFilter from '@/components/filters/StatusFilter';
+
 // 더미 데이터 추가
 const dummyStudyData = [
   {
@@ -251,12 +249,6 @@ export default function StudyRecruit() {
       <h2 className='text-2xl font-semibold mb-[34px]'>스터디 모집</h2>
       <div className='flex justify-between items-end mb-[34px]'>
         <div className='flex items-center gap-5 justify-start'>
-          {/* <FilterSelect type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
-          onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')}/>
-          <FilterSelect type='button' title='원하는 직무를 골라주세요.' onChange={handlePositionChange} defaultValue={selectPosition} options={dummyPositions.map((position)=> ({id: position.id,value: position.value, label: position.label}))} isOpen={openSelectId === 'select2'}
-          onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')} closeOnSelect={false}/>
-          <FilterSelect type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={dummyStatus.map((status)=> ({id: status.id,value: status.value, label: status.label}))} isOpen={openSelectId === 'select3'}
-          onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} /> */}
           <CategoryFilter type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
           onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')} />
           <PositionFilter type='button' onChange={handlePositionChange} defaultValue={selectPosition} options={dummyPositions.map((position)=> ({id: position.id,value: position.value, label: position.label}))} isOpen={openSelectId === 'select2'}
