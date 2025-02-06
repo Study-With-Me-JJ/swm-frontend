@@ -5,8 +5,9 @@ import { useState } from 'react';
 // import { getStudy } from '@/app/_lib/getStudy';  
 // import Loading from '@/components/ui/Loading';
 import StudyItem from '@/components/StudyItem';
-import FilterSelect from '@/components/ui/FilterSelect';
-
+import CategoryFilter from '@/components/filters/CategoryFilter';
+import PositionFilter from '@/components/filters/PositionFilter';
+import StatusFilter from '@/components/filters/StatusFilter';
 // 더미 데이터 추가
 const dummyStudyData = [
   {
@@ -192,23 +193,6 @@ export default function StudyRecruit() {
   const [selectPosition,setSelectPosition] = useState<string | string[]>('ALL');
   const [selectStatus,setSelectStatus] = useState<string | string[]>('ALL');
 
-  const handleCategoryChange = (value: string | string[]) => {
-    setSelectCategory(value || 'ALL');
-  };
-
-  const handlePositionChange = (value: string | string[]) => {
-    if (Array.isArray(value) && value.length === 0) {
-      setSelectPosition(['ALL']);
-      return;
-    }
-    setSelectPosition(value || 'ALL');
-  };
-
-  const handleStatusChange = (value: string | string[]) => {
-    setSelectStatus(value || 'ALL');
-  };
-  
-
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
 
@@ -235,21 +219,54 @@ export default function StudyRecruit() {
   //   return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>데이터를 찾을 수 없습니다.</div>;
   // }
 
+  const handleCategoryChange = (value: string | string[]) => {
+    setSelectCategory(value || 'ALL');
+  };
+
+  const handlePositionChange = (value: string | string[]) => {
+    if (Array.isArray(value) && value.length === 0) {
+      setSelectPosition(['ALL']);
+      return;
+    }
+    setSelectPosition(value || 'ALL');
+  };  
+
+  const handleStatusChange = (value: string | string[]) => {
+    setSelectStatus(value || 'ALL');
+  };
+
+  const filteredStudyData = studyData
+  .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
+  .filter(item => {
+    if (Array.isArray(selectPosition)) {
+      return selectPosition.includes('ALL') ? true : selectPosition.includes(item.position);
+    }
+    return selectPosition === 'ALL' ? true : item.position === selectPosition;
+  })
+  .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus);
+
+
   return (
     <section className='pt-10 pb-[110px] max-w-screen-xl px-5 xl:px-0  mx-auto'>
       <h2 className='text-2xl font-semibold mb-[34px]'>스터디 모집</h2>
       <div className='flex justify-between items-end mb-[34px]'>
         <div className='flex items-center gap-5 justify-start'>
-          <FilterSelect type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
+          {/* <FilterSelect type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
           onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')}/>
           <FilterSelect type='button' title='원하는 직무를 골라주세요.' onChange={handlePositionChange} defaultValue={selectPosition} options={dummyPositions.map((position)=> ({id: position.id,value: position.value, label: position.label}))} isOpen={openSelectId === 'select2'}
           onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')} closeOnSelect={false}/>
           <FilterSelect type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={dummyStatus.map((status)=> ({id: status.id,value: status.value, label: status.label}))} isOpen={openSelectId === 'select3'}
+          onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} /> */}
+          <CategoryFilter type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
+          onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')} />
+          <PositionFilter type='button' onChange={handlePositionChange} defaultValue={selectPosition} options={dummyPositions.map((position)=> ({id: position.id,value: position.value, label: position.label}))} isOpen={openSelectId === 'select2'}
+          onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')} />
+          <StatusFilter type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={dummyStatus.map((status)=> ({id: status.id,value: status.value, label: status.label}))} isOpen={openSelectId === 'select3'}
           onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} />
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
-        {studyData.filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory).filter(item => selectPosition === 'ALL' ? true : selectPosition.includes(item.position)).filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus).map((item) => (
+        {filteredStudyData.map((item) => (
           <StudyItem key={item.studyId} data={item} />
         ))}
       </div>
