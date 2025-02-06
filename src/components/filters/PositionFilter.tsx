@@ -13,6 +13,6 @@ export default function PositionFilter({type,onChange,defaultValue,options,isOpe
   };
 
     return <>
-        <FilterSelect type={type as "button"} onChange={handlePositionChange} defaultValue={defaultValue} options={options} isOpen={isOpen} onToggle={onToggle} />
+        <FilterSelect type={type as "button"} onChange={handlePositionChange} defaultValue={defaultValue} options={options} isOpen={isOpen} onToggle={onToggle} title='원하는 직무를 골라주세요.' />
     </>
 }
