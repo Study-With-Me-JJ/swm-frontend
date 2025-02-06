@@ -220,7 +220,7 @@ export default function StudyRecruit() {
   // }
 
   const handleCategoryChange = (value: string | string[]) => {
-    setSelectCategory(value || 'ALL');
+    setSelectCategory(value || 'ALL'); 
   };
 
   const handlePositionChange = (value: string | string[]) => {
@@ -228,11 +228,11 @@ export default function StudyRecruit() {
       setSelectPosition(['ALL']);
       return;
     }
-    setSelectPosition(value || 'ALL');
+    setSelectPosition(value || 'ALL'); 
   };  
 
   const handleStatusChange = (value: string | string[]) => {
-    setSelectStatus(value || 'ALL');
+    setSelectStatus(value || 'ALL'); 
   };
 
   const filteredStudyData = studyData
