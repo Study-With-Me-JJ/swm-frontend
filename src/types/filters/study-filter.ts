@@ -4,5 +4,6 @@ export interface StudyFilterProps {
     defaultValue: string | string[];
     options: { id: number; value: string; label: string }[];
     isOpen: boolean;
-    onToggle: () => void;
+    onToggle: () => void; 
+    filterName?: string;
 }

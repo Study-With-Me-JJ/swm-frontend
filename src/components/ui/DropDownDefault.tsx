@@ -3,14 +3,15 @@ interface DropDownDefaultProps {
     defaultValue: string | string[];
     onClickOption: (value: string) => void;
     onToggle: () => void;
+    filterType?: string;
 }
 
-export default function DropDownDefault({options,defaultValue,onClickOption,onToggle}: DropDownDefaultProps) {
+export default function DropDownDefault({options,defaultValue,onClickOption,filterType}: DropDownDefaultProps) {
     return (
         <>
             <ul className='absolute top-full left-0 w-full h-auto p-1 bg-white rounded-[8px] border border-link-default mt-[10px]' role='listbox'>
             {options.map((option) => (
-                <li className=' px-[13px] py-[16px] text-[16px] font-regular hover:font-semibold text-gray-default hover:bg-[#f2f2f2] hover:cursor-pointer hover:rounded-[4px] flex items-center gap-2 justify-between flex-row-reverse relative my-[2px]' key={option.id} >
+                <li className={`${filterType === 'text' ? 'text-[#c8c8c8]' : 'px-[13px] py-[16px]'} text-[16px] font-regular hover:font-semibold text-gray-default hover:bg-[#f2f2f2] hover:cursor-pointer hover:rounded-[4px] flex items-center gap-2 justify-between flex-row-reverse relative my-[2px]`} key={option.id} >
                     <input type="radio" id={option.value} name="select-option" value={option.value} className="peer absolute left-0 top-0 w-full h-full cursor-pointer opacity-0"
                     onChange={() => onClickOption(option.value)}
                     checked={defaultValue === option.value}

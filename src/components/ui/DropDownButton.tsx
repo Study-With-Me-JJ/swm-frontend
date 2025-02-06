@@ -8,21 +8,25 @@ interface DropDownButtonProps {
     onClickOption: (value: string[]) => void;
     title?: string; 
     onToggle?: () => void; 
-    onChange?: (value: string[]) => void;
+    onChange?: (value: string[]) => void; 
+    position?: {
+        left?: string;
+        right?: string;
+    };  
 }
 interface Option {
     id: number;
     value: string;
     label: string;
 }
-export default function DropDownButton({options,defaultValue,onClickOption,title,onToggle,onChange}: DropDownButtonProps) {
+export default function DropDownButton({options,defaultValue,onClickOption,title,onToggle,onChange,position={left: 'left-0', right: 'right-0'}}: DropDownButtonProps) {
 
     const [checkOption, setCheckOption] = useState<Option[]>([]); 
-    const defaultOption = options.filter(option => 
-        Array.isArray(defaultValue) 
-            ? defaultValue.includes(option.value)
-            : option.value === defaultValue
-    ); 
+    // const defaultOption = options.filter(option => 
+    //     Array.isArray(defaultValue) 
+    //         ? defaultValue.includes(option.value)
+    //         : option.value === defaultValue
+    // ); 
 
     useEffect(() => { 
         const currentOptions = options.filter(option => 
@@ -65,7 +69,7 @@ export default function DropDownButton({options,defaultValue,onClickOption,title
 
     return (
         <>
-            <div className='dropdown-button-content absolute top-full left-0 w-fit h-auto py-[40px] px-[30px] bg-white rounded-[8px] border border-link-default mt-[10px]'>
+            <div className={`dropdown-button-content absolute ${position.left} ${position.right} w-fit h-auto py-[40px] px-[30px] bg-white rounded-[8px] border border-link-default mt-[10px]`}>
                 <h3 className='text-sm font-semibold text-gray-default mb-[24px] text-center'>{title}</h3>
                 <ul role='listbox' className='flex flex-wrap gap-[10px] w-[380px]'>
                 {options.map((option: Option) => (

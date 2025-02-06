@@ -11,7 +11,7 @@ interface Option {
   label: string;
 }
 
-interface FilterSelectProps {
+interface FilterTextProps {
   onChange: (value: string | string[]) => void;
   defaultValue: string | string[];
   options: Option[]; 
@@ -20,9 +20,10 @@ interface FilterSelectProps {
   type?: 'default' | 'button';
   title?: string;
   closeOnSelect?: boolean;
+  filterName?: string;
 }
 
-export default function FilterSelect({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true}: FilterSelectProps) { 
+export default function FilterText({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true,filterName='default'}: FilterTextProps) { 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -59,18 +60,32 @@ export default function FilterSelect({ options, defaultValue, onChange, onToggle
 
   return (
       <div className='relative' ref={containerRef}>
-          <button className={`w-[220px] flex justify-between gap-1 px-[13px] items-center h-[50px] text-[16px] font-semibold text-gray-default border rounded-[8px] ${
-              isOpen ? 'border-link-default' : 'border-gray-disabled'
-            }`} onClick={(e) => {
+          <button className={'min-w-[95px] max-w-[130px] flex gap-1 px-[8px] items-center h-[30px] text-[12px] font-semibold text-link-default'} onClick={(e) => {
               e.stopPropagation();
               onToggle();
             }}>
-            <span className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[calc(100%-40px)]">
-              {Array.isArray(defaultValue) 
+            <Image 
+              src={(() => {
+                switch(filterName) {
+                  case '태그':
+                    return "/icons/icon_select_tag.svg";
+                  case '정렬':
+                    return "/icons/icon_select_sort.svg"; 
+                  default:
+                    return "/icons/icon_select_tag.svg";
+                }
+              })()} 
+              alt="" 
+              width={18} 
+              height={18}
+            />
+            <span className='overflow-hidden text-ellipsis whitespace-nowrap '> 
+              {Array.isArray(defaultValue) && defaultValue.length > 0
                 ? defaultValue.map(value => options.find(option => option.value === value)?.label).join(', ')
-                : options.find(option => option.value === defaultValue)?.label}
+                : !Array.isArray(defaultValue) && defaultValue && defaultValue !== '' && options.find(option => option.value === defaultValue)?.label
+                  ? options.find(option => option.value === defaultValue)?.label
+                  : filterName}
             </span>
-            <Image src={isOpen ? "/icons/icon_select_arrow_up.svg" : "/icons/icon_select_arrow.svg"} alt="arrow-right" width={28} height={28}/>
           </button> 
           {isOpen && renderDropDown()}
       </div>
@@ -79,9 +94,9 @@ export default function FilterSelect({ options, defaultValue, onChange, onToggle
   function renderDropDown() {
       switch(type) {
           case 'default':
-              return <DropDownDefault options={options} defaultValue={defaultValue as string} onClickOption={onClickOption} onToggle={onToggle}/>
+              return <DropDownDefault options={options} defaultValue={defaultValue as string} onClickOption={onClickOption} onToggle={onToggle} filterType='text' />
           case 'button':
-              return <DropDownButton options={options} defaultValue={defaultValue as string[]} onClickOption={onClickOption} title={title} onToggle={onToggle}  /> 
+              return <DropDownButton options={options} defaultValue={defaultValue as string[]} onClickOption={onClickOption} title={title} onToggle={onToggle} position={{left: 'left-auto',right: 'right-0'}}/> 
           default:
               return null;
       }

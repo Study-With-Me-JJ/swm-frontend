@@ -5,6 +5,7 @@ import StudyItem from '@/components/StudyItem';
 import CategoryFilter from '@/components/filters/CategoryFilter';
 import PositionFilter from '@/components/filters/PositionFilter';
 import StatusFilter from '@/components/filters/StatusFilter';
+import TagFilter from '@/components/filters/TagFilter'; 
 
 // 더미 데이터 추가
 const dummyStudyData = [
@@ -26,7 +27,7 @@ const dummyStudyData = [
     tagInquiryListResponse: [
       {
         studyTagId: 0,
-        name: "리액트"
+        name: "REACT"
       }
     ],
   }, 
@@ -48,11 +49,11 @@ const dummyStudyData = [
     tagInquiryListResponse: [
       {
         studyTagId: 0,
-        name: "자바"
+        name: "JAVA"
       },
       {
         studyTagId: 1,
-        name: "스프링"
+        name: "SPRING"
       }
     ],
   }, 
@@ -74,7 +75,7 @@ const dummyStudyData = [
     tagInquiryListResponse: [
       {
         studyTagId: 0,
-        name: "파이썬"
+        name: "PYTHON"
       }
     ],
   },
@@ -96,7 +97,7 @@ const dummyStudyData = [
     tagInquiryListResponse: [
       {
         studyTagId: 0,
-        name: "파이썬"
+        name: "PYTHON"
       }
     ],
   }, 
@@ -186,10 +187,49 @@ const dummyStatus = [
   }
 ]
 
+const dummyTags = [
+  {
+    id:0,
+    value: 'JAVA',
+    label: '자바'
+  },
+  {
+    id:1,
+    value: 'REACT',
+    label: '리액트'
+  },
+  {
+    id:2,
+    value: 'PYTHON',
+    label: '파이썬'
+  },
+  {
+    id:3,
+    value: 'SPRING',
+    label: '스프링'
+  },
+  {
+    id:4,
+    value: 'NODEJS',
+    label: '노드'
+  },
+  {
+    id:5,
+    value: 'AI',
+    label: 'AI'
+  },
+  {
+    id:6,
+    value: 'Figma',
+    label: '피그마'
+  }
+]
+
 export default function StudyRecruit() {
   const [selectCategory,setSelectCategory] = useState<string | string[]>('ALL');
   const [selectPosition,setSelectPosition] = useState<string | string[]>('ALL');
   const [selectStatus,setSelectStatus] = useState<string | string[]>('ALL');
+  const [selectTag,setSelectTag] = useState<string | string[]>('태그');
 
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
@@ -233,6 +273,14 @@ export default function StudyRecruit() {
     setSelectStatus(value || 'ALL'); 
   };
 
+  const handleTagChange = (value: string | string[]) => {
+    if (Array.isArray(value) && value.length === 0) {
+      setSelectTag('태그');
+      return;
+    }
+    setSelectTag(value || '태그'); 
+  };
+
   const filteredStudyData = studyData
   .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
   .filter(item => {
@@ -241,7 +289,17 @@ export default function StudyRecruit() {
     }
     return selectPosition === 'ALL' ? true : item.position === selectPosition;
   })
-  .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus);
+  .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus)
+  .filter(item => {
+    if(selectTag === '태그') return true;
+    if(Array.isArray(selectTag)) {
+      if(selectTag.length === 0) return true;
+      return item.tagInquiryListResponse.some(tag => 
+        selectTag.includes(tag.name)
+      );
+    }
+    return selectTag === '' ? true : item.tagInquiryListResponse.some(tag => tag.name.includes(selectTag));
+  });
 
 
   return (
@@ -255,6 +313,10 @@ export default function StudyRecruit() {
           onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')} />
           <StatusFilter type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={dummyStatus.map((status)=> ({id: status.id,value: status.value, label: status.label}))} isOpen={openSelectId === 'select3'}
           onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} />
+        </div>
+        <div className='flex items-center gap-1'>
+          <TagFilter type='button' onChange={handleTagChange} defaultValue={selectTag} options={dummyTags.map((tag)=> ({id: tag.id,value: tag.value, label: tag.label}))} isOpen={openSelectId === 'select4'}
+          onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='태그' />
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
