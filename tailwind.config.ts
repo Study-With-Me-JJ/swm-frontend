@@ -43,11 +43,12 @@ const config: Config = {
 				'disabled': '#e0e0e0'
   			},
 			blue: {
-				'example': '#4998E9',
+				'default': '#4998E9',
 			},
 			red: {
 				'error': '#E0143C',
 			},
+
 			link: {
 				'default': '#4998E9',
 			}
