@@ -6,7 +6,7 @@ import CategoryFilter from '@/components/filters/CategoryFilter';
 import PositionFilter from '@/components/filters/PositionFilter';
 import StatusFilter from '@/components/filters/StatusFilter';
 import SortFilter from '@/components/filters/SortFilter'; 
-
+import Image from 'next/image';
 // 더미 데이터 추가
 const dummyStudyData = [
   {
@@ -298,11 +298,21 @@ export default function StudyRecruit() {
           <SortFilter type='default' onChange={handleSortChange} defaultValue={selectSort} options={dummySort.map((sort)=> ({id: sort.id,value: sort.value, label: sort.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='정렬' />
         </div>
       </div>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
+      {filteredStudyData.length === 0 ? (
+        <div className='h-[300px] flex justify-center items-center'>
+          <div className='flex flex-col items-center justify-center w-full max-w-[480px] bg-[#f9f9f9] rounded-[8px] py-[40px]'>
+            <Image src='/icons/icon_no_result.svg' alt='search' width={65} height={65} />
+            <h3 className='mt-[30px] text-[20px] font-semibold text-black'>스터디를 찾지 못했습니다.</h3>
+            <p className='mt-[12px] text-gray-default text-sm text-regular'>검색 결과가 없습니다.</p>
+          </div>
+        </div>
+      ) : (
+        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
         {filteredStudyData.map((item) => (
           <StudyItem key={item.studyId} data={item}/>
         ))}
       </div>
+      )}
     </section>
   )
 }
