@@ -1,14 +1,16 @@
 import { useState } from 'react';
-import { SortCriteria, StudyRoomListParams } from "@/types/api";
+import { StudyRoomListParams } from "@/types/api";
 
 export const useStudyRoomModel = () => {
   const [filters, setFilters] = useState<Partial<StudyRoomListParams>>({
-    sortCriteria: SortCriteria.STARS,
+    sortCriteria: undefined,
     headCount: undefined,
     minPricePerHour: undefined,
     maxPricePerHour: undefined,
     options: [],
-    title: ''
+    title: '',
+    userLatitude: undefined,
+    userLongitude: undefined,
   });
 
   const handleFilterChange = (newFilters: Partial<StudyRoomListParams>) => {

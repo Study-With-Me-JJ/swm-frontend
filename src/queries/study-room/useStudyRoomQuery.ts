@@ -9,12 +9,15 @@ export const studyRoomQueryKey = {
 export const useStudyRoomQuery = (filters: Partial<StudyRoomListParams>) => {
   return useInfiniteQuery({
     queryKey: studyRoomQueryKey.list(filters),
-    queryFn: async ({ pageParam }: { pageParam: Pick<StudyRoomListParams, 'lastStudyRoomId' | 'lastAverageRatingValue'> | null }) => {
+    queryFn: async ({ pageParam }: { pageParam: Pick<StudyRoomListParams, 'lastStudyRoomId' | 'lastSortValue' | 'lastAverageRatingValue' | 'lastLatitudeValue' | 'lastLongitudeValue'> | null }) => {
       const response = await StudyRoomService.getStudyRoomList({ 
         queryParams: {
           ...filters, 
           lastStudyRoomId: pageParam?.lastStudyRoomId,
+          lastSortValue: pageParam?.lastSortValue,
           lastAverageRatingValue: pageParam?.lastAverageRatingValue,
+          lastLatitudeValue: pageParam?.lastLatitudeValue,
+          lastLongitudeValue: pageParam?.lastLongitudeValue,
         }
       });
       return response;
@@ -25,7 +28,10 @@ export const useStudyRoomQuery = (filters: Partial<StudyRoomListParams>) => {
         const lastItem = lastPage.data.data[lastPage.data.data.length - 1];
         return {
           lastStudyRoomId: lastItem.studyRoomId,
-          lastAverageRatingValue: lastItem.starAvg
+          lastSortValue: lastItem.starAvg,
+          lastAverageRatingValue: lastItem.starAvg, 
+          lastLatitudeValue: lastItem.coordinates.latitude,
+          lastLongitudeValue: lastItem.coordinates.longitude,
         };
       }
       return null;
