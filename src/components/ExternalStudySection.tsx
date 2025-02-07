@@ -3,7 +3,7 @@
 import ExternalStudyItem from "./ExternalStudyItem";
 import Link from "next/link";
 import Image from "next/image";
-import { getExternalStudy } from "@/app/_lib/getExternalStudy";
+import { getExternalStudy } from "@/lib/api/study/getExternalStudy";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/ui/Loading";
 

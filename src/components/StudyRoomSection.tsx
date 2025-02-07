@@ -3,7 +3,7 @@
 import StudyroomItem from "./StudyroomItem";
 import Link from "next/link";
 import Image from "next/image";
-import { getStudyRoom } from "@/app/_lib/getStudyRoom";
+import { getStudyRoom } from "@/lib/api/study/getStudyRoom";
 import { useQuery } from "@tanstack/react-query";
 import Loading from "@/components/ui/Loading";
 
