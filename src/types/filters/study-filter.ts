@@ -7,3 +7,4 @@ export interface StudyFilterProps {
     onToggle: () => void; 
     filterName?: string;
 }
+

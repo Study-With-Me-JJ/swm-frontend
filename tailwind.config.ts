@@ -24,7 +24,7 @@ const config: Config = {
 		},
 		animation: {
 			'spin-slow': 'spin-slow 2s linear infinite',
-			'slide-up-fade': 'slideUpAndFade 2s ease-in-out forwards'
+			'slide-up-fade': 'slideUpAndFade 1.8s ease-in-out forwards'
 		},
 		fontFamily: {
 			pretendard: ['var(--font-pretendard)'],

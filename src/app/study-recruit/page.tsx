@@ -5,7 +5,7 @@ import StudyItem from '@/components/StudyItem';
 import CategoryFilter from '@/components/filters/CategoryFilter';
 import PositionFilter from '@/components/filters/PositionFilter';
 import StatusFilter from '@/components/filters/StatusFilter';
-import TagFilter from '@/components/filters/TagFilter'; 
+import SortFilter from '@/components/filters/SortFilter'; 
 
 // 더미 데이터 추가
 const dummyStudyData = [
@@ -24,6 +24,7 @@ const dummyStudyData = [
     nickname: '김개발',
     profileImageUrl: 'https://via.placeholder.com/150',
     studyBookmarkId: null,
+    createdAt: '2025-01-01',
     tagInquiryListResponse: [
       {
         studyTagId: 0,
@@ -39,13 +40,14 @@ const dummyStudyData = [
     category: 'MACHINELEARNING',
     position: 'DESIGNER',
     thumbnail: 'https://via.placeholder.com/150',
-    likeCount: 0,
+    likeCount: 5,
     commentCount: 0,
     status: 'INACTIVE',
     viewCount: 0,
     nickname: '김개발',
     profileImageUrl: 'https://via.placeholder.com/150',
     studyBookmarkId: 2,
+    createdAt: '2025-02-01',
     tagInquiryListResponse: [
       {
         studyTagId: 0,
@@ -72,6 +74,7 @@ const dummyStudyData = [
     nickname: '이개발',
     profileImageUrl: 'https://via.placeholder.com/150',
     studyBookmarkId: null,
+    createdAt: '2024-12-01',
     tagInquiryListResponse: [
       {
         studyTagId: 0,
@@ -94,6 +97,7 @@ const dummyStudyData = [
     nickname: '이개발',
     profileImageUrl: 'https://via.placeholder.com/150',
     studyBookmarkId: null,
+    createdAt: '2025-04-01',
     tagInquiryListResponse: [
       {
         studyTagId: 0,
@@ -187,41 +191,21 @@ const dummyStatus = [
   }
 ]
 
-const dummyTags = [
+const dummySort = [
   {
     id:0,
-    value: 'JAVA',
-    label: '자바'
+    value: 'latest',
+    label: '최신순'
   },
   {
     id:1,
-    value: 'REACT',
-    label: '리액트'
+    value: 'like',
+    label: '좋아요순'
   },
   {
     id:2,
-    value: 'PYTHON',
-    label: '파이썬'
-  },
-  {
-    id:3,
-    value: 'SPRING',
-    label: '스프링'
-  },
-  {
-    id:4,
-    value: 'NODEJS',
-    label: '노드'
-  },
-  {
-    id:5,
-    value: 'AI',
-    label: 'AI'
-  },
-  {
-    id:6,
-    value: 'Figma',
-    label: '피그마'
+    value: 'view',
+    label: '조회순'
   }
 ]
 
@@ -229,7 +213,7 @@ export default function StudyRecruit() {
   const [selectCategory,setSelectCategory] = useState<string | string[]>('ALL');
   const [selectPosition,setSelectPosition] = useState<string | string[]>('ALL');
   const [selectStatus,setSelectStatus] = useState<string | string[]>('ALL');
-  const [selectTag,setSelectTag] = useState<string | string[]>('태그');
+  const [selectSort,setSelectSort] = useState<string | string[]>('latest');
 
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
@@ -273,12 +257,8 @@ export default function StudyRecruit() {
     setSelectStatus(value || 'ALL'); 
   };
 
-  const handleTagChange = (value: string | string[]) => {
-    if (Array.isArray(value) && value.length === 0) {
-      setSelectTag('태그');
-      return;
-    }
-    setSelectTag(value || '태그'); 
+  const handleSortChange = (value: string | string[]) => {
+    setSelectSort(value || 'latest'); 
   };
 
   const filteredStudyData = studyData
@@ -290,17 +270,16 @@ export default function StudyRecruit() {
     return selectPosition === 'ALL' ? true : item.position === selectPosition;
   })
   .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus)
-  .filter(item => {
-    if(selectTag === '태그') return true;
-    if(Array.isArray(selectTag)) {
-      if(selectTag.length === 0) return true;
-      return item.tagInquiryListResponse.some(tag => 
-        selectTag.includes(tag.name)
-      );
+  .sort((a, b) => {
+    if (selectSort === 'latest') {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    } else if (selectSort === 'like') {
+      return b.likeCount - a.likeCount;
+    } else if (selectSort === 'view') {
+      return b.viewCount - a.viewCount;
     }
-    return selectTag === '' ? true : item.tagInquiryListResponse.some(tag => tag.name.includes(selectTag));
+    return 0;
   });
-
 
   return (
     <section className='pt-10 pb-[110px] max-w-screen-xl px-5 xl:px-0  mx-auto'>
@@ -315,13 +294,13 @@ export default function StudyRecruit() {
           onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} />
         </div>
         <div className='flex items-center gap-1'>
-          <TagFilter type='button' onChange={handleTagChange} defaultValue={selectTag} options={dummyTags.map((tag)=> ({id: tag.id,value: tag.value, label: tag.label}))} isOpen={openSelectId === 'select4'}
-          onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='태그' />
+          {/* <TagFilter type='button' onChange={handleTagChange} defaultValue={selectTag} options={dummyTags.map((tag)=> ({id: tag.id,value: tag.value, label: tag.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='태그' /> */}
+          <SortFilter type='default' onChange={handleSortChange} defaultValue={selectSort} options={dummySort.map((sort)=> ({id: sort.id,value: sort.value, label: sort.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='정렬' />
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
         {filteredStudyData.map((item) => (
-          <StudyItem key={item.studyId} data={item} />
+          <StudyItem key={item.studyId} data={item}/>
         ))}
       </div>
     </section>
