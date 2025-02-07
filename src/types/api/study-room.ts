@@ -2,8 +2,8 @@ import { ApiResponse, CursorPageData } from ".";
 
 export enum SortCriteria {
   STARS = 'STARS',
-  LIKES = 'LIKES',
-  REVIEWS = 'REVIEWS',
+  LIKE = 'LIKE',
+  REVIEW = 'REVIEW',
   PRICE = 'PRICE'
 }
   

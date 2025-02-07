@@ -128,7 +128,7 @@ export const StudyRoomFilter = ({ filters, onFilterChange }: StudyRoomFilterProp
               defaultValue={[0, 300000]}
               min={0}
               max={300000}
-              step={5000}
+              step={1000}
               value={priceRange}
               onValueChange={handlePriceChange}
               className="[&_[role=slider]]:border-[#E0E0E0]"
@@ -207,8 +207,8 @@ export const StudyRoomFilter = ({ filters, onFilterChange }: StudyRoomFilterProp
         <SelectContent className="bg-white w-[95px]">
           <SelectGroup>
             <SelectItem hideCheck value="STARS" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">평점순</SelectItem>
-            <SelectItem hideCheck value="LIKES" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">좋아요순</SelectItem>
-            <SelectItem hideCheck value="REVIEWS" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">후기순</SelectItem>
+            <SelectItem hideCheck value="LIKE" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">좋아요순</SelectItem>
+            <SelectItem hideCheck value="REVIEW" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">후기순</SelectItem>
             <SelectItem hideCheck value="PRICE" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">가격순</SelectItem>
           </SelectGroup>
         </SelectContent>
