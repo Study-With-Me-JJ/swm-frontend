@@ -17,9 +17,16 @@ export default function HeaderUser() {
     }, []);
 
     const handleLogout = async () => {
-        await logout();
-        setIsLoggedIn(false);
-        router.push('/');
+        try {
+            await logout();
+        } catch (error) {
+            console.error('로그아웃 에러:', error);
+        } finally { 
+            setIsLoggedIn(false);
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('expirationTime');
+            router.push('/');
+        }
     };
 
     const { data } = useQuery({

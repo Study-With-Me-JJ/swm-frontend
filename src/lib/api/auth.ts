@@ -15,29 +15,24 @@ export const login = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
-  try { 
-    try {
-      await axiosInstance.patch(API_ENDPOINTS.USER.LOGOUT);
-    } catch (serverError: any) { 
-      if (serverError.response?.status !== 401) { 
-        throw serverError;
-      }
-    }
- 
+  try {
+    await axiosInstance.patch(API_ENDPOINTS.USER.LOGOUT);
     localStorage.removeItem('accessToken');
     localStorage.removeItem('expirationTime');
-     
     delete axiosInstance.defaults.headers.common['Authorization'];
-    
     return { success: true };
-  } catch (error: any) { 
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('expirationTime');
-    delete axiosInstance.defaults.headers.common['Authorization'];
-    
-    if (error.response?.data?.messageClient) {
-      throw new Error(error.response.data.messageClient);
+  } catch (error: any) {
+    if (error.response?.status === 401) {
+      // 401 에러의 경우 정상적인 로그아웃으로 처리
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('expirationTime');
+      delete axiosInstance.defaults.headers.common['Authorization'];
+      return { success: true };
     }
-    throw new Error('로그아웃 처리 중 오류가 발생했습니다.');
+    
+    // 다른 에러의 경우 에러 throw
+    const errorMessage = error.response?.data?.messageClient 
+      || '로그아웃 중 오류가 발생했습니다.';
+    throw new Error(errorMessage);
   }
 };
