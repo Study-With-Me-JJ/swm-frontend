@@ -1,5 +1,6 @@
 import { axiosInstance } from './axios';
 import { API_ENDPOINTS } from './endpoints';
+import { AxiosError } from 'axios';
 
 export const login = async (email: string, password: string) => {
   try {
@@ -21,18 +22,20 @@ export const logout = async () => {
     localStorage.removeItem('expirationTime');
     delete axiosInstance.defaults.headers.common['Authorization'];
     return { success: true };
-  } catch (error: any) {
-    if (error.response?.status === 401) {
-      // 401 에러의 경우 정상적인 로그아웃으로 처리
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('expirationTime');
-      delete axiosInstance.defaults.headers.common['Authorization'];
-      return { success: true };
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      if (error.response?.status === 401) {  
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('expirationTime');
+        delete axiosInstance.defaults.headers.common['Authorization'];
+        return { success: true };
+      }
+       
+      const errorMessage = error.response?.data?.messageClient 
+        || '로그아웃 중 오류가 발생했습니다.';
+      throw new Error(errorMessage);
     }
-    
-    // 다른 에러의 경우 에러 throw
-    const errorMessage = error.response?.data?.messageClient 
-      || '로그아웃 중 오류가 발생했습니다.';
-    throw new Error(errorMessage);
+     
+    throw new Error('로그아웃 중 예기치 않은 오류가 발생했습니다.');
   }
 };
