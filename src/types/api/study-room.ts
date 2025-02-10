@@ -1,10 +1,11 @@
 import { ApiResponse, CursorPageData } from ".";
 
 export enum SortCriteria {
-  STARS = 'STARS',
-  LIKE = 'LIKE',
-  REVIEW = 'REVIEW',
-  PRICE = 'PRICE'
+  STAR = 'STAR', // 평점 -> lastAverageRatingValue
+  LIKE = 'LIKE', // 좋아요 -> lastSortValue
+  REVIEW = 'REVIEW', // 리뷰 -> lastSortValue
+  PRICE_ASC = 'PRICE_ASC', // 가격오름차순 -> lastSortValue
+  PRICE_DESC = 'PRICE_DESC', // 가격내림차순 -> lastSortValue
 }
   
 
@@ -43,6 +44,7 @@ export interface StudyRoomListRes {
     likeCount: number;
     reviewCount: number;
     entireMinPricePerHour: number;
+    entireMaxPricePerHour: number;
     entireMaxHeadcount: number;
     starAvg: number;
     coordinates: {
