@@ -206,10 +206,11 @@ export const StudyRoomFilter = ({ filters, onFilterChange }: StudyRoomFilterProp
         </SelectTrigger>
         <SelectContent className="bg-white w-[95px]">
           <SelectGroup>
-            <SelectItem hideCheck value="STARS" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">평점순</SelectItem>
-            <SelectItem hideCheck value="LIKE" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">좋아요순</SelectItem>
-            <SelectItem hideCheck value="REVIEW" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">후기순</SelectItem>
-            <SelectItem hideCheck value="PRICE" className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">가격순</SelectItem>
+            <SelectItem hideCheck value={SortCriteria.STAR} className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">평점순</SelectItem>
+            <SelectItem hideCheck value={SortCriteria.LIKE} className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">좋아요순</SelectItem>
+            <SelectItem hideCheck value={SortCriteria.REVIEW} className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">후기순</SelectItem>
+            <SelectItem hideCheck value={SortCriteria.PRICE_ASC} className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">가격 오름차순</SelectItem>
+            <SelectItem hideCheck value={SortCriteria.PRICE_DESC} className="font-[600] h-[35px] pl-[16px] data-[state=checked]:text-[#4998E9] data-[state=unchecked]:text-[#C8C8C8]">가격 내림차순</SelectItem>
           </SelectGroup>
         </SelectContent>
       </Select>
