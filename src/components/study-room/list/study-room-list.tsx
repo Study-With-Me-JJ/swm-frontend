@@ -57,7 +57,6 @@ export const StudyRoomList = ({ data, hasNextPage, fetchNextPage, isLoading }: S
             >
               <div className="relative aspect-[413/160] overflow-hidden rounded-tl-[8px] rounded-tr-[8px]">
                 <div className="w-full h-full bg-gray-100">
-                  {/* TODO: rounded 없는 이미지 받으면 교체 */}
                   {room.thumbnail ? (
                     <img 
                       src={room.thumbnail} 

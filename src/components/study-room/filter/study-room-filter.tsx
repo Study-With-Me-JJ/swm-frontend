@@ -1,4 +1,4 @@
-import { AlignRight } from 'lucide-react';
+import { AlignRight, Filter } from 'lucide-react';
 import { StudyRoomListParams, SortCriteria } from '@/types/api';        
 import { ScrollArea } from "@/components/ui/scroll-area"
 import {
@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { RangeSlider } from '@/components/ui/range-slider';
 import { LocalitySelect, LocalitySelectContent, LocalitySelectItem, LocalitySelectTrigger, LocalitySelectValue } from '@/components/ui/locality-select';
+import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
 
 const REGIONS = [
   { label: "지역 전체", value: "ALL" },
@@ -199,6 +200,23 @@ export const StudyRoomFilter = ({ filters, onFilterChange }: StudyRoomFilterProp
       </Select>
     </div>
     <div>
+    <Popover>
+      <PopoverTrigger asChild>
+        <Button variant="outline">
+          <Filter className='w-[18px] h-[18px]' />
+        </Button> 
+      </PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h4 className="font-medium leading-none">Dimensions</h4>
+            <p className="text-sm text-muted-foreground">
+              Set the dimensions for the layer.
+            </p>
+          </div>
+        </div>
+      </PopoverContent>
+    </Popover>  
       <Select value={filters.sortCriteria || "STARS"} onValueChange={(value) => onFilterChange({ sortCriteria: value as SortCriteria })}>
         <SelectTrigger hideChevron className="bg-white font-[600] text-[14px] text-[#4998E9] flex gap-2 items-center border-0">
           <AlignRight className='w-[18px] h-[18px]' />
