@@ -12,10 +12,12 @@ interface InputFieldProps {
   helperText?: string;
   maxLength?: number;
   buttonText?: string;
+  onButtonClick?: () => void;
+  buttonDisabled?: boolean;
 }
 
 
-export function InputField({ name, label, type, placeholder, helperText, maxLength, buttonText }: InputFieldProps) {
+export function InputField({ name, label, type, placeholder, helperText, maxLength, buttonText, onButtonClick, buttonDisabled }: InputFieldProps) {
   const { control, formState: { errors } } = useFormContext();
 
   return (
@@ -45,8 +47,17 @@ export function InputField({ name, label, type, placeholder, helperText, maxLeng
         );
       }}
       />
-      {buttonText && <Button className="bg-blue-default w-36 flex-shrink-0">{buttonText}</Button>}
-</div>
+      {buttonText && onButtonClick && (
+        <Button
+          type="button"
+          className="bg-blue-default w-36 flex-shrink-0"
+          onClick={onButtonClick}
+          disabled={buttonDisabled}
+        >
+          {buttonText}
+          </Button>
+        )}
+      </div>
       {helperText && !errors[name] && <p className='text-xs text-blue-default whitespace-pre-line'>{helperText}</p>}
       {errors[name] && <p className="text-xs text-red-error whitespace-pre-line">{errors[name]?.message?.toString()}</p>}
     </div>
