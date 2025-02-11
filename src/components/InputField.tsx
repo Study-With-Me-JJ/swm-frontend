@@ -30,6 +30,7 @@ export function InputField({ name, label, type, placeholder, helperText, maxLeng
           return (
           <Input
             {...field}
+            value={field.value ?? ''}
             type={type}
             placeholder={placeholder}
             maxLength={maxLength}
