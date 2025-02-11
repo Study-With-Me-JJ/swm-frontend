@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { getUserInfo } from "@/app/_lib/getUserInfo";
-import { logout } from "@/lib/api/auth";
+// import { logout } from "@/lib/api/auth";
 export default function HeaderUser() {  
     const [isLoggedIn, setIsLoggedIn] = useState(false); 
     const router = useRouter(); 
