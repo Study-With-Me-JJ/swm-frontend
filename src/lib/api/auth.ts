@@ -23,7 +23,7 @@ export const logout = async () => {
     await axiosInstance.patch(API_ENDPOINTS.USER.LOGOUT);
     clearAuthData();
     return { success: true };
-  } catch (_) { 
+  } catch { 
     clearAuthData();
     
     return { success: true };  
