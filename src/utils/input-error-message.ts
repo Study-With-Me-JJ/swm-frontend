@@ -1,6 +1,9 @@
 export const INPUT_ERROR_MESSAGE = {
     NAME: "최소 2글자 이상(한글, 영어) 입력해 주세요. (띄어쓰기 가능)",
-    NICKNAME: "영문, 숫자 이외 특수문자는 입력할 수 없습니다.\n닉네임은 본인 페이지 주소로 활용됩니다. ex)studywithme.site/jiyuuun",
+    NICKNAME: {
+      REQUIRED: "닉네임을 입력해 주세요.",
+      HELPER_TEXT:"영문, 숫자 이외 특수문자는 입력할 수 없습니다.\n닉네임은 본인 페이지 주소로 활용됩니다. ex)studywithme.site/jiyuuun",
+    },
     EMAIL: {
       REQUIRED: "이메일을 입력해 주세요.",
       INVALID_FORMAT:"적합하지 않은 이메일 형식입니다. 다시 입력해 주세요."
