@@ -16,26 +16,25 @@ export const login = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
-  try {
-    await axiosInstance.patch(API_ENDPOINTS.USER.LOGOUT);
+  const clearAuthData = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('expirationTime');
     delete axiosInstance.defaults.headers.common['Authorization'];
+  };
+
+  try {
+    await axiosInstance.patch(API_ENDPOINTS.USER.LOGOUT);
+    clearAuthData();
     return { success: true };
-  } catch (error) {
-    if (error instanceof AxiosError) {
-      if (error.response?.status === 401) {  
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('expirationTime');
-        delete axiosInstance.defaults.headers.common['Authorization'];
-        return { success: true };
-      }
-       
-      const errorMessage = error.response?.data?.messageClient 
-        || '로그아웃 중 오류가 발생했습니다.';
-      throw new Error(errorMessage);
-    }
+  } catch (error) { 
+    clearAuthData();
      
-    throw new Error('로그아웃 중 예기치 않은 오류가 발생했습니다.');
+    // console.log('로그아웃 에러 상세:', error);
+     
+    if (error instanceof AxiosError && error.response?.status === 401) {
+      return { success: true };
+    }
+    
+    return { success: true };  
   }
 };
