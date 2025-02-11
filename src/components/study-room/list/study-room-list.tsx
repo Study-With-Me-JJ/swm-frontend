@@ -64,11 +64,11 @@ export const StudyRoomList = ({ data, hasNextPage, fetchNextPage, isLoading }: S
                       alt="Study Room Image" 
                       className="w-full h-full object-cover" 
                       onError={(e) => {
-                        e.currentTarget.src = '/no-image.png';
+                        e.currentTarget.src = '/no-image-square.png';
                       }}
                     />
                   ) : (
-                    <img src="/no-image.png" alt="No Image Available" className="w-full h-full object-cover" />
+                    <img src="/no-image-square.png" alt="No Image Available" className="w-full h-full object-cover" />
                   )}
                 </div>
               </div>
