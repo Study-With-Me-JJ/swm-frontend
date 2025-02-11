@@ -3,7 +3,7 @@ import localFont from "next/font/local";
 import RootProvider from "@/providers/root-provider";
 import "@/styles/globals.css";
 import Header from "@/components/Header";     
-
+import { Toaster } from "react-hot-toast";
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
   display: 'swap',
@@ -30,8 +30,16 @@ export default function RootLayout({
         className={`${pretendard.className} antialiased`}
       >
         <RootProvider>
-          <Header />
-          {children}  
+          <Toaster
+            toastOptions={{
+              style: {
+                maxWidth: '500px',
+                width: '100%',
+              }
+            }}
+          />
+            <Header />
+            {children}  
         </RootProvider>
       </body>
     </html>
