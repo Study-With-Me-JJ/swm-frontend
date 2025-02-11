@@ -17,16 +17,20 @@ export default function HeaderUser() {
     }, []);
 
     const handleLogout = async () => {
-        try {
-            await logout();
-        } catch (error) {
-            console.error('로그아웃 에러:', error);
-        } finally { 
-            setIsLoggedIn(false);
-            localStorage.removeItem('accessToken');
-            localStorage.removeItem('expirationTime');
-            router.push('/');
-        }
+        // try {
+        //     await logout();
+        // } catch (error) {
+        //     console.error('로그아웃 에러:', error);
+        // } finally { 
+        //     setIsLoggedIn(false);
+        //     localStorage.removeItem('accessToken');
+        //     localStorage.removeItem('expirationTime');
+        //     router.push('/');
+        // }
+        setIsLoggedIn(false);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('expirationTime');
+        router.push('/');
     };
 
     const { data } = useQuery({

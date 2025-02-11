@@ -1,6 +1,5 @@
 import { axiosInstance } from './axios';
-import { API_ENDPOINTS } from './endpoints';
-import { AxiosError } from 'axios';
+import { API_ENDPOINTS } from './endpoints'; 
 
 export const login = async (email: string, password: string) => {
   try {
@@ -16,9 +15,7 @@ export const login = async (email: string, password: string) => {
 };
 
 export const logout = async () => {
-  const clearAuthData = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('expirationTime');
+  const clearAuthData = () => { 
     delete axiosInstance.defaults.headers.common['Authorization'];
   };
 
@@ -26,14 +23,8 @@ export const logout = async () => {
     await axiosInstance.patch(API_ENDPOINTS.USER.LOGOUT);
     clearAuthData();
     return { success: true };
-  } catch (error) { 
+  } catch (_) { 
     clearAuthData();
-     
-    // console.log('로그아웃 에러 상세:', error);
-     
-    if (error instanceof AxiosError && error.response?.status === 401) {
-      return { success: true };
-    }
     
     return { success: true };  
   }
