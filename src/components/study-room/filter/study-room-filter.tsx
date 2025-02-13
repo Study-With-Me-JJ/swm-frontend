@@ -1,7 +1,9 @@
-import { AlignRight, Filter } from 'lucide-react';
 import { useState } from 'react';
-
+import { AlignRight, Filter, Minus, Plus } from 'lucide-react';
+import { SortCriteria, StudyRoomListParams } from '@/types/api';
+import { StudyRoomOption } from '@/types/api/study-room';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   LocalitySelect,
   LocalitySelectContent,
@@ -11,8 +13,8 @@ import {
 } from '@/components/ui/locality-select';
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from '@/components/ui/popover';
 import { RangeSlider } from '@/components/ui/range-slider';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -24,8 +26,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { StudyRoomListParams, SortCriteria } from '@/types/api';
-import { StudyRoomOption } from '@/types/api/study-room';
 
 const REGIONS = [
   { label: '지역 전체', value: 'ALL' },
@@ -92,9 +92,7 @@ export const StudyRoomFilter = ({
   const [tempPriceRange, setTempPriceRange] = useState<[number, number]>([
     0, 300000,
   ]);
-  const [tempHeadCountRange, setTempHeadCountRange] = useState<
-    [number, number]
-  >([1, 50]);
+  const [tempHeadCount, setTempHeadCount] = useState<number>(0);
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const [isHeadCountOpen, setIsHeadCountOpen] = useState(false);
 
@@ -102,10 +100,24 @@ export const StudyRoomFilter = ({
     setTempPriceRange(value);
   };
 
-  const handleHeadCountChange = (value: [number, number]) => {
-    setTempHeadCountRange(value);
+  const handleHeadCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (Number(e.target.value) > 50 || Number(e.target.value) < 0) {
+      return;
+    }
+    setTempHeadCount(Number(e.target.value));
   };
 
+  const handleHeadCountMinus = () => {
+    if (tempHeadCount > 0) {
+      setTempHeadCount(tempHeadCount - 1);
+    }
+  };
+
+  const handleHeadCountPlus = () => {
+    if (tempHeadCount < 50) {
+      setTempHeadCount(tempHeadCount + 1);
+    }
+  };
   return (
     <div className="flex justify-between">
       <div className="flex gap-[20px]">
@@ -206,35 +218,46 @@ export const StudyRoomFilter = ({
                 <h3 className="mb-2 text-[14px] font-[600] text-[#565656]">
                   인원을 설정해 주세요.
                 </h3>
-                <p className="text-[20px] font-[600] text-[#565656]">
-                  {tempHeadCountRange[0].toLocaleString()}명 ~{' '}
-                  {tempHeadCountRange[1].toLocaleString()}명
-                </p>
               </div>
-
-              <RangeSlider
-                defaultValue={[1, 50]}
-                min={1}
-                max={50}
-                step={1}
-                value={tempHeadCountRange}
-                onValueChange={handleHeadCountChange}
-                className="[&_[role=slider]]:border-[#E0E0E0]"
-                minStepsBetweenThumbs={1}
-              />
+              <div className="flex w-[258px] items-center rounded-[8px] border border-[#E0E0E0]">
+                <Button
+                  variant="ghost"
+                  className="h-[50px] w-[50px] disabled:bg-[#ffffff] disabled:opacity-30"
+                  onClick={handleHeadCountMinus}
+                  disabled={tempHeadCount === 0}
+                >
+                  <Minus />
+                </Button>
+                <Input
+                  value={tempHeadCount}
+                  onChange={handleHeadCountChange}
+                  min={1}
+                  max={50}
+                  type="number"
+                  className="rounded-none border-b-0 border-t-0 text-center text-[20px] font-[600] text-[#565656] focus:border-transparent focus:outline-none focus:ring-0 focus-visible:border-[#E0E0E0] focus-visible:outline-none focus-visible:ring-0 active:border-transparent active:outline-none active:ring-0"
+                />
+                <Button
+                  variant="ghost"
+                  className="h-[50px] w-[50px] disabled:bg-white disabled:opacity-50"
+                  onClick={handleHeadCountPlus}
+                  disabled={tempHeadCount === 50}
+                >
+                  <Plus />
+                </Button>
+              </div>
 
               <div className="flex w-full gap-2">
                 <Button
                   variant="outline"
                   className="w-[80px] flex-shrink-0 border-0 bg-[#E7F3FF] font-[600] text-[#4998E9] hover:bg-[#E7F3FF]/90"
-                  onClick={() => setTempHeadCountRange([1, 50])}
+                  onClick={() => setTempHeadCount(0)}
                 >
                   초기화
                 </Button>
                 <Button
                   className="flex-grow-1 w-full bg-[#4998E9] font-[600] text-white hover:bg-[#4998E9]/90"
                   onClick={() => {
-                    onFilterChange({ headCount: tempHeadCountRange[1] });
+                    onFilterChange({ headCount: tempHeadCount });
                     setIsHeadCountOpen(false);
                   }}
                 >
