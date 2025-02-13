@@ -6,12 +6,19 @@
   "printWidth": 80,
   "arrowParens": "always",
   "importOrder": [
-    "^@/(.*)$",
+    "^(react|next)(.*)$",
+    "^[^@/].*$",
+    "^@/utils/(.*)$",
+    "^@/api/(.*)$",
+    "^@/types/(.*)$",
+    "^@/queries/(.*)$",
+    "^@/hooks/(.*)$",
+    "^@/components/(.*)$",
     "^[./]"
   ],
-  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true,
   "plugins": [
     "@trivago/prettier-plugin-sort-imports",
     "prettier-plugin-tailwindcss"
   ]
-} 
+}
