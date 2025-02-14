@@ -333,7 +333,7 @@ export const StudyRoomFilter = ({
         >
           <SelectTrigger
             hideChevron
-            className="flex items-center gap-2 border-0 bg-white text-[14px] font-[600] text-[#4998E9]"
+            className="flex items-center gap-2 border-0 bg-white text-[12px] font-[600] text-[#4998E9]"
           >
             <AlignRight className="h-[18px] w-[18px]" />
             <SelectValue defaultValue="" placeholder="평점순" />
