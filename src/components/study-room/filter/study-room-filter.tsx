@@ -96,8 +96,25 @@ export const StudyRoomFilter = ({
   const [isPriceOpen, setIsPriceOpen] = useState(false);
   const [isHeadCountOpen, setIsHeadCountOpen] = useState(false);
 
+  const handlePriceInit = () => {
+    setTempPriceRange([0, 300000]);
+    onFilterChange({
+      minPricePerHour: undefined,
+      maxPricePerHour: undefined,
+    });
+    setIsPriceOpen(false);
+  };
+
   const handlePriceChange = (value: [number, number]) => {
     setTempPriceRange(value);
+  };
+
+  const handlePriceApply = () => {
+    onFilterChange({
+      minPricePerHour: tempPriceRange[0],
+      maxPricePerHour: tempPriceRange[1],
+    });
+    setIsPriceOpen(false);
   };
 
   const handleHeadCountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,6 +135,29 @@ export const StudyRoomFilter = ({
       setTempHeadCount(tempHeadCount + 1);
     }
   };
+
+  const handleHeadCountInit = () => {
+    setTempHeadCount(0);
+    onFilterChange({ headCount: undefined });
+    setIsHeadCountOpen(false);
+  };
+
+  const handleHeadCountApply = () => {
+    onFilterChange({ headCount: tempHeadCount });
+    setIsHeadCountOpen(false);
+  };
+
+  const handleOptionsInit = () => {
+    setTempOptions([]);
+    onFilterChange({ options: [] });
+    setOpen(false);
+  };
+
+  const handleOptionsApply = () => {
+    onFilterChange({ options: tempOptions });
+    setOpen(false);
+  };
+
   return (
     <div className="flex justify-between">
       <div className="flex gap-[20px]">
@@ -147,8 +187,13 @@ export const StudyRoomFilter = ({
         <Select value="" open={isPriceOpen} onOpenChange={setIsPriceOpen}>
           <SelectTrigger className="h-[50px] w-[220px] bg-white">
             <SelectValue
-              defaultValue=""
-              placeholder="가격"
+              defaultValue={''}
+              placeholder={
+                filters.minPricePerHour === undefined &&
+                filters.maxPricePerHour === undefined
+                  ? '가격'
+                  : `${filters.minPricePerHour?.toLocaleString()}원 ~ ${filters.maxPricePerHour?.toLocaleString()}원`
+              }
               className="text-[#565656]"
             />
           </SelectTrigger>
@@ -179,19 +224,13 @@ export const StudyRoomFilter = ({
                 <Button
                   variant="outline"
                   className="w-[80px] flex-shrink-0 border-0 bg-[#E7F3FF] font-[600] text-[#4998E9] hover:bg-[#E7F3FF]/90"
-                  onClick={() => setTempPriceRange([0, 300000])}
+                  onClick={handlePriceInit}
                 >
                   초기화
                 </Button>
                 <Button
                   className="flex-grow-1 w-full bg-[#4998E9] font-[600] text-white hover:bg-[#4998E9]/90"
-                  onClick={() => {
-                    onFilterChange({
-                      minPricePerHour: tempPriceRange[0],
-                      maxPricePerHour: tempPriceRange[1],
-                    });
-                    setIsPriceOpen(false);
-                  }}
+                  onClick={handlePriceApply}
                 >
                   적용
                 </Button>
@@ -208,7 +247,11 @@ export const StudyRoomFilter = ({
           <SelectTrigger className="h-[50px] w-[220px] bg-white">
             <SelectValue
               defaultValue=""
-              placeholder="인원"
+              placeholder={
+                filters.headCount === undefined
+                  ? '인원'
+                  : `${filters.headCount}명`
+              }
               className="text-[#565656]"
             />
           </SelectTrigger>
@@ -250,16 +293,13 @@ export const StudyRoomFilter = ({
                 <Button
                   variant="outline"
                   className="w-[80px] flex-shrink-0 border-0 bg-[#E7F3FF] font-[600] text-[#4998E9] hover:bg-[#E7F3FF]/90"
-                  onClick={() => setTempHeadCount(0)}
+                  onClick={handleHeadCountInit}
                 >
                   초기화
                 </Button>
                 <Button
                   className="flex-grow-1 w-full bg-[#4998E9] font-[600] text-white hover:bg-[#4998E9]/90"
-                  onClick={() => {
-                    onFilterChange({ headCount: tempHeadCount });
-                    setIsHeadCountOpen(false);
-                  }}
+                  onClick={handleHeadCountApply}
                 >
                   적용
                 </Button>
@@ -306,18 +346,13 @@ export const StudyRoomFilter = ({
                 <Button
                   variant="outline"
                   className="w-[80px] flex-shrink-0 border-0 bg-[#E7F3FF] font-[600] text-[#4998E9] hover:bg-[#E7F3FF]/90"
-                  onClick={() => {
-                    setTempOptions([]);
-                  }}
+                  onClick={handleOptionsInit}
                 >
                   초기화
                 </Button>
                 <Button
                   className="flex-grow-1 w-full bg-[#4998E9] font-[600] text-white hover:bg-[#4998E9]/90"
-                  onClick={() => {
-                    onFilterChange({ options: tempOptions });
-                    setOpen(false);
-                  }}
+                  onClick={handleOptionsApply}
                 >
                   적용
                 </Button>
@@ -333,7 +368,7 @@ export const StudyRoomFilter = ({
         >
           <SelectTrigger
             hideChevron
-            className="flex items-center gap-2 border-0 bg-white text-[12px] font-[600] text-[#4998E9]"
+            className="flex items-center gap-2 border-0 bg-white text-[12px] font-[600] text-[#4998E9] focus:ring-0 focus-visible:ring-0"
           >
             <AlignRight className="h-[18px] w-[18px]" />
             <SelectValue defaultValue="" placeholder="평점순" />
