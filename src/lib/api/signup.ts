@@ -24,3 +24,15 @@ export const checkEmail = async (email: string) => {
         throw error;
     }
 }
+
+export const sendAuthCode = async (email: string) => {
+    try {
+        const response = await axiosInstance.post(API_ENDPOINTS.USER.SEND_AUTH_CODE, {
+            loginId: email
+        });
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
