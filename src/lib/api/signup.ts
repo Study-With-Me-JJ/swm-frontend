@@ -13,3 +13,14 @@ export const checkNickname = async (nickname: string) => {
     }
 };
 
+export const checkEmail = async (email: string) => {
+    try {
+        const response = await axiosInstance.get(API_ENDPOINTS.USER.CHECK_EMAIL, {
+            params: { loginId: email }
+        });
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
