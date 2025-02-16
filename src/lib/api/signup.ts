@@ -36,3 +36,17 @@ export const sendAuthCode = async (email: string) => {
         throw error;
     }
 }
+
+export const checkAuthCode = async (email: string, authCode: string) => {
+    try {
+        const response = await axiosInstance.post(API_ENDPOINTS.USER.CHECK_AUTH_CODE, {
+            loginId: email,
+            authCode: authCode
+        });
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
+
