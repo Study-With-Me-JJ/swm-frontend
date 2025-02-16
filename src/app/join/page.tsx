@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { INPUT_ERROR_MESSAGE } from "@/utils/input-error-message";
 import { Button } from "@/components/ui/button";
-import { checkEmail, checkNickname } from "@/lib/api/signup";
+import { checkEmail, checkNickname, sendAuthCode } from "@/lib/api/signup";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -31,11 +31,13 @@ export default function Join() {
   const {watch, setError, formState: {errors}} = methods;
   const [nicknameHelperText, setNicknameHelperText] = useState<string>(INPUT_ERROR_MESSAGE.NICKNAME.HELPER_TEXT);
   const [emailHelperText, setEmailHelperText] = useState<string>('');
+  const [authCodeHelperText, setAuthCodeHelperText] = useState<string>('');
   const [isNicknameChecked, setIsNicknameChecked] = useState<boolean>(false);
   const [isEmailChecked, setIsEmailChecked] = useState<boolean>(false);
 
   const nickname = watch('nickName');
   const email = watch('email');
+
   // 닉네임 중복 확인
   const handleCheckNickname = async () => {
     const nickname = methods.getValues('nickName');
@@ -81,6 +83,23 @@ export default function Join() {
       setIsEmailChecked(false);
     }
   }
+
+// 인증번호 전송
+const handleSendAuthCode = async () => {
+  const email = methods.getValues('email');
+
+  try {
+    if (!errors.authCode) {
+      await sendAuthCode(email);
+      setAuthCodeHelperText('이메일로 인증번호를 발송했습니다.');
+    }
+  } catch (error) {
+    console.error('Auth code send error:', error);
+    toast.error('인증번호 전송 중 오류가 발생했습니다. 다시 시도해 주세요.', {
+      duration: 3000,
+    })
+  }
+}
 
 // 닉네임이 변경되면 닉네임 체크 상태 초기화
 useEffect(() => {
@@ -128,13 +147,16 @@ useEffect(() => {
               onButtonClick={handleCheckEmail}
               buttonDisabled={!email || !!errors.email || isEmailChecked}
             />
-              <InputField
-                name="authCode"
-                label="인증번호 입력"
-                type="text"
-                placeholder="6자리 인증번호"
-                maxLength={6}
+            <InputField
+              name="authCode"
+              label="인증번호 입력"
+              type="text"
+              placeholder="6자리 인증번호"
+              helperText={authCodeHelperText}
+              maxLength={6}
               buttonText="인증번호 받기"
+              onButtonClick={handleSendAuthCode}
+              buttonDisabled={!isEmailChecked}
             />
             <InputField
               name="password"
