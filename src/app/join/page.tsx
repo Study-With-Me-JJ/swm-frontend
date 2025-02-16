@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { INPUT_ERROR_MESSAGE } from "@/utils/input-error-message";
 import { Button } from "@/components/ui/button";
-import { checkEmail, checkNickname, sendAuthCode } from "@/lib/api/signup";
+import { checkAuthCode, checkEmail, checkNickname, sendAuthCode } from "@/lib/api/signup";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -16,7 +16,7 @@ const signupSchema = z.object({
     .regex(/^[가-힣a-zA-Z\s]+$/, INPUT_ERROR_MESSAGE.NAME),
   nickName: z.string({required_error: INPUT_ERROR_MESSAGE.NICKNAME.REQUIRED}).regex(/^[a-zA-Z0-9]+$/, INPUT_ERROR_MESSAGE.NICKNAME.HELPER_TEXT),
   email: z.string({required_error: INPUT_ERROR_MESSAGE.EMAIL.REQUIRED}).email(INPUT_ERROR_MESSAGE.EMAIL.INVALID_FORMAT),
-  authCode: z.string().regex(/^\d*$/, "숫자만 입력 가능합니다.").length(6, "6자리 숫자를 입력해 주세요.").optional(),
+  authCode: z.string({required_error: INPUT_ERROR_MESSAGE.AUTH_CODE.REQUIRED}).regex(/^\d*$/, INPUT_ERROR_MESSAGE.AUTH_CODE.ONLY_NUMBER).length(6, INPUT_ERROR_MESSAGE.AUTH_CODE.LENGTH),
   password: z.string({required_error: INPUT_ERROR_MESSAGE.PASSWORD.REQUIRED}).min(8, INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT).max(20, INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT),
   passwordCheck: z.string({required_error: INPUT_ERROR_MESSAGE.PASSWORD_CHECK})
 });
@@ -32,6 +32,7 @@ export default function Join() {
   const [nicknameHelperText, setNicknameHelperText] = useState<string>(INPUT_ERROR_MESSAGE.NICKNAME.HELPER_TEXT);
   const [emailHelperText, setEmailHelperText] = useState<string>('');
   const [authCodeHelperText, setAuthCodeHelperText] = useState<string>('');
+  const [authCodeButtonText, setAuthCodeButtonText] = useState<string>('인증번호 받기');
   const [isNicknameChecked, setIsNicknameChecked] = useState<boolean>(false);
   const [isEmailChecked, setIsEmailChecked] = useState<boolean>(false);
 
@@ -89,13 +90,37 @@ const handleSendAuthCode = async () => {
   const email = methods.getValues('email');
 
   try {
-    if (!errors.authCode) {
-      await sendAuthCode(email);
-      setAuthCodeHelperText('이메일로 인증번호를 발송했습니다.');
-    }
+    await sendAuthCode(email);
+    setAuthCodeHelperText('이메일로 인증번호를 발송했습니다.');
+    setAuthCodeButtonText('인증번호 재전송');
   } catch (error) {
     console.error('Auth code send error:', error);
     toast.error('인증번호 전송 중 오류가 발생했습니다. 다시 시도해 주세요.', {
+      duration: 3000,
+    })
+  }
+}
+
+// 인증번호 검증
+const handleAuthCodeCheck = async () => {
+  const email = methods.getValues('email');
+  const authCode = methods.getValues('authCode');
+
+  try {
+    if (!errors.authCode) {
+      const response = await checkAuthCode(email, authCode);
+
+      if (response.data) {
+        setAuthCodeHelperText(INPUT_ERROR_MESSAGE.AUTH_CODE.VALID);
+      } else {
+        setAuthCodeHelperText('');
+        setError('authCode', {message: INPUT_ERROR_MESSAGE.AUTH_CODE.INVALID});
+      }
+    }
+
+  } catch (error) {
+    console.error('Auth code check error:', error);
+    toast.error('인증번호 확인 중 오류가 발생했습니다. 다시 시도해 주세요.', {
       duration: 3000,
     })
   }
@@ -154,9 +179,10 @@ useEffect(() => {
               placeholder="6자리 인증번호"
               helperText={authCodeHelperText}
               maxLength={6}
-              buttonText="인증번호 받기"
+              buttonText={authCodeButtonText}
               onButtonClick={handleSendAuthCode}
               buttonDisabled={!isEmailChecked}
+              onAuthCodeCheck={handleAuthCodeCheck}
             />
             <InputField
               name="password"
