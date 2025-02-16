@@ -1,12 +1,14 @@
 'use client'
 
 import { Input } from "@/components/ui/input";
+import { useEffect } from "react";
 import { useFormContext, Controller } from "react-hook-form";
 import { Button } from "./ui/button";
+import { useState } from "react";
 
 interface InputFieldProps {
   name: string;
-  label: string;
+  label?: string;
   type: string;
   placeholder: string;
   helperText?: string;
@@ -14,15 +16,49 @@ interface InputFieldProps {
   buttonText?: string;
   onButtonClick?: () => void;
   buttonDisabled?: boolean;
+  onAuthCodeCheck?: () => void;
 }
 
 
-export function InputField({ name, label, type, placeholder, helperText, maxLength, buttonText, onButtonClick, buttonDisabled }: InputFieldProps) {
-  const { control, formState: { errors } } = useFormContext();
+export function InputField({ name, label, type, placeholder, helperText, maxLength, buttonText, onButtonClick, buttonDisabled, onAuthCodeCheck }: InputFieldProps) {
+  const { control, formState: { errors }} = useFormContext();
+  const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
+  const [countdown, setCountdown] = useState<number>(600);
+  const [isAuthCodeInputEnabled, setIsAuthCodeInputEnabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (isCountdownActive && countdown > 0) {
+      timer = setInterval(() => {
+        setCountdown((prev) => prev - 1);
+      }, 1000);
+    } else if (countdown === 0) {
+      setIsCountdownActive(false);
+    }
+
+    return () => clearInterval(timer);
+  }, [isCountdownActive, countdown]);
+
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
+
+  const handleButtonClick = () => {
+    if (onButtonClick) {
+      onButtonClick();
+    }
+    if (name === 'authCode') {
+      setIsCountdownActive(true);
+      setCountdown(600);
+      setIsAuthCodeInputEnabled(true);
+    }
+  };
 
   return (
     <div className='flex flex-col gap-2'>
-      <h3 className='font-medium'>{label}</h3>
+      {label && <h3 className='font-medium'>{label}</h3>}
       <div className='flex gap-2'>
       <Controller
         name={name}
@@ -36,7 +72,8 @@ export function InputField({ name, label, type, placeholder, helperText, maxLeng
             type={type}
             placeholder={placeholder}
             maxLength={maxLength}
-            className={`flex-grow
+            disabled={name === 'authCode' && !isAuthCodeInputEnabled}
+            className={`flex-grow disabled:cursor-default
               ${errors[name]
               ? 'border-red-error'
               : isValid
@@ -51,13 +88,18 @@ export function InputField({ name, label, type, placeholder, helperText, maxLeng
         <Button
           type="button"
           className="bg-blue-default w-36 flex-shrink-0"
-          onClick={onButtonClick}
+          onClick={handleButtonClick}
           disabled={buttonDisabled}
         >
           {buttonText}
           </Button>
         )}
       </div>
+      {name === 'authCode' && (
+        <Button type="button" className="bg-blue-default" onClick={onAuthCodeCheck} disabled={!isCountdownActive}>
+          인증번호 확인 {isCountdownActive && `(${formatTime(countdown)})`}
+        </Button>
+      )}
       {helperText && !errors[name] && <p className='text-xs text-blue-default whitespace-pre-line'>{helperText}</p>}
       {errors[name] && <p className="text-xs text-red-error whitespace-pre-line">{errors[name]?.message?.toString()}</p>}
     </div>
