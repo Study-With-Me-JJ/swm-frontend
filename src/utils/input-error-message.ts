@@ -8,7 +8,13 @@ export const INPUT_ERROR_MESSAGE = {
       REQUIRED: "이메일을 입력해 주세요.",
       INVALID_FORMAT:"적합하지 않은 이메일 형식입니다. 다시 입력해 주세요."
     },
-    AUTH_CODE: "인증번호가 올바르지 않습니다.",
+    AUTH_CODE: {
+      REQUIRED: "인증번호를 입력해 주세요.",
+      ONLY_NUMBER: "숫자만 입력 가능합니다.",
+      LENGTH: "6자리 숫자를 입력해 주세요.",
+      INVALID: "인증번호가 올바르지 않습니다.",
+      VALID: "인증되었습니다.",
+    },
     PASSWORD: {
       REQUIRED: "비밀번호를 입력해 주세요.",
       HELPER_TEXT: "영문, 숫자, 특수문자를 포함한 8~20자리의 비밀번호를 입력해 주세요.\n아이디와 같은 비밀번호는 사용하실 수 없습니다.",
