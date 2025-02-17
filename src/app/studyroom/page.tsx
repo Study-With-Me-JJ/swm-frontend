@@ -1,17 +1,21 @@
 'use client';
 
-import dynamic from 'next/dynamic';
 import { QueryErrorResetBoundary } from '@tanstack/react-query';
-import { StudyRoomErrorBoundary } from '@/components/error-boundary/study-room/study-room-errorboundary';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 import { StudyRoomErrorFallback } from '@/components/error-boundary/study-room/study-room-error-fallback';
+import { StudyRoomErrorBoundary } from '@/components/error-boundary/study-room/study-room-errorboundary';
 import { StudyRoomLoading } from '@/components/loading/study-room-loading';
 
 const StudyRoomContainer = dynamic(
-  () => import('@/components/study-room/container').then(mod => mod.StudyRoomContainer),
-  { 
+  () =>
+    import('@/components/study-room/container').then(
+      (mod) => mod.StudyRoomContainer,
+    ),
+  {
     ssr: false,
-    loading: () => <StudyRoomLoading /> 
-  }
+    loading: () => <StudyRoomLoading />,
+  },
 );
 
 export default function StudyRoom() {
@@ -22,7 +26,9 @@ export default function StudyRoom() {
           onReset={reset}
           FallbackComponent={StudyRoomErrorFallback}
         >
-          <StudyRoomContainer />
+          <Suspense fallback={<StudyRoomLoading />}>
+            <StudyRoomContainer />
+          </Suspense>
         </StudyRoomErrorBoundary>
       )}
     </QueryErrorResetBoundary>

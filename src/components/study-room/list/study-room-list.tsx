@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { devLog } from '@/utils/dev-log';
 import { StudyRoomListResponse } from '@/types/api';
+import { StudyRoomLoading } from '@/components/loading';
 import StudyRoomSearchEmpty from '@/components/study-room/ui/study-room-search-empty';
 
 export interface StudyRoomListProps {
@@ -141,7 +142,11 @@ export const StudyRoomList = ({
         )}
       </div>
 
-      {!isLoading && hasNextPage && <div ref={nextFetchTargetRef}>. . .</div>}
+      {!isLoading && hasNextPage && (
+        <div ref={nextFetchTargetRef}>
+          <StudyRoomLoading />
+        </div>
+      )}
     </div>
   );
 };
