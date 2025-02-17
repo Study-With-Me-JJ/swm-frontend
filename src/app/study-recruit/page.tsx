@@ -7,104 +7,149 @@ import PositionFilter from '@/components/filters/PositionFilter';
 import StatusFilter from '@/components/filters/StatusFilter';
 import SortFilter from '@/components/filters/SortFilter'; 
 import Image from 'next/image';
+import { Study } from '@/types/api/study';
+
 // 더미 데이터 추가
 const dummyStudyData = [
   {
-    userId: '1',
     studyId: 1,
     title: '리액트 스터디 모집합니다',
     content: '리액트 기초부터 심화까지 함께 공부해요',
-    category: 'MACHINELEARNING',
-    position: 'DEVELOPER',
-    thumbnail: 'https://via.placeholder.com/150',
+    category: 'MACHINELEARNING', 
     likeCount: 0,
     commentCount: 0,
     status: 'ACTIVE',
     viewCount: 0,
-    nickname: '김개발',
-    profileImageUrl: 'https://via.placeholder.com/150',
     studyBookmarkId: null,
-    createdAt: '2025-01-01',
-    tagInquiryListResponse: [
+    getTagResponseList: [
       {
-        studyTagId: 0,
-        name: "REACT"
-      }
-    ],
-  }, 
-  {
-    userId: '2',
-    studyId: 2,
-    title: '자바 스터디 모집합니다',
-    content: '자바 기초부터 심화까지 함께 공부해요',
-    category: 'MACHINELEARNING',
-    position: 'DESIGNER',
-    thumbnail: 'https://via.placeholder.com/150',
-    likeCount: 5,
-    commentCount: 0,
-    status: 'INACTIVE',
-    viewCount: 0,
-    nickname: '김개발',
-    profileImageUrl: 'https://via.placeholder.com/150',
-    studyBookmarkId: 2,
-    createdAt: '2025-02-01',
-    tagInquiryListResponse: [
-      {
-        studyTagId: 0,
-        name: "JAVA"
+        tagId: 0,
+        name: "어쩌고저쩌고"
       },
       {
-        studyTagId: 1,
-        name: "SPRING"
+        tagId: 1,
+        name: "어쩌고저쩌고"
       }
     ],
-  }, 
-  {
-    userId: '3',
-    studyId: 3,
-    title: '파이썬 스터디 모집합니다',
-    content: '파이썬 기초부터 심화까지 함께 공부해요',
-    category: 'ALGORITHM',
-    position: 'DESIGNER',
-    thumbnail: 'https://via.placeholder.com/150',
-    likeCount: 0,
-    commentCount: 0,
-    status: 'ACTIVE',
-    viewCount: 0,
-    nickname: '이개발',
-    profileImageUrl: 'https://via.placeholder.com/150',
-    studyBookmarkId: null,
-    createdAt: '2024-12-01',
-    tagInquiryListResponse: [
+    getRecruitmentPositionResponseList: [
       {
-        studyTagId: 0,
-        name: "PYTHON"
+        recruitmentPositionId: 0,
+        title: "BACKEND",
+        headcount: 10,
+        acceptedCount: 0
+      },
+      {
+        recruitmentPositionId: 1,
+        title: "FRONTEND",
+        headcount: 10,
+        acceptedCount: 0
       }
     ],
   },
   {
-    userId: '4',
-    studyId: 4,
+    studyId: 2,
     title: '파이썬 스터디 모집합니다',
     content: '파이썬 기초부터 심화까지 함께 공부해요',
-    category: 'DATAANALYSIS',
-    position: 'PLANNER',
-    thumbnail: 'https://via.placeholder.com/150',
-    likeCount: 0,
-    commentCount: 0,
+    category: 'MOBILE', 
+    likeCount: 2,
+    commentCount: 6,
     status: 'ACTIVE',
-    viewCount: 0,
-    nickname: '이개발',
-    profileImageUrl: 'https://via.placeholder.com/150',
-    studyBookmarkId: null,
-    createdAt: '2025-04-01',
-    tagInquiryListResponse: [
+    viewCount: 10,
+    studyBookmarkId: 1,
+    getTagResponseList: [
       {
-        studyTagId: 0,
-        name: "PYTHON"
+        tagId: 0,
+        name: "어쩌고저쩌고"
+      }
+    ],
+    getRecruitmentPositionResponseList: [
+      {
+        recruitmentPositionId: 0,
+        title: "FRONTEND",
+        headcount: 10,
+        acceptedCount: 0
       }
     ],
   }, 
+  {
+    studyId: 3,
+    title: '자바 스터디 모집합니다',
+    content: '자바 기초부터 심화까지 함께 공부해요',
+    category: 'ALGORITHM', 
+    likeCount: 2,
+    commentCount: 6,
+    status: 'ACTIVE',
+    viewCount: 10,
+    studyBookmarkId: 1,
+    getTagResponseList: [
+      {
+        tagId: 0,
+        name: "어쩌고저쩌고"
+      }
+    ],
+    getRecruitmentPositionResponseList: [
+      {
+        recruitmentPositionId: 0,
+        title: "BACKEND",
+        headcount: 10,
+        acceptedCount: 0
+      }
+    ],
+  },
+  {
+    studyId: 4,
+    title: '빅데이터 스터디 모집합니다',
+    content: '빅데이터 기초부터 심화까지 함께 공부해요',
+    category: 'BIGDATA', 
+    likeCount: 2,
+    commentCount: 6,
+    status: 'ACTIVE',
+    viewCount: 10,
+    studyBookmarkId: 1,
+    getTagResponseList: [
+      {
+        tagId: 0,
+        name: "어쩌고저쩌고"
+      }
+    ],
+    getRecruitmentPositionResponseList: [
+      {
+        recruitmentPositionId: 0,
+        title: "DESIGNER",
+        headcount: 10,
+        acceptedCount: 0
+      }
+    ],
+  },
+  {
+    studyId: 5,
+    title: '데이터분석 스터디 모집합니다',
+    content: '데이터분석 기초부터 심화까지 함께 공부해요',
+    category: 'DATAANALYSIS', 
+    likeCount: 2,
+    commentCount: 6,
+    status: 'ACTIVE',
+    viewCount: 10,
+    studyBookmarkId: 1,
+    getTagResponseList: [
+      {
+        tagId: 0,
+        name: "어쩌고저쩌고"
+      },
+      {
+        tagId: 1,
+        name: "어쩌고저쩌고"
+      }
+    ],
+    getRecruitmentPositionResponseList: [
+      {
+        recruitmentPositionId: 0,
+        title: "DESIGNER",
+        headcount: 2,
+        acceptedCount: 0
+      }
+    ],
+  },
 ];
  
 const dummyCategories = [
@@ -265,21 +310,11 @@ export default function StudyRecruit() {
   .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
   .filter(item => {
     if (Array.isArray(selectPosition)) {
-      return selectPosition.includes('ALL') ? true : selectPosition.includes(item.position);
+      return selectPosition.includes('ALL') ? true : selectPosition.includes(item.getRecruitmentPositionResponseList[0].title);
     }
-    return selectPosition === 'ALL' ? true : item.position === selectPosition;
+    return selectPosition === 'ALL' ? true : item.getRecruitmentPositionResponseList[0].title === selectPosition;
   })
-  .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus)
-  .sort((a, b) => {
-    if (selectSort === 'latest') {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    } else if (selectSort === 'like') {
-      return b.likeCount - a.likeCount;
-    } else if (selectSort === 'view') {
-      return b.viewCount - a.viewCount;
-    }
-    return 0;
-  });
+  .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus);
 
   return (
     <section className='pt-10 pb-[110px] max-w-screen-xl px-5 xl:px-0  mx-auto'>
@@ -309,7 +344,7 @@ export default function StudyRecruit() {
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
         {filteredStudyData.map((item) => (
-          <StudyItem key={item.studyId} data={item}/>
+          <StudyItem key={item.studyId} data={item as Study}/>
         ))}
       </div>
       )}

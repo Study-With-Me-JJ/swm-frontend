@@ -3,26 +3,30 @@ export interface ApiResponse<T> {
   data: PaginatedResponse<T>;
 }
 
-interface StudyTag {
-  studyTagId: number;
+export interface getTagResponseList {
+  tagId: number;
   name: string;
 }
 
+export interface getRecruitmentPositionResponseList {
+  recruitmentPositionId: number;
+  title: string;
+  headcount: number;
+  acceptedCount: number;
+}
+
 export interface Study {
-  userId: string;
   studyId: number;
   title: string;
   content: string;
   category: string;
-  thumbnail: string;
   likeCount: number;
   commentCount: number;
   status: string;
   viewCount: number;
-  nickname: string;
-  profileImageUrl: string | null;
-  studyBookmarkId: number | null;
-  tagInquiryListResponse: StudyTag[];
+  studyBookmarkId: number;
+  getTagResponseList: getTagResponseList[];
+  getRecruitmentPositionResponseList: getRecruitmentPositionResponseList[]; 
 }
   
   export type StudyResponse = ApiResponse<Study>;
