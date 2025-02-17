@@ -6,151 +6,153 @@ import CategoryFilter from '@/components/filters/CategoryFilter';
 import PositionFilter from '@/components/filters/PositionFilter';
 import StatusFilter from '@/components/filters/StatusFilter';
 import SortFilter from '@/components/filters/SortFilter'; 
-import Image from 'next/image';
-import { Study } from '@/types/api/study';
+import Image from 'next/image'; 
+import { useQuery } from '@tanstack/react-query';
+import { Study } from '@/types/api/study'; 
+import { getStudy } from '@/lib/api/study/getStudy';
 
 // 더미 데이터 추가
-const dummyStudyData = [
-  {
-    studyId: 1,
-    title: '리액트 스터디 모집합니다',
-    content: '리액트 기초부터 심화까지 함께 공부해요',
-    category: 'MACHINELEARNING', 
-    likeCount: 0,
-    commentCount: 0,
-    status: 'ACTIVE',
-    viewCount: 0,
-    studyBookmarkId: null,
-    getTagResponseList: [
-      {
-        tagId: 0,
-        name: "어쩌고저쩌고"
-      },
-      {
-        tagId: 1,
-        name: "어쩌고저쩌고"
-      }
-    ],
-    getRecruitmentPositionResponseList: [
-      {
-        recruitmentPositionId: 0,
-        title: "BACKEND",
-        headcount: 10,
-        acceptedCount: 0
-      },
-      {
-        recruitmentPositionId: 1,
-        title: "FRONTEND",
-        headcount: 10,
-        acceptedCount: 0
-      }
-    ],
-  },
-  {
-    studyId: 2,
-    title: '파이썬 스터디 모집합니다',
-    content: '파이썬 기초부터 심화까지 함께 공부해요',
-    category: 'MOBILE', 
-    likeCount: 2,
-    commentCount: 6,
-    status: 'ACTIVE',
-    viewCount: 10,
-    studyBookmarkId: 1,
-    getTagResponseList: [
-      {
-        tagId: 0,
-        name: "어쩌고저쩌고"
-      }
-    ],
-    getRecruitmentPositionResponseList: [
-      {
-        recruitmentPositionId: 0,
-        title: "FRONTEND",
-        headcount: 10,
-        acceptedCount: 0
-      }
-    ],
-  }, 
-  {
-    studyId: 3,
-    title: '자바 스터디 모집합니다',
-    content: '자바 기초부터 심화까지 함께 공부해요',
-    category: 'ALGORITHM', 
-    likeCount: 2,
-    commentCount: 6,
-    status: 'ACTIVE',
-    viewCount: 10,
-    studyBookmarkId: 1,
-    getTagResponseList: [
-      {
-        tagId: 0,
-        name: "어쩌고저쩌고"
-      }
-    ],
-    getRecruitmentPositionResponseList: [
-      {
-        recruitmentPositionId: 0,
-        title: "BACKEND",
-        headcount: 10,
-        acceptedCount: 0
-      }
-    ],
-  },
-  {
-    studyId: 4,
-    title: '빅데이터 스터디 모집합니다',
-    content: '빅데이터 기초부터 심화까지 함께 공부해요',
-    category: 'BIGDATA', 
-    likeCount: 2,
-    commentCount: 6,
-    status: 'ACTIVE',
-    viewCount: 10,
-    studyBookmarkId: 1,
-    getTagResponseList: [
-      {
-        tagId: 0,
-        name: "어쩌고저쩌고"
-      }
-    ],
-    getRecruitmentPositionResponseList: [
-      {
-        recruitmentPositionId: 0,
-        title: "DESIGNER",
-        headcount: 10,
-        acceptedCount: 0
-      }
-    ],
-  },
-  {
-    studyId: 5,
-    title: '데이터분석 스터디 모집합니다',
-    content: '데이터분석 기초부터 심화까지 함께 공부해요',
-    category: 'DATAANALYSIS', 
-    likeCount: 2,
-    commentCount: 6,
-    status: 'ACTIVE',
-    viewCount: 10,
-    studyBookmarkId: 1,
-    getTagResponseList: [
-      {
-        tagId: 0,
-        name: "어쩌고저쩌고"
-      },
-      {
-        tagId: 1,
-        name: "어쩌고저쩌고"
-      }
-    ],
-    getRecruitmentPositionResponseList: [
-      {
-        recruitmentPositionId: 0,
-        title: "DESIGNER",
-        headcount: 2,
-        acceptedCount: 0
-      }
-    ],
-  },
-];
+// const dummyStudyData = [
+//   {
+//     studyId: 1,
+//     title: '리액트 스터디 모집합니다',
+//     content: '리액트 기초부터 심화까지 함께 공부해요',
+//     category: 'MACHINELEARNING', 
+//     likeCount: 0,
+//     commentCount: 0,
+//     status: 'ACTIVE',
+//     viewCount: 0,
+//     studyBookmarkId: null,
+//     getTagResponseList: [
+//       {
+//         tagId: 0,
+//         name: "어쩌고저쩌고"
+//       },
+//       {
+//         tagId: 1,
+//         name: "어쩌고저쩌고"
+//       }
+//     ],
+//     getRecruitmentPositionResponseList: [
+//       {
+//         recruitmentPositionId: 0,
+//         title: "BACKEND",
+//         headcount: 10,
+//         acceptedCount: 0
+//       },
+//       {
+//         recruitmentPositionId: 1,
+//         title: "FRONTEND",
+//         headcount: 10,
+//         acceptedCount: 0
+//       }
+//     ],
+//   },
+//   {
+//     studyId: 2,
+//     title: '파이썬 스터디 모집합니다',
+//     content: '파이썬 기초부터 심화까지 함께 공부해요',
+//     category: 'MOBILE', 
+//     likeCount: 2,
+//     commentCount: 6,
+//     status: 'ACTIVE',
+//     viewCount: 10,
+//     studyBookmarkId: 1,
+//     getTagResponseList: [
+//       {
+//         tagId: 0,
+//         name: "어쩌고저쩌고"
+//       }
+//     ],
+//     getRecruitmentPositionResponseList: [
+//       {
+//         recruitmentPositionId: 0,
+//         title: "FRONTEND",
+//         headcount: 10,
+//         acceptedCount: 0
+//       }
+//     ],
+//   }, 
+//   {
+//     studyId: 3,
+//     title: '자바 스터디 모집합니다',
+//     content: '자바 기초부터 심화까지 함께 공부해요',
+//     category: 'ALGORITHM', 
+//     likeCount: 2,
+//     commentCount: 6,
+//     status: 'ACTIVE',
+//     viewCount: 10,
+//     studyBookmarkId: 1,
+//     getTagResponseList: [
+//       {
+//         tagId: 0,
+//         name: "어쩌고저쩌고"
+//       }
+//     ],
+//     getRecruitmentPositionResponseList: [
+//       {
+//         recruitmentPositionId: 0,
+//         title: "BACKEND",
+//         headcount: 10,
+//         acceptedCount: 0
+//       }
+//     ],
+//   },
+//   {
+//     studyId: 4,
+//     title: '빅데이터 스터디 모집합니다',
+//     content: '빅데이터 기초부터 심화까지 함께 공부해요',
+//     category: 'BIGDATA', 
+//     likeCount: 2,
+//     commentCount: 6,
+//     status: 'ACTIVE',
+//     viewCount: 10,
+//     studyBookmarkId: 1,
+//     getTagResponseList: [
+//       {
+//         tagId: 0,
+//         name: "어쩌고저쩌고"
+//       }
+//     ],
+//     getRecruitmentPositionResponseList: [
+//       {
+//         recruitmentPositionId: 0,
+//         title: "DESIGNER",
+//         headcount: 10,
+//         acceptedCount: 0
+//       }
+//     ],
+//   },
+//   {
+//     studyId: 5,
+//     title: '데이터분석 스터디 모집합니다',
+//     content: '데이터분석 기초부터 심화까지 함께 공부해요',
+//     category: 'DATAANALYSIS', 
+//     likeCount: 2,
+//     commentCount: 6,
+//     status: 'ACTIVE',
+//     viewCount: 10,
+//     studyBookmarkId: 1,
+//     getTagResponseList: [
+//       {
+//         tagId: 0,
+//         name: "어쩌고저쩌고"
+//       },
+//       {
+//         tagId: 1,
+//         name: "어쩌고저쩌고"
+//       }
+//     ],
+//     getRecruitmentPositionResponseList: [
+//       {
+//         recruitmentPositionId: 0,
+//         title: "DESIGNER",
+//         headcount: 2,
+//         acceptedCount: 0
+//       }
+//     ],
+//   },
+// ];
  
 const dummyCategories = [
   {
@@ -263,16 +265,16 @@ export default function StudyRecruit() {
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
 
-  // const { data: study, isLoading, error } = useQuery({
-  //   queryKey: ['study'],
-  //   queryFn: getStudy,
-  //   staleTime: 1000 * 60 * 60,  
-  //   gcTime: 1000 * 60 * 60 * 24,  
-  // });
+  const { data: study, isLoading, error } = useQuery({
+    queryKey: ['study'],
+    queryFn: getStudy,
+    staleTime: 1000 * 60 * 60,  
+    gcTime: 1000 * 60 * 60 * 24,  
+  });
   
-  // const studyData = study?.data;
-  const studyData = dummyStudyData;
-  // console.log('studyData type:', typeof studyData, 'value:', studyData);
+  const studyData = study?.data;
+  // const studyData = dummyStudyData;
+  console.log('studyData type:', typeof studyData, 'value:', studyData);
 
   // if (isLoading) {
   //   return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'><Loading /></div>;
@@ -306,7 +308,7 @@ export default function StudyRecruit() {
     setSelectSort(value || 'latest'); 
   };
 
-  const filteredStudyData = studyData
+  const filteredStudyData = studyData?.data
   .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
   .filter(item => {
     if (Array.isArray(selectPosition)) {
@@ -333,7 +335,7 @@ export default function StudyRecruit() {
           <SortFilter type='default' onChange={handleSortChange} defaultValue={selectSort} options={dummySort.map((sort)=> ({id: sort.id,value: sort.value, label: sort.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='정렬' />
         </div>
       </div>
-      {filteredStudyData.length === 0 ? (
+      {filteredStudyData?.length === 0 ? (
         <div className='h-[300px] flex justify-center items-center'>
           <div className='flex flex-col items-center justify-center w-full max-w-[480px] bg-[#f9f9f9] rounded-[8px] py-[40px]'>
             <Image src='/icons/icon_no_result.svg' alt='search' width={65} height={65} />
@@ -343,7 +345,7 @@ export default function StudyRecruit() {
         </div>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
-        {filteredStudyData.map((item) => (
+        {filteredStudyData?.map((item) => (
           <StudyItem key={item.studyId} data={item as Study}/>
         ))}
       </div>

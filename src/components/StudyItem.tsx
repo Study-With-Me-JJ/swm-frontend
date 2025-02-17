@@ -52,7 +52,7 @@ export default function StudyItem({data}: {data: Study}) {
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-1'>  
                     {data.getTagResponseList.map((item)=>(
-                        <span key={item.tagId} className='min-w-[30px] h-[26px] rounded-[4px] px-[7px] flex items-center justify-center text-[10px] font-[500] border border-[#eee] bg-white text-[#a5a5a5]'>{item.name}</span>
+                        <span key={item.tagId} className='min-w-[30px] h-[26px] rounded-[4px] px-[7px] flex items-center justify-center text-[10px] font-[500] border border-[#eee] bg-white text-[#a5a5a5]'>#{item.name}</span>
                     ))}
                 </div>
                 <InteractionStatus likeCount={likeCount} commentCount={commentCount} viewCount={viewCount} />
