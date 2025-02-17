@@ -10,6 +10,7 @@ import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { Study } from '@/types/api/study'; 
 import { getStudy } from '@/lib/api/study/getStudy';
+import { categoryOptions, positionOptions, statusOptions } from '@/types/filters/study-filter';
 
 // 더미 데이터 추가
 // const dummyStudyData = [
@@ -252,7 +253,7 @@ const dummySort = [
   {
     id:2,
     value: 'view',
-    label: '조회순'
+    label: '댓글순'
   }
 ]
 
@@ -323,11 +324,11 @@ export default function StudyRecruit() {
       <h2 className='text-2xl font-semibold mb-[34px]'>스터디 모집</h2>
       <div className='flex justify-between items-end mb-[34px]'>
         <div className='flex items-center gap-5 justify-start'>
-          <CategoryFilter type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={dummyCategories.map((category,index)=> ({id: index,value: category.value, label: category.label}))} isOpen={openSelectId === 'select1'}
+          <CategoryFilter type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={categoryOptions} isOpen={openSelectId === 'select1'}
           onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')} />
-          <PositionFilter type='button' onChange={handlePositionChange} defaultValue={selectPosition} options={dummyPositions.map((position)=> ({id: position.id,value: position.value, label: position.label}))} isOpen={openSelectId === 'select2'}
+          <PositionFilter type='button' onChange={handlePositionChange} defaultValue={selectPosition} options={positionOptions} isOpen={openSelectId === 'select2'}
           onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')} />
-          <StatusFilter type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={dummyStatus.map((status)=> ({id: status.id,value: status.value, label: status.label}))} isOpen={openSelectId === 'select3'}
+          <StatusFilter type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={statusOptions} isOpen={openSelectId === 'select3'}
           onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} />
         </div>
         <div className='flex items-center gap-1'>

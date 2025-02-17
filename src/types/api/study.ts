@@ -1,3 +1,24 @@
+export enum RecruitmentPosition {
+  BACKEND = 'BACKEND',
+  FRONTEND = 'FRONTEND',
+  DESIGNER = 'DESIGNER',
+  PM = 'PM',
+  MARKETING = 'MARKETING',
+}
+
+export enum StudyCategory {
+  ALGORITHM = 'ALGORITHM',
+  BIGDATA = 'BIGDATA',
+  DATAANALYSIS = 'DATAANALYSIS',
+  MACHINELEARNING = 'MACHINELEARNING',
+  MOBILE = 'MOBILE',
+}
+
+export enum StudyStatus {
+  RECRUITING = 'RECRUITING', 
+  COMPLETED = 'COMPLETED',
+}
+
 export interface ApiResponse<T> {
   message: string;
   data: PaginatedResponse<T>;
