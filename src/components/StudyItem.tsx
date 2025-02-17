@@ -43,16 +43,16 @@ export default function StudyItem({data}: {data: Study}) {
                 </div>
                 <h3 className='text-xl font-semibold text-black line-clamp-2'>{data.title}</h3>
                 <div className='flex gap-2 flex-wrap items-center justify-start'>
-                    {data.getRecruitmentPositionResponseList.map((tag) => (
-                        <span key={tag.title} className='min-w-[30px] h-[28px] bg-[#eee] rounded-[4px] px-[7px] flex items-center justify-center text-xs font-[500] text-gray-default'>{tag.title}<span className='text-link-default ml-1'>{tag.headcount}</span></span>
+                    {data.getRecruitmentPositionResponseList.map((tag, index) => (
+                        <span key={`${data.studyId}-${tag.recruitmentPositionId}-${index}`} className='min-w-[30px] h-[28px] bg-[#eee] rounded-[4px] px-[7px] flex items-center justify-center text-xs font-[500] text-gray-default'>{tag.title}<span className='text-link-default ml-1'>{tag.headcount}</span></span>
                     ))}
                 </div>
                 <p className='text-sm text-regular text-[#828282] line-clamp-2'>{data.content}</p>
             </div>
             <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-1'>  
-                    {data.getTagResponseList.map((item)=>(
-                        <span key={item.tagId} className='min-w-[30px] h-[26px] rounded-[4px] px-[7px] flex items-center justify-center text-[10px] font-[500] border border-[#eee] bg-white text-[#a5a5a5]'>#{item.name}</span>
+                    {data.getTagResponseList.map((item, index)=>(
+                        <span key={`${data.studyId}-${item.tagId}-${index}`} className='min-w-[30px] h-[26px] rounded-[4px] px-[7px] flex items-center justify-center text-[10px] font-[500] border border-[#eee] bg-white text-[#a5a5a5]'>#{item.name}</span>
                     ))}
                 </div>
                 <InteractionStatus likeCount={likeCount} commentCount={commentCount} viewCount={viewCount} />

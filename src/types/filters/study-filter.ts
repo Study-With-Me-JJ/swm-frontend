@@ -1,4 +1,4 @@
-import { StudyCategory, RecruitmentPosition } from "@/types/api/study";
+import { StudyCategory, RecruitmentPosition, StudyStatus } from "@/types/api/study";
 export interface StudyFilterProps {
     type: string | null;
     onChange: (value: string | string[]) => void;
@@ -16,6 +16,7 @@ export const positionOptions = [
     { id: 3, value: RecruitmentPosition.DESIGNER, label: '디자이너' },
     { id: 4, value: RecruitmentPosition.PM, label: '기획자' },
     { id: 5, value: RecruitmentPosition.MARKETING, label: '마케터' },
+    { id: 6, value: RecruitmentPosition.ETC, label: '기타' },
   ];
   
   export const categoryOptions = [
@@ -24,11 +25,12 @@ export const positionOptions = [
     { id: 2, value: StudyCategory.BIGDATA, label: '빅데이터' },
     { id: 3, value: StudyCategory.DATAANALYSIS, label: '데이터분석' },
     { id: 4, value: StudyCategory.MACHINELEARNING, label: '머신러닝' },
-    { id: 5, value: StudyCategory.MOBILE, label: '모바일' },
+    { id: 5, value: StudyCategory.DEVELOPMENT, label: '개발' },
+    { id: 6, value: StudyCategory.ETC, label: '기타' },
   ];
 
   export const statusOptions = [
     { id: 0, value: 'ALL', label: '상태전체' },
-    { id: 1, value: 'RECRUITING', label: '모집중' },
-    { id: 2, value: 'COMPLETED', label: '모집마감' }, 
+    { id: 1, value: StudyStatus.ACTIVE, label: '모집중' },
+    { id: 2, value: StudyStatus.INACTIVE, label: '모집마감' }, 
   ];

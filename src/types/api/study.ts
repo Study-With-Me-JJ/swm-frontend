@@ -4,19 +4,21 @@ export enum RecruitmentPosition {
   DESIGNER = 'DESIGNER',
   PM = 'PM',
   MARKETING = 'MARKETING',
+  ETC = 'ETC',
 }
 
 export enum StudyCategory {
   ALGORITHM = 'ALGORITHM',
   BIGDATA = 'BIGDATA',
   DATAANALYSIS = 'DATAANALYSIS',
-  MACHINELEARNING = 'MACHINELEARNING',
-  MOBILE = 'MOBILE',
+  MACHINELEARNING = 'MACHINELEARNING', 
+  DEVELOPMENT = 'DEVELOPMENT',
+  ETC = 'ETC',
 }
 
 export enum StudyStatus {
-  RECRUITING = 'RECRUITING', 
-  COMPLETED = 'COMPLETED',
+  ACTIVE = 'ACTIVE', 
+  INACTIVE = 'INACTIVE',
 }
 
 export interface ApiResponse<T> {

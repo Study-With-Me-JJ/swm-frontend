@@ -155,89 +155,89 @@ import { categoryOptions, positionOptions, statusOptions } from '@/types/filters
 //   },
 // ];
  
-const dummyCategories = [
-  {
-    id:0,
-    value: 'ALL',
-    label: '카테고리 전체'
-  },
-  {
-    id:1,
-    value: 'ALGORITHM',
-    label: '알고리즘'
-  },
-  {
-    id:2,
-    value: 'BIGDATA',
-    label: '빅데이터'
-  },
-  {
-    id:3,
-    value: 'DATAANALYSIS',
-    label: '데이터분석'
-  },
-  {
-    id:4,
-    value: 'MACHINELEARNING',
-    label: '머신러닝'
-  },
-  {
-    id:5,
-    value: 'MOBILE',
-    label: '모바일'
-  }
-] 
+// const dummyCategories = [
+//   {
+//     id:0,
+//     value: 'ALL',
+//     label: '카테고리 전체'
+//   },
+//   {
+//     id:1,
+//     value: 'ALGORITHM',
+//     label: '알고리즘'
+//   },
+//   {
+//     id:2,
+//     value: 'BIGDATA',
+//     label: '빅데이터'
+//   },
+//   {
+//     id:3,
+//     value: 'DATAANALYSIS',
+//     label: '데이터분석'
+//   },
+//   {
+//     id:4,
+//     value: 'MACHINELEARNING',
+//     label: '머신러닝'
+//   },
+//   {
+//     id:5,
+//     value: 'MOBILE',
+//     label: '모바일'
+//   }
+// ] 
 
-const dummyPositions = [
-  {
-    id:0,
-    value: 'ALL',
-    label: '직무 전체'
-  },
-  {
-    id:1,
-    value: 'PLANNER',
-    label: '기획자'
-  },
-  {
-    id:2,
-    value: 'DESIGNER',
-    label: '디자이너'
-  },
-  {
-    id:3,
-    value: 'DEVELOPER',
-    label: '개발자'
-  },
-  {
-    id:4,
-    value: 'MARKETER',
-    label: '마케터'
-  },
-  {
-    id:5,
-    value: 'ETC',
-    label: '기타'
-  }  
-]
+// const dummyPositions = [
+//   {
+//     id:0,
+//     value: 'ALL',
+//     label: '직무 전체'
+//   },
+//   {
+//     id:1,
+//     value: 'PLANNER',
+//     label: '기획자'
+//   },
+//   {
+//     id:2,
+//     value: 'DESIGNER',
+//     label: '디자이너'
+//   },
+//   {
+//     id:3,
+//     value: 'DEVELOPER',
+//     label: '개발자'
+//   },
+//   {
+//     id:4,
+//     value: 'MARKETER',
+//     label: '마케터'
+//   },
+//   {
+//     id:5,
+//     value: 'ETC',
+//     label: '기타'
+//   }  
+// ]
 
-const dummyStatus = [
-  {
-    id:0,
-    value: 'ALL',
-    label: '상태전체'
-  },
-  {
-    id:1,
-    value: 'ACTIVE',
-    label: '모집중'
-  },
-  {
-    id:2,
-    value: 'INACTIVE',
-    label: '모집마감'
-  }
-]
+// const dummyStatus = [
+//   {
+//     id:0,
+//     value: 'ALL',
+//     label: '상태전체'
+//   },
+//   {
+//     id:1,
+//     value: 'ACTIVE',
+//     label: '모집중'
+//   },
+//   {
+//     id:2,
+//     value: 'INACTIVE',
+//     label: '모집마감'
+//   }
+// ]
 
 const dummySort = [
   {
@@ -313,9 +313,9 @@ export default function StudyRecruit() {
   .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
   .filter(item => {
     if (Array.isArray(selectPosition)) {
-      return selectPosition.includes('ALL') ? true : selectPosition.includes(item.getRecruitmentPositionResponseList[0].title);
+      return selectPosition.includes('ALL') ? true : item.getRecruitmentPositionResponseList.some(position => selectPosition.includes(position.title));
     }
-    return selectPosition === 'ALL' ? true : item.getRecruitmentPositionResponseList[0].title === selectPosition;
+    return selectPosition === 'ALL' ? true : item.getRecruitmentPositionResponseList.some(position => position.title === selectPosition);
   })
   .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus);
 
@@ -347,7 +347,7 @@ export default function StudyRecruit() {
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
         {filteredStudyData?.map((item) => (
-          <StudyItem key={item.studyId} data={item as Study}/>
+          <StudyItem key={`${item.studyId}-${item.title}`} data={item as Study}/>
         ))}
       </div>
       )}
