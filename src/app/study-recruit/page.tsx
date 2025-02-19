@@ -1,289 +1,91 @@
 'use client'
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import StudyItem from '@/components/StudyItem';
 import CategoryFilter from '@/components/filters/CategoryFilter';
 import PositionFilter from '@/components/filters/PositionFilter';
 import StatusFilter from '@/components/filters/StatusFilter';
 import SortFilter from '@/components/filters/SortFilter'; 
 import Image from 'next/image'; 
-import { useQuery } from '@tanstack/react-query';
-import { Study } from '@/types/api/study'; 
+import { useInfiniteQuery } from '@tanstack/react-query';
+import {  Study, StudyCategory, StudyStatus, RecruitmentPositionTitle, SortCriteria, SearchStudyParams } from '@/types/api/study'; 
 import { getStudy } from '@/lib/api/study/getStudy';
-import { categoryOptions, positionOptions, statusOptions } from '@/types/filters/study-filter';
-
-// 더미 데이터 추가
-// const dummyStudyData = [
-//   {
-//     studyId: 1,
-//     title: '리액트 스터디 모집합니다',
-//     content: '리액트 기초부터 심화까지 함께 공부해요',
-//     category: 'MACHINELEARNING', 
-//     likeCount: 0,
-//     commentCount: 0,
-//     status: 'ACTIVE',
-//     viewCount: 0,
-//     studyBookmarkId: null,
-//     getTagResponseList: [
-//       {
-//         tagId: 0,
-//         name: "어쩌고저쩌고"
-//       },
-//       {
-//         tagId: 1,
-//         name: "어쩌고저쩌고"
-//       }
-//     ],
-//     getRecruitmentPositionResponseList: [
-//       {
-//         recruitmentPositionId: 0,
-//         title: "BACKEND",
-//         headcount: 10,
-//         acceptedCount: 0
-//       },
-//       {
-//         recruitmentPositionId: 1,
-//         title: "FRONTEND",
-//         headcount: 10,
-//         acceptedCount: 0
-//       }
-//     ],
-//   },
-//   {
-//     studyId: 2,
-//     title: '파이썬 스터디 모집합니다',
-//     content: '파이썬 기초부터 심화까지 함께 공부해요',
-//     category: 'MOBILE', 
-//     likeCount: 2,
-//     commentCount: 6,
-//     status: 'ACTIVE',
-//     viewCount: 10,
-//     studyBookmarkId: 1,
-//     getTagResponseList: [
-//       {
-//         tagId: 0,
-//         name: "어쩌고저쩌고"
-//       }
-//     ],
-//     getRecruitmentPositionResponseList: [
-//       {
-//         recruitmentPositionId: 0,
-//         title: "FRONTEND",
-//         headcount: 10,
-//         acceptedCount: 0
-//       }
-//     ],
-//   }, 
-//   {
-//     studyId: 3,
-//     title: '자바 스터디 모집합니다',
-//     content: '자바 기초부터 심화까지 함께 공부해요',
-//     category: 'ALGORITHM', 
-//     likeCount: 2,
-//     commentCount: 6,
-//     status: 'ACTIVE',
-//     viewCount: 10,
-//     studyBookmarkId: 1,
-//     getTagResponseList: [
-//       {
-//         tagId: 0,
-//         name: "어쩌고저쩌고"
-//       }
-//     ],
-//     getRecruitmentPositionResponseList: [
-//       {
-//         recruitmentPositionId: 0,
-//         title: "BACKEND",
-//         headcount: 10,
-//         acceptedCount: 0
-//       }
-//     ],
-//   },
-//   {
-//     studyId: 4,
-//     title: '빅데이터 스터디 모집합니다',
-//     content: '빅데이터 기초부터 심화까지 함께 공부해요',
-//     category: 'BIGDATA', 
-//     likeCount: 2,
-//     commentCount: 6,
-//     status: 'ACTIVE',
-//     viewCount: 10,
-//     studyBookmarkId: 1,
-//     getTagResponseList: [
-//       {
-//         tagId: 0,
-//         name: "어쩌고저쩌고"
-//       }
-//     ],
-//     getRecruitmentPositionResponseList: [
-//       {
-//         recruitmentPositionId: 0,
-//         title: "DESIGNER",
-//         headcount: 10,
-//         acceptedCount: 0
-//       }
-//     ],
-//   },
-//   {
-//     studyId: 5,
-//     title: '데이터분석 스터디 모집합니다',
-//     content: '데이터분석 기초부터 심화까지 함께 공부해요',
-//     category: 'DATAANALYSIS', 
-//     likeCount: 2,
-//     commentCount: 6,
-//     status: 'ACTIVE',
-//     viewCount: 10,
-//     studyBookmarkId: 1,
-//     getTagResponseList: [
-//       {
-//         tagId: 0,
-//         name: "어쩌고저쩌고"
-//       },
-//       {
-//         tagId: 1,
-//         name: "어쩌고저쩌고"
-//       }
-//     ],
-//     getRecruitmentPositionResponseList: [
-//       {
-//         recruitmentPositionId: 0,
-//         title: "DESIGNER",
-//         headcount: 2,
-//         acceptedCount: 0
-//       }
-//     ],
-//   },
-// ];
- 
-// const dummyCategories = [
-//   {
-//     id:0,
-//     value: 'ALL',
-//     label: '카테고리 전체'
-//   },
-//   {
-//     id:1,
-//     value: 'ALGORITHM',
-//     label: '알고리즘'
-//   },
-//   {
-//     id:2,
-//     value: 'BIGDATA',
-//     label: '빅데이터'
-//   },
-//   {
-//     id:3,
-//     value: 'DATAANALYSIS',
-//     label: '데이터분석'
-//   },
-//   {
-//     id:4,
-//     value: 'MACHINELEARNING',
-//     label: '머신러닝'
-//   },
-//   {
-//     id:5,
-//     value: 'MOBILE',
-//     label: '모바일'
-//   }
-// ] 
-
-// const dummyPositions = [
-//   {
-//     id:0,
-//     value: 'ALL',
-//     label: '직무 전체'
-//   },
-//   {
-//     id:1,
-//     value: 'PLANNER',
-//     label: '기획자'
-//   },
-//   {
-//     id:2,
-//     value: 'DESIGNER',
-//     label: '디자이너'
-//   },
-//   {
-//     id:3,
-//     value: 'DEVELOPER',
-//     label: '개발자'
-//   },
-//   {
-//     id:4,
-//     value: 'MARKETER',
-//     label: '마케터'
-//   },
-//   {
-//     id:5,
-//     value: 'ETC',
-//     label: '기타'
-//   }  
-// ]
-
-// const dummyStatus = [
-//   {
-//     id:0,
-//     value: 'ALL',
-//     label: '상태전체'
-//   },
-//   {
-//     id:1,
-//     value: 'ACTIVE',
-//     label: '모집중'
-//   },
-//   {
-//     id:2,
-//     value: 'INACTIVE',
-//     label: '모집마감'
-//   }
-// ]
-
-const dummySort = [
-  {
-    id:0,
-    value: 'latest',
-    label: '최신순'
-  },
-  {
-    id:1,
-    value: 'like',
-    label: '좋아요순'
-  },
-  {
-    id:2,
-    value: 'view',
-    label: '댓글순'
-  }
-]
+import Loading from '@/components/ui/Loading'; 
+import { useRef } from 'react';
 
 export default function StudyRecruit() {
   const [selectCategory,setSelectCategory] = useState<string | string[]>('ALL');
   const [selectPosition,setSelectPosition] = useState<string | string[]>('ALL');
   const [selectStatus,setSelectStatus] = useState<string | string[]>('ALL');
-  const [selectSort,setSelectSort] = useState<string | string[]>('latest');
+  const [selectSort,setSelectSort] = useState<string | string[]>(SortCriteria.NEWEST);
 
   const [openSelectId, setOpenSelectId] = useState<string | null>(null);
 
-
-  const { data: study, isLoading, error } = useQuery({
-    queryKey: ['study'],
-    queryFn: getStudy,
-    staleTime: 1000 * 60 * 60,  
-    gcTime: 1000 * 60 * 60 * 24,  
-  });
   
-  const studyData = study?.data;
-  // const studyData = dummyStudyData;
-  console.log('studyData type:', typeof studyData, 'value:', studyData);
+  const { data: study, isLoading, error, fetchNextPage, hasNextPage } = useInfiniteQuery({
+    queryKey: ['study', selectSort,selectCategory, selectPosition, selectStatus],
+    initialPageParam: { lastStudyId: 0, lastSortValue: 0 },  // 추가
+    queryFn: async ({ pageParam = { lastStudyId: 0, lastSortValue: 0 } }) => {
+      const params: SearchStudyParams = {
+        sortCriteria: selectSort as SortCriteria,
+        ...(selectCategory !== 'ALL' && { category: selectCategory as StudyCategory }),
+        ...(selectStatus !== 'ALL' && { status: selectStatus as StudyStatus }),
+        ...(selectPosition !== 'ALL' && { 
+          // 배열이 이미 들어온 경우와 단일 값인 경우를 구분
+          recruitmentPositionTitleList: Array.isArray(selectPosition) 
+            ? selectPosition as RecruitmentPositionTitle[]
+            : [selectPosition as RecruitmentPositionTitle]
+        }),
+        ...(pageParam?.lastStudyId && { lastStudyId: pageParam.lastStudyId }),
+        ...(pageParam?.lastSortValue && { lastSortValue: pageParam.lastSortValue })
+      };
+      console.log('실제 API 요청 파라미터:', JSON.stringify(params, null, 2));
 
-  // if (isLoading) {
-  //   return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'><Loading /></div>;
-  // }
+      return await getStudy(params);
+    },
+    getNextPageParam: (lastPage) => {
+      if (!lastPage.data.hasNext) return undefined;
+  
+      const lastItem = lastPage.data.data[lastPage.data.data.length - 1];
+      return {
+        lastStudyId: lastItem.studyId,
+        lastSortValue: selectSort === SortCriteria.LIKE 
+          ? lastItem.likeCount
+          : selectSort === SortCriteria.COMMENT
+            ? lastItem.commentCount
+            : lastItem.studyId  // NEWEST의 경우
+      };
+    }
+  });
 
-  // if (error) {
-  //   return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>에러가 발생했습니다.</div>;
-  // }
+  const observerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasNextPage && !isLoading) {
+          fetchNextPage();
+        }
+      },
+      { threshold: 1.0 }
+    );
+  
+    if (observerRef.current) {
+      observer.observe(observerRef.current);
+    }
+  
+    return () => {
+      observer.disconnect();
+    };
+  }, [fetchNextPage, hasNextPage, isLoading]);
+
+  if (isLoading) {
+    return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'><Loading /></div>;
+  }
+
+  if (error) {
+    return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>에러가 발생했습니다.</div>;
+  }
 
   // if (!studyData) {
   //   return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>데이터를 찾을 수 없습니다.</div>;
@@ -295,29 +97,95 @@ export default function StudyRecruit() {
 
   const handlePositionChange = (value: string | string[]) => {
     if (Array.isArray(value) && value.length === 0) {
-      setSelectPosition(['ALL']);
+      setSelectPosition([RecruitmentPositionTitle.BACKEND]); 
       return;
     }
-    setSelectPosition(value || 'ALL'); 
-  };  
+    if (Array.isArray(value)) {
+      const positions = value.filter(v => v !== 'ALL').map(v => v as RecruitmentPositionTitle);
+      setSelectPosition(positions.length > 0 ? positions : [RecruitmentPositionTitle.BACKEND]);
+      return;
+    }
+    setSelectPosition(value || RecruitmentPositionTitle.BACKEND); 
+  };
 
   const handleStatusChange = (value: string | string[]) => {
     setSelectStatus(value || 'ALL'); 
   };
 
   const handleSortChange = (value: string | string[]) => {
-    setSelectSort(value || 'latest'); 
+    setSelectSort(value || SortCriteria.NEWEST); 
   };
 
-  const filteredStudyData = studyData?.data
-  .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
-  .filter(item => {
-    if (Array.isArray(selectPosition)) {
-      return selectPosition.includes('ALL') ? true : item.getRecruitmentPositionResponseList.some(position => selectPosition.includes(position.title));
-    }
-    return selectPosition === 'ALL' ? true : item.getRecruitmentPositionResponseList.some(position => position.title === selectPosition);
-  })
-  .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus);
+  // const filteredStudyData = studyData?.data
+  // .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
+  // .filter(item => {
+  //   if (Array.isArray(selectPosition)) {
+  //     return selectPosition.includes('ALL') ? true : item.getRecruitmentPositionResponseList.some(position => selectPosition.includes(position.title));
+  //   }
+  //   return selectPosition === 'ALL' ? true : item.getRecruitmentPositionResponseList.some(position => position.title === selectPosition);
+  // })
+  // .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus) 
+
+  const categoryLabels: Record<StudyCategory, string> = {
+    [StudyCategory.ALGORITHM]: '알고리즘',
+    [StudyCategory.DEVELOPMENT]: '개발', 
+  };
+
+  const categoryOptions = [
+    { id: 0, value: 'ALL', label: '카테고리 전체' },
+    ...Object.entries(StudyCategory).map(([, value], index) => ({
+      id: index + 1,
+      value,
+      label: categoryLabels[value as StudyCategory]
+    }))
+  ];
+  
+  const positionLabels: Record<RecruitmentPositionTitle, string> = {
+    [RecruitmentPositionTitle.BACKEND]: '백엔드',
+    [RecruitmentPositionTitle.FRONTEND]: '프론트엔드',
+    [RecruitmentPositionTitle.ETC]: '기타',
+  };
+
+  const positionOptions = [
+    { id: 0, value: 'ALL', label: '직무 전체' },
+    ...Object.entries(RecruitmentPositionTitle).map(([, value], index) => ({
+      id: index + 1,
+      value,
+      label: positionLabels[value as RecruitmentPositionTitle]
+    }))
+  ];
+
+  const SORT_OPTIONS = {
+    [SortCriteria.NEWEST]: '최신순',
+    [SortCriteria.LIKE]: '좋아요순',
+    [SortCriteria.COMMENT]: '댓글순'
+  } as const;
+
+  const sortOptions = Object.entries(SORT_OPTIONS).map(([value, label], index) => ({
+    id: index,
+    value,
+    label
+  }));
+
+  const STATUS_OPTIONS = {
+    [StudyStatus.ACTIVE]: '모집중',
+    [StudyStatus.INACTIVE]: '모집마감'
+  } as const;
+
+  const statusOptions = [
+    { id: 0, value: 'ALL', label: '상태 전체' },
+    ...Object.entries(STATUS_OPTIONS).map(([value, label], index) => ({
+      id: index + 1,
+      value,
+      label
+    }))
+  ];
+
+  console.log('studyData 구조:', JSON.stringify(study, null, 2));
+
+ 
+  const studyData = study?.pages[0].data.data; 
+  console.log('studyData type:', typeof studyData, 'value:', studyData);
 
   return (
     <section className='pt-10 pb-[110px] max-w-screen-xl px-5 xl:px-0  mx-auto'>
@@ -333,10 +201,10 @@ export default function StudyRecruit() {
         </div>
         <div className='flex items-center gap-1'>
           {/* <TagFilter type='button' onChange={handleTagChange} defaultValue={selectTag} options={dummyTags.map((tag)=> ({id: tag.id,value: tag.value, label: tag.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='태그' /> */}
-          <SortFilter type='default' onChange={handleSortChange} defaultValue={selectSort} options={dummySort.map((sort)=> ({id: sort.id,value: sort.value, label: sort.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='정렬' />
+          <SortFilter type='default' onChange={handleSortChange} defaultValue={selectSort} options={sortOptions.map((sort)=> ({id: sort.id,value: sort.value, label: sort.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='최신순' />
         </div>
       </div>
-      {filteredStudyData?.length === 0 ? (
+      {!study?.pages || study.pages[0].data.data.length === 0? (
         <div className='h-[300px] flex justify-center items-center'>
           <div className='flex flex-col items-center justify-center w-full max-w-[480px] bg-[#f9f9f9] rounded-[8px] py-[40px]'>
             <Image src='/icons/icon_no_result.svg' alt='search' width={65} height={65} />
@@ -346,11 +214,21 @@ export default function StudyRecruit() {
         </div>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
-        {filteredStudyData?.map((item) => (
-          <StudyItem key={`${item.studyId}-${item.title}`} data={item as Study}/>
-        ))}
+        {study.pages.flatMap((page) => {
+          
+          console.log('page 데이터:', page);
+          
+          const mappedData = page.data.data.map((item) => {
+            console.log('개별 아이템:', item);
+            return <StudyItem key={`${item.studyId}-${item.title}`} data={item as Study}/>;
+          });
+          
+          console.log('매핑된 결과:', mappedData);
+          return mappedData;
+        })}
       </div>
       )}
+      <div ref={observerRef} className="h-4" /> 
     </section>
   )
 }

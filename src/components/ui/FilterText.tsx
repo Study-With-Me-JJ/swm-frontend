@@ -67,7 +67,7 @@ export default function FilterText({ options, defaultValue, onChange, onToggle,i
             <Image 
               src={(() => {
                 switch(filterName) {
-                  case '정렬':
+                  case '최신순':
                     return "/icons/icon_select_sort.svg"; 
                   default:
                     return "/icons/icon_select_tag.svg";

@@ -1,24 +1,33 @@
-export enum RecruitmentPosition {
+export enum RecruitmentPositionTitle {
   BACKEND = 'BACKEND',
   FRONTEND = 'FRONTEND',
-  DESIGNER = 'DESIGNER',
-  PM = 'PM',
-  MARKETING = 'MARKETING',
   ETC = 'ETC',
 }
 
 export enum StudyCategory {
   ALGORITHM = 'ALGORITHM',
-  BIGDATA = 'BIGDATA',
-  DATAANALYSIS = 'DATAANALYSIS',
-  MACHINELEARNING = 'MACHINELEARNING', 
   DEVELOPMENT = 'DEVELOPMENT',
-  ETC = 'ETC',
 }
 
 export enum StudyStatus {
   ACTIVE = 'ACTIVE', 
   INACTIVE = 'INACTIVE',
+}
+
+export enum SortCriteria {
+  NEWEST = 'NEWEST',
+  LIKE = 'LIKE',
+  COMMENT = 'COMMENT',
+}
+
+export interface SearchStudyParams {
+  title?: string;                                        
+  category?: StudyCategory | '';                         
+  status?: StudyStatus | '';
+  recruitmentPositionTitleList?: RecruitmentPositionTitle[];  
+  lastStudyId?: number;                                 
+  sortCriteria?: SortCriteria | '';                    
+  lastSortValue?: number;   
 }
 
 export interface ApiResponse<T> {

@@ -38,7 +38,7 @@ export default function DropDownButton({options,defaultValue,onClickOption,title
     }, [defaultValue, options]);
 
     const onClickApply = () => {
-        const selectedValues = checkOption.map((option) => option.value);
+        const selectedValues = checkOption.length === 0 ? ['ALL'] : checkOption.map((option) => option.value);
         onClickOption(selectedValues);
         onChange?.(selectedValues);   
         onToggle?.();
@@ -64,7 +64,7 @@ export default function DropDownButton({options,defaultValue,onClickOption,title
 
     const handleReset = () => {
         setCheckOption([]);
-        onChange?.([]);  
+        onChange?.(['ALL']);  
     }
 
     return (

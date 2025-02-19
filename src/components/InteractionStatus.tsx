@@ -16,7 +16,7 @@ export default function InteractionStatus({likeCount, commentCount, viewCount}: 
     };
 
     return <>
-        <div className='flex items-center gap-[16px]'>
+        <div className='flex items-center gap-[16px] flex-shrink-0'>
             <div className='flex items-center gap-[4px]'>
                 <Image src='/icons/icon_interaction_view.svg' alt='view' width={18} height={18} />
                 <span className='text-sm text-semibold text-gray-default'>{viewCount}</span>
