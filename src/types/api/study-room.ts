@@ -73,3 +73,16 @@ export interface TagRes {
 export type StudyRoomListResponse = ApiResponse<
   CursorPageData<StudyRoomListRes>
 >;
+
+export interface LikeResponse {
+  message: string;
+  data: {
+    studyRoomLikeId: number;
+    studyRoomLikeCount: number; //1번만 가능
+  };
+}
+
+export interface UnlikeResponse {
+  message: string;
+  data: object;
+}
