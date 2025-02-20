@@ -28,7 +28,6 @@ export default function StudyRecruit() {
     queryFn: async ({ pageParam = { lastStudyId: 0, lastSortValue: 0 } }) => {
       const params: SearchStudyParams = {
         sortCriteria: selectSort as SortCriteria,
-        // 각 필터가 'ALL'이 아닐 때만 파라미터 추가
         ...(selectCategory !== 'ALL' && { category: selectCategory as StudyCategory }),
         ...(selectStatus !== 'ALL' && { status: selectStatus as StudyStatus }),
         ...(selectPosition !== 'ALL' && Array.isArray(selectPosition) && selectPosition.length > 0 && { 
@@ -169,9 +168,6 @@ export default function StudyRecruit() {
     }))
   ];
 
-  const studyData = study?.pages[0].data.data; 
-  // console.log('studyData type:', typeof studyData, 'value:', studyData);
-
   return (
     <section className='pt-10 pb-[110px] max-w-screen-xl px-5 xl:px-0  mx-auto'>
       <h2 className='text-2xl font-semibold mb-[34px]'>스터디 모집</h2>
@@ -199,18 +195,6 @@ export default function StudyRecruit() {
         </div>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
-        {/* {study.pages.flatMap((page) => {
-          
-          console.log('page 데이터:', page);
-          
-          const mappedData = page.data.data.map((item) => {
-            console.log('개별 아이템:', item);
-            return <StudyItem key={`${item.studyId}-${item.title}`} data={item as Study}/>;
-          });
-          
-          console.log('매핑된 결과:', mappedData);
-          return mappedData;
-        })} */}
         {study.pages.map((page) => {  
           return page.data.data.map((item) => { 
             return <StudyItem key={`${item.studyId}-${item.title}`} data={item as Study}/>;

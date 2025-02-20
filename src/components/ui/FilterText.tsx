@@ -20,11 +20,10 @@ interface FilterTextProps {
   type?: 'default' | 'button';
   title?: string;
   closeOnSelect?: boolean;
-  filterName?: string;
-  placeholder?: string;
+  filterName?: string; 
 }
 
-export default function FilterText({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true,filterName='default',placeholder='default'}: FilterTextProps) { 
+export default function FilterText({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true,filterName='default' }: FilterTextProps) { 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -81,7 +80,7 @@ export default function FilterText({ options, defaultValue, onChange, onToggle,i
             <span className='overflow-hidden text-ellipsis whitespace-nowrap '> 
             {defaultValue && defaultValue !== '' 
             ? options.find(option => option.value === defaultValue)?.label 
-            : placeholder}
+            : '정렬 기준'}
             </span>
           </button> 
           {isOpen && renderDropDown()}

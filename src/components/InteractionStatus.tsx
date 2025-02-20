@@ -1,12 +1,12 @@
 'use client'
 
 import Image from 'next/image';
-import { useState } from 'react';
+// import { useState } from 'react';
 import { InteractionStatusProps } from '@/types/api/interaction';
 
 export default function InteractionStatus({likeCount, commentCount, viewCount}: InteractionStatusProps) {
-    const [isLike, setIsLike] = useState(false);
-    const [likeCountValue, setLikeCountValue] = useState(likeCount);
+    // const [isLike, setIsLike] = useState(false);
+    // const [likeCountValue, setLikeCountValue] = useState(likeCount);
 
     // const handleLikeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     //     e.stopPropagation();
@@ -26,8 +26,8 @@ export default function InteractionStatus({likeCount, commentCount, viewCount}: 
                 <span className='text-sm text-semibold text-gray-default'>{commentCount}</span>
             </div>
             <button className='flex items-center gap-[4px]'>
-                <Image src={isLike ? '/icons/icon_interaction_like_on.svg' : '/icons/icon_interaction_like.svg'} alt='like' width={18} height={18} />
-                <span className={`text-sm text-semibold text-gray-default`}>{likeCountValue}</span>
+                <Image src='/icons/icon_interaction_like.svg' alt='like' width={18} height={18} />
+                <span className={`text-sm text-semibold text-gray-default`}>{likeCount}</span>
             </button>
         </div>
     </>
