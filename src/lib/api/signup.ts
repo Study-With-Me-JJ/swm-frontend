@@ -1,3 +1,4 @@
+import { User } from "@/types/api/user";
 import { axiosInstance } from "./axios";
 import { API_ENDPOINTS } from "./endpoints";
 
@@ -50,3 +51,12 @@ export const checkAuthCode = async (email: string, authCode: string) => {
     }
 }
 
+export const createUser = async (user: User) => {
+    try {
+        const response = await axiosInstance.post(API_ENDPOINTS.USER.CREATE, user);
+
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+}
