@@ -230,7 +230,7 @@ useEffect(() => {
               placeholder="비밀번호를 입력해 주세요."
             />
           </section>
-          <Button className="bg-blue-default" disabled={!isValid}>가입하기</Button>
+          <Button type="submit" className="bg-blue-default" disabled={!isValid} onClick={handleCreateUser}>가입하기</Button>
         </form>
       </FormProvider>
     </div>
