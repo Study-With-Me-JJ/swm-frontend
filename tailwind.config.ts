@@ -9,33 +9,39 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
   ],
   theme: {
-    extend: {
-      fontFamily: {
-        pretendard: ['var(--font-pretendard)'],
-      },
-      colors: {
-        background: 'hsl(var(--background))',
-        foreground: 'hsl(var(--foreground))',
-        primary: {
-          default: 'hsl(var(--primary))',
-        },
-        border: 'hsl(var(--border))',
-        input: 'hsl(var(--input))',
-        gray: {
-          default: '#565656',
-          light: '#bbbbbb',
-          disabled: '#e0e0e0',
-        },
-        link: {
-          default: '#4998E9',
-        },
-      },
-      borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
-      },
-    },
+  	extend: {
+		fontFamily: {
+			pretendard: ['var(--font-pretendard)'],
+		},
+  		colors: {
+  			background: 'hsl(var(--background))',
+  			foreground: 'hsl(var(--foreground))', 
+  			primary: {
+  				'default': 'hsl(var(--primary))',  
+  			},  
+  			border: 'hsl(var(--border))',
+  			input: 'hsl(var(--input))',
+  			gray: {
+				'default': '#565656',
+				'light': '#bbbbbb',
+				'disabled': '#e0e0e0'
+  			},
+			blue: {
+				'example': '#4998E9',
+			},
+			red: {
+				'error': '#E0143C',
+			},
+			link: {
+				'default': '#4998E9',
+			}
+  		},
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		}
+  	}
   },
   plugins: [animate],
 };
