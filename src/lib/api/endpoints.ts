@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     },
     USER: {
       INFO: '/api/v1/user',
+      CREATE: '/api/v1/user',
       CHECK_NICKNAME: '/api/v1/user/nickname/validation',
       CHECK_EMAIL: '/api/v1/user/login-id/validation',
       SEND_AUTH_CODE: '/api/v1/user/login-id/auth-codes',
