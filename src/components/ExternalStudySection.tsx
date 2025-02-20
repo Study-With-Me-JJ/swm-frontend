@@ -3,10 +3,11 @@
 import ExternalStudyItem from "./ExternalStudyItem";
 import Link from "next/link";
 import Image from "next/image";
-import { getExternalStudy } from "@/app/_lib/getExternalStudy";
+import { getExternalStudy } from "@/lib/api/study/getExternalStudy";
 import { useQuery } from "@tanstack/react-query";
+import Loading from "@/components/ui/Loading";
 
-export default function ExternalStudyList() {
+export default function ExternalStudySection() {
     
     const { data: externalStudy, isLoading, error } = useQuery({
         queryKey: ['externalStudy'],
@@ -16,9 +17,7 @@ export default function ExternalStudyList() {
     });
     const externalStudyData = externalStudy?.data.externalStudies;  
     // console.log('externalStudyData type:', typeof externalStudyData, 'value:', externalStudyData);
-    if (isLoading) return <div>로딩중...</div>;
     if (error) return <div>에러가 발생했습니다</div>;
-    if (!externalStudyData) return null;
 
     return <>
         <article className='relative'>
@@ -28,9 +27,13 @@ export default function ExternalStudyList() {
               <Link href='/external-studies' className='flex items-center gap-[6px] text-base font-semibold text-gray-light'>전체보기 <Image src="/icons/icon_gry_18_back.svg" alt="arrow-right" width={14} height={14}/></Link>
             </div>
           </div>
-          <div className='flex items-center gap-[20px]'>
-          <ExternalStudyItem slideData={externalStudyData.content} useSlider={true}/>
-          </div>
+          {isLoading ? (
+            <div className='flex justify-center items-center max-w-screen-xl mx-auto'><Loading /></div>
+          ) : externalStudyData && (
+            <div className='flex items-center gap-[20px] max-w-screen-xl w-full'>
+              <ExternalStudyItem slideData={externalStudyData.content} useSlider={true}/>
+            </div>
+          )}
         </article>
     </>
 }

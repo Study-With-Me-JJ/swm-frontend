@@ -1,5 +1,5 @@
-import StudyRoomList from '@/components/StudyRoomList';
-import ExternalStudyList from '@/components/ExternalStudyList';
+import StudyRoomSection from '@/components/StudyRoomSection';
+import ExternalStudySection from '@/components/ExternalStudySection';
 
 export default async function Home() { 
 
@@ -17,8 +17,8 @@ export default async function Home() {
         </div> 
     </div>
     <section className='pt-[100px] pb-[200px] max-w-screen-xl px-5 xl:px-0 mx-auto flex flex-col gap-[80px]'> 
-        <StudyRoomList />
-        <ExternalStudyList />
+        <StudyRoomSection />
+        <ExternalStudySection />
     </section>
     </>
   );

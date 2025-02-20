@@ -10,6 +10,22 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+		keyframes: {
+			'spin-slow': {
+				'0%': { transform: 'rotate(0deg)' },
+				'100%': { transform: 'rotate(360deg)' },
+			},
+			slideUpAndFade: {
+				'0%': { transform: 'translateY(20%)', opacity: '0' },
+				'10%': { transform: 'translateY(0)', opacity: '1' },
+				'90%': { transform: 'translateY(0)', opacity: '1' },
+				'100%': { transform: 'translateY(20%)', opacity: '0' },
+			}
+		},
+		animation: {
+			'spin-slow': 'spin-slow 2s linear infinite',
+			'slide-up-fade': 'slideUpAndFade 1.8s ease-in-out forwards'
+		},
 		fontFamily: {
 			pretendard: ['var(--font-pretendard)'],
 		},
