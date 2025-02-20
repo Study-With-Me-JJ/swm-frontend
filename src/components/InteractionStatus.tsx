@@ -8,12 +8,12 @@ export default function InteractionStatus({likeCount, commentCount, viewCount}: 
     const [isLike, setIsLike] = useState(false);
     const [likeCountValue, setLikeCountValue] = useState(likeCount);
 
-    const handleLikeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-        e.stopPropagation();
-        e.preventDefault();
-        setIsLike(!isLike);
-        setLikeCountValue(prev => isLike ? prev - 1 : prev + 1);
-    };
+    // const handleLikeClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    //     e.stopPropagation();
+    //     e.preventDefault();
+    //     setIsLike(!isLike);
+    //     setLikeCountValue(prev => isLike ? prev - 1 : prev + 1);
+    // };
 
     return <>
         <div className='flex items-center gap-[16px] flex-shrink-0'>
@@ -25,9 +25,9 @@ export default function InteractionStatus({likeCount, commentCount, viewCount}: 
                 <Image src='/icons/icon_interaction_review.svg' alt='review' width={18} height={18} />
                 <span className='text-sm text-semibold text-gray-default'>{commentCount}</span>
             </div>
-            <button className='flex items-center gap-[4px]' onClick={handleLikeClick}>
+            <button className='flex items-center gap-[4px]'>
                 <Image src={isLike ? '/icons/icon_interaction_like_on.svg' : '/icons/icon_interaction_like.svg'} alt='like' width={18} height={18} />
-                <span className={`text-sm text-semibold ${isLike ? 'text-[#E01E5A]' : 'text-gray-default'}`}>{likeCountValue}</span>
+                <span className={`text-sm text-semibold text-gray-default`}>{likeCountValue}</span>
             </button>
         </div>
     </>
