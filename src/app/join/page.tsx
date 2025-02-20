@@ -6,21 +6,32 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { INPUT_ERROR_MESSAGE } from "@/utils/input-error-message";
 import { Button } from "@/components/ui/button";
-import { checkAuthCode, checkEmail, checkNickname, sendAuthCode } from "@/lib/api/signup";
+import { checkAuthCode, checkEmail, checkNickname, createUser, sendAuthCode } from "@/lib/api/signup";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { User } from "@/types/api/user";
 
 const signupSchema = z.object({
   name: z.string({required_error: INPUT_ERROR_MESSAGE.NAME})
     .min(2, INPUT_ERROR_MESSAGE.NAME)
     .regex(/^[가-힣a-zA-Z\s]+$/, INPUT_ERROR_MESSAGE.NAME),
-  nickName: z.string({required_error: INPUT_ERROR_MESSAGE.NICKNAME.REQUIRED}).regex(/^[a-zA-Z0-9]+$/, INPUT_ERROR_MESSAGE.NICKNAME.HELPER_TEXT),
-  email: z.string({required_error: INPUT_ERROR_MESSAGE.EMAIL.REQUIRED}).email(INPUT_ERROR_MESSAGE.EMAIL.INVALID_FORMAT),
-  authCode: z.string({required_error: INPUT_ERROR_MESSAGE.AUTH_CODE.REQUIRED}).regex(/^\d*$/, INPUT_ERROR_MESSAGE.AUTH_CODE.ONLY_NUMBER).length(6, INPUT_ERROR_MESSAGE.AUTH_CODE.LENGTH),
-  password: z.string({required_error: INPUT_ERROR_MESSAGE.PASSWORD.REQUIRED}).min(8, INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT).max(20, INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT),
+  nickName: z.string({required_error: INPUT_ERROR_MESSAGE.NICKNAME.REQUIRED})
+    .regex(/^[a-zA-Z0-9]+$/, INPUT_ERROR_MESSAGE.NICKNAME.HELPER_TEXT),
+  email: z.string({required_error: INPUT_ERROR_MESSAGE.EMAIL.REQUIRED})
+    .email(INPUT_ERROR_MESSAGE.EMAIL.INVALID_FORMAT),
+  authCode: z.string({required_error: INPUT_ERROR_MESSAGE.AUTH_CODE.REQUIRED})
+    .regex(/^\d*$/, INPUT_ERROR_MESSAGE.AUTH_CODE.ONLY_NUMBER)
+    .length(6, INPUT_ERROR_MESSAGE.AUTH_CODE.LENGTH),
+  password: z.string({required_error: INPUT_ERROR_MESSAGE.PASSWORD.REQUIRED})
+  .min(8, INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT)
+  .max(20, INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT)
+  .regex(/^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*()_+[\]{};':"\\|,.<>/?]).{8,20}$/, INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT),
   passwordCheck: z.string({required_error: INPUT_ERROR_MESSAGE.PASSWORD_CHECK})
+})
+.refine(data => data.password === data.passwordCheck, {
+  message: INPUT_ERROR_MESSAGE.PASSWORD_CHECK,
+  path: ['passwordCheck']
 });
-
 
 export default function Join() {
   const methods = useForm<z.infer<typeof signupSchema>>({
@@ -28,7 +39,7 @@ export default function Join() {
     mode: "onBlur",
   });
   
-  const {watch, setError, formState: {errors}} = methods;
+  const {watch, setError, formState: {errors, isValid}} = methods;
   const [nicknameHelperText, setNicknameHelperText] = useState<string>(INPUT_ERROR_MESSAGE.NICKNAME.HELPER_TEXT);
   const [emailHelperText, setEmailHelperText] = useState<string>('');
   const [authCodeHelperText, setAuthCodeHelperText] = useState<string>('');
@@ -126,6 +137,27 @@ const handleAuthCodeCheck = async () => {
   }
 }
 
+// 회원가입
+const handleCreateUser = async () => {
+  const {nickName, password, name, email} = methods.getValues();
+  const user: User = {
+    nickname: nickName,
+    password: password,
+    name: name,
+    loginId: email
+  };
+
+  try {
+    await createUser(user);
+    // 회원가입 후 로직
+  } catch (error) {
+    console.error('User create error:', error);
+    toast.error('회원가입 중 오류가 발생했습니다. 다시 시도해 주세요.', {
+      duration: 3000,
+    })
+  }
+}
+
 // 닉네임이 변경되면 닉네임 체크 상태 초기화
 useEffect(() => {
   setIsNicknameChecked(false);
@@ -160,7 +192,7 @@ useEffect(() => {
               helperText={nicknameHelperText}
               buttonText="중복 확인"
               onButtonClick={handleCheckNickname}
-              buttonDisabled={!nickname || !!errors.nickName || isNicknameChecked}
+              disabled={!nickname || !!errors.nickName || isNicknameChecked}
             />
             <InputField
               name="email"
@@ -170,7 +202,7 @@ useEffect(() => {
               helperText={emailHelperText}
               buttonText="중복 확인"
               onButtonClick={handleCheckEmail}
-              buttonDisabled={!email || !!errors.email || isEmailChecked}
+              disabled={!email || !!errors.email || isEmailChecked}
             />
             <InputField
               name="authCode"
@@ -181,7 +213,7 @@ useEffect(() => {
               maxLength={6}
               buttonText={authCodeButtonText}
               onButtonClick={handleSendAuthCode}
-              buttonDisabled={!isEmailChecked}
+              disabled={!isEmailChecked}
               onAuthCodeCheck={handleAuthCodeCheck}
             />
             <InputField
@@ -198,7 +230,7 @@ useEffect(() => {
               placeholder="비밀번호를 입력해 주세요."
             />
           </section>
-          <Button className="bg-blue-default">가입하기</Button>
+          <Button className="bg-blue-default" disabled={!isValid}>가입하기</Button>
         </form>
       </FormProvider>
     </div>
