@@ -15,12 +15,12 @@ interface InputFieldProps {
   maxLength?: number;
   buttonText?: string;
   onButtonClick?: () => void;
-  buttonDisabled?: boolean;
+  disabled?: boolean;
   onAuthCodeCheck?: () => void;
 }
 
 
-export function InputField({ name, label, type, placeholder, helperText, maxLength, buttonText, onButtonClick, buttonDisabled, onAuthCodeCheck }: InputFieldProps) {
+export function InputField({ name, label, type, placeholder, helperText, maxLength, buttonText, onButtonClick, disabled, onAuthCodeCheck }: InputFieldProps) {
   const { control, formState: { errors }} = useFormContext();
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(600);
@@ -72,14 +72,13 @@ export function InputField({ name, label, type, placeholder, helperText, maxLeng
             type={type}
             placeholder={placeholder}
             maxLength={maxLength}
-            disabled={name === 'authCode' && !isAuthCodeInputEnabled}
+            disabled={(name === 'authCode' && !isAuthCodeInputEnabled)}
             className={`flex-grow disabled:cursor-default
               ${errors[name]
               ? 'border-red-error'
               : isValid
               ? 'border-gray-light'
-              : ''}
-            `}
+              : ''}`}
           />
         );
       }}
@@ -89,7 +88,7 @@ export function InputField({ name, label, type, placeholder, helperText, maxLeng
           type="button"
           className="bg-blue-default w-36 flex-shrink-0"
           onClick={handleButtonClick}
-          disabled={buttonDisabled}
+          disabled={disabled}
         >
           {buttonText}
           </Button>
