@@ -21,9 +21,10 @@ interface FilterTextProps {
   title?: string;
   closeOnSelect?: boolean;
   filterName?: string;
+  placeholder?: string;
 }
 
-export default function FilterText({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true,filterName='default'}: FilterTextProps) { 
+export default function FilterText({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true,filterName='default',placeholder='default'}: FilterTextProps) { 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -78,11 +79,9 @@ export default function FilterText({ options, defaultValue, onChange, onToggle,i
               height={18}
             />
             <span className='overflow-hidden text-ellipsis whitespace-nowrap '> 
-              {Array.isArray(defaultValue) && defaultValue.length > 0
-                ? defaultValue.map(value => options.find(option => option.value === value)?.label).join(', ')
-                : !Array.isArray(defaultValue) && defaultValue && defaultValue !== '' && options.find(option => option.value === defaultValue)?.label
-                  ? options.find(option => option.value === defaultValue)?.label
-                  : filterName}
+            {defaultValue && defaultValue !== '' 
+            ? options.find(option => option.value === defaultValue)?.label 
+            : placeholder}
             </span>
           </button> 
           {isOpen && renderDropDown()}

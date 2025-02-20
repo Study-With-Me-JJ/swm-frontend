@@ -12,7 +12,7 @@ interface DropDownButtonProps {
     position?: {
         left?: string;
         right?: string;
-    };  
+    };   
 }
 interface Option {
     id: number;
@@ -21,7 +21,7 @@ interface Option {
 }
 export default function DropDownButton({options,defaultValue,onClickOption,title,onToggle,onChange,position={left: 'left-0', right: 'right-0'}}: DropDownButtonProps) {
 
-    const [checkOption, setCheckOption] = useState<Option[]>([]); 
+    const [checkOption, setCheckOption] = useState<Option[]>([]);  
     // const defaultOption = options.filter(option => 
     //     Array.isArray(defaultValue) 
     //         ? defaultValue.includes(option.value)
@@ -29,22 +29,24 @@ export default function DropDownButton({options,defaultValue,onClickOption,title
     // ); 
 
     useEffect(() => { 
+        console.log('useEffect in DropDownButton:', {
+            defaultValue,
+            options,
+            type: Array.isArray(defaultValue) ? 'array' : 'string',
+            defaultValueContent: Array.isArray(defaultValue) ? defaultValue : [defaultValue]
+        });
+
         const currentOptions = options.filter(option => 
             Array.isArray(defaultValue) 
                 ? defaultValue.includes(option.value)
                 : option.value === defaultValue
         );
+        console.log('Filtered currentOptions:', currentOptions);
+
         setCheckOption(currentOptions);
     }, [defaultValue, options]);
 
-    const onClickApply = () => {
-        const selectedValues = checkOption.length === 0 ? ['ALL'] : checkOption.map((option) => option.value);
-        onClickOption(selectedValues);
-        onChange?.(selectedValues);   
-        onToggle?.();
-    } 
-
-    const selectOption = (option: Option) => {  
+    const selectOption = (option: Option) => { 
         if(!checkOption.some(item => item.id === option.id)){
             const newCheckOption = [...checkOption, option];
             setCheckOption(newCheckOption); 
@@ -62,10 +64,26 @@ export default function DropDownButton({options,defaultValue,onClickOption,title
         onChange?.(updatedOptions.map(o => o.value));
     } 
 
-    const handleReset = () => {
+    const handleReset = () => { 
+        console.log('Reset clicked:', {
+            beforeReset: checkOption
+        });
         setCheckOption([]);
-        onChange?.(['ALL']);  
+        console.log('After setCheckOption to empty array');
+
+        // onChange?.([]);  
     }
+
+    const onClickApply = () => {
+        console.log('Apply clicked:', {
+            checkOptionBeforeApply: checkOption,
+            willBeSelected: checkOption.length === 0 ? ['ALL'] : checkOption.map((option) => option.value)
+        });
+        const selectedValues = checkOption.length === 0 ? ['ALL'] : checkOption.map((option) => option.value);
+        onClickOption(selectedValues);
+        onChange?.(selectedValues);   
+        onToggle?.();
+    } 
 
     return (
         <>

@@ -19,10 +19,10 @@ interface FilterSelectProps {
   onToggle: () => void;  
   type?: 'default' | 'button';
   title?: string;
-  closeOnSelect?: boolean;
+  closeOnSelect?: boolean;  
 }
 
-export default function FilterSelect({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true}: FilterSelectProps) { 
+  export default function FilterSelect({ options, defaultValue, onChange, onToggle,isOpen,type='default',title='default',closeOnSelect=true}: FilterSelectProps) { 
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -66,10 +66,12 @@ export default function FilterSelect({ options, defaultValue, onChange, onToggle
               onToggle();
             }}>
             <span className="overflow-hidden text-ellipsis whitespace-nowrap max-w-[calc(100%-40px)]">
-              {Array.isArray(defaultValue) 
-                ? defaultValue.map(value => options.find(option => option.value === value)?.label).join(', ')
+            {Array.isArray(defaultValue) 
+              ? defaultValue.map(value => options.find(option => option.value === value)?.label).join(', ')
+              : typeof defaultValue === 'string' && defaultValue.includes('전체') 
+                ? defaultValue 
                 : options.find(option => option.value === defaultValue)?.label}
-            </span>
+          </span>
             <Image src={isOpen ? "/icons/icon_select_arrow_up.svg" : "/icons/icon_select_arrow.svg"} alt="arrow-right" width={28} height={28}/>
           </button> 
           {isOpen && renderDropDown()}
@@ -81,7 +83,7 @@ export default function FilterSelect({ options, defaultValue, onChange, onToggle
           case 'default':
               return <DropDownDefault options={options} defaultValue={defaultValue as string} onClickOption={onClickOption} onToggle={onToggle}/>
           case 'button':
-              return <DropDownButton options={options} defaultValue={defaultValue as string[]} onClickOption={onClickOption} title={title} onToggle={onToggle}  /> 
+              return <DropDownButton options={options} defaultValue={defaultValue as string[]} onClickOption={onClickOption} title={title} onToggle={onToggle} /> 
           default:
               return null;
       }

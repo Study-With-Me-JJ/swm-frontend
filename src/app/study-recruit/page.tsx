@@ -53,7 +53,7 @@ export default function StudyRecruit() {
           ? lastItem.likeCount
           : selectSort === SortCriteria.COMMENT
             ? lastItem.commentCount
-            : lastItem.studyId  // NEWEST의 경우
+            : lastItem.studyId  
       };
     }
   });
@@ -85,27 +85,25 @@ export default function StudyRecruit() {
 
   if (error) {
     return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>에러가 발생했습니다.</div>;
-  }
-
-  // if (!studyData) {
-  //   return <div className='flex justify-center items-center max-w-screen-xl mx-auto h-screen'>데이터를 찾을 수 없습니다.</div>;
-  // }
+  } 
 
   const handleCategoryChange = (value: string | string[]) => {
     setSelectCategory(value || 'ALL'); 
   };
 
   const handlePositionChange = (value: string | string[]) => {
-    if (Array.isArray(value) && value.length === 0) {
-      setSelectPosition([RecruitmentPositionTitle.BACKEND]); 
-      return;
-    }
     if (Array.isArray(value)) {
+      // value가 빈 배열이거나 'ALL'만 포함된 경우
+      if (value.length === 0 || value.includes('ALL')) {
+        setSelectPosition('ALL');
+        return;
+      }
+      
       const positions = value.filter(v => v !== 'ALL').map(v => v as RecruitmentPositionTitle);
-      setSelectPosition(positions.length > 0 ? positions : [RecruitmentPositionTitle.BACKEND]);
+      setSelectPosition(positions);
       return;
     }
-    setSelectPosition(value || RecruitmentPositionTitle.BACKEND); 
+    setSelectPosition(value || 'ALL'); 
   };
 
   const handleStatusChange = (value: string | string[]) => {
@@ -115,16 +113,6 @@ export default function StudyRecruit() {
   const handleSortChange = (value: string | string[]) => {
     setSelectSort(value || SortCriteria.NEWEST); 
   };
-
-  // const filteredStudyData = studyData?.data
-  // .filter(item => selectCategory === 'ALL' ? true : item.category === selectCategory)
-  // .filter(item => {
-  //   if (Array.isArray(selectPosition)) {
-  //     return selectPosition.includes('ALL') ? true : item.getRecruitmentPositionResponseList.some(position => selectPosition.includes(position.title));
-  //   }
-  //   return selectPosition === 'ALL' ? true : item.getRecruitmentPositionResponseList.some(position => position.title === selectPosition);
-  // })
-  // .filter(item => selectStatus === 'ALL' ? true : item.status === selectStatus) 
 
   const categoryLabels: Record<StudyCategory, string> = {
     [StudyCategory.ALGORITHM]: '알고리즘',
@@ -150,10 +138,10 @@ export default function StudyRecruit() {
     { id: 0, value: 'ALL', label: '직무 전체' },
     ...Object.entries(RecruitmentPositionTitle).map(([, value], index) => ({
       id: index + 1,
-      value,
+      value, 
       label: positionLabels[value as RecruitmentPositionTitle]
     }))
-  ];
+  ]  
 
   const SORT_OPTIONS = {
     [SortCriteria.NEWEST]: '최신순',
@@ -193,11 +181,11 @@ export default function StudyRecruit() {
       <div className='flex justify-between items-end mb-[34px]'>
         <div className='flex items-center gap-5 justify-start'>
           <CategoryFilter type='default' onChange={handleCategoryChange} defaultValue={selectCategory} options={categoryOptions} isOpen={openSelectId === 'select1'}
-          onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')} />
+          onToggle={() => setOpenSelectId(openSelectId === 'select1' ? null : 'select1')}/>
           <PositionFilter type='button' onChange={handlePositionChange} defaultValue={selectPosition} options={positionOptions} isOpen={openSelectId === 'select2'}
           onToggle={() => setOpenSelectId(openSelectId === 'select2' ? null : 'select2')} />
           <StatusFilter type='default' onChange={handleStatusChange} defaultValue={selectStatus} options={statusOptions} isOpen={openSelectId === 'select3'}
-          onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')} />
+          onToggle={() => setOpenSelectId(openSelectId === 'select3' ? null : 'select3')}  />
         </div>
         <div className='flex items-center gap-1'>
           {/* <TagFilter type='button' onChange={handleTagChange} defaultValue={selectTag} options={dummyTags.map((tag)=> ({id: tag.id,value: tag.value, label: tag.label}))} isOpen={openSelectId === 'select4'} onToggle={() => setOpenSelectId(openSelectId === 'select4' ? null : 'select4')} filterName='태그' /> */}
@@ -214,7 +202,7 @@ export default function StudyRecruit() {
         </div>
       ) : (
         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-5 gap-y-[26px] max-w-screen-xl w-full'> 
-        {study.pages.flatMap((page) => {
+        {/* {study.pages.flatMap((page) => {
           
           console.log('page 데이터:', page);
           
@@ -225,6 +213,11 @@ export default function StudyRecruit() {
           
           console.log('매핑된 결과:', mappedData);
           return mappedData;
+        })} */}
+        {study.pages.map((page) => {  
+          return page.data.data.map((item) => { 
+            return <StudyItem key={`${item.studyId}-${item.title}`} data={item as Study}/>;
+          });
         })}
       </div>
       )}

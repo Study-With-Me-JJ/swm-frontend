@@ -17,8 +17,7 @@ export const getStudy = async (params: SearchStudyParams) => {
             paramsSerializer: {
                 indexes: null  
             } 
-        });
-        console.log('[getStudy] 응답 데이터 전체:', res);
+        }); 
         console.log('[getStudy] 응답 데이터 내용:', res.data);
 
         if (!res.data) {

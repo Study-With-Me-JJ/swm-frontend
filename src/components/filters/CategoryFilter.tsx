@@ -10,6 +10,6 @@ export default function CategoryFilter({type,onChange,defaultValue,options,isOpe
       };
 
     return <>
-        <FilterSelect type={type as "default"} onChange={handleCategoryChange} defaultValue={defaultValue} options={options} isOpen={isOpen} onToggle={onToggle} />
+        <FilterSelect type={type as "default"} onChange={handleCategoryChange} defaultValue={defaultValue} options={options} isOpen={isOpen} onToggle={onToggle}   />
     </>
 }
