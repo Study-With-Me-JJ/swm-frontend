@@ -14,7 +14,7 @@ export const getStudy = async (params: SearchStudyParams) => {
                 indexes: null  
             }
         }); 
-        console.log('[getStudy] 응답 데이터 내용:', res.data);
+        // console.log('[getStudy] 응답 데이터 내용:', res.data);
 
         if (!res.data) {
             console.warn('[getStudy] 응답 데이터가 비어있습니다');
