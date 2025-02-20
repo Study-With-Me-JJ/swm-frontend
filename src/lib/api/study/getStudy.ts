@@ -6,27 +6,19 @@ import axios from "axios";
 export const getStudy = async (params: SearchStudyParams) => { 
     try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-        const url = `${baseUrl}${API_ENDPOINTS.STUDY.LIST}`; 
- 
-        const queryParams = {
-            ...params, 
-        };
+        const url = `${baseUrl}${API_ENDPOINTS.STUDY.LIST}`;  
 
         const res = await axios.get<ApiResponse<Study>>(url, { 
-            params: queryParams, 
+            params, 
+            paramsSerializer: {
+                indexes: null  
+            }
         }); 
         console.log('[getStudy] 응답 데이터 내용:', res.data);
 
         if (!res.data) {
             console.warn('[getStudy] 응답 데이터가 비어있습니다');
         }
-
-        // 더 자세한 에러 로깅 추가
-        console.log('[getStudy] URL:', url);
-        console.log('[getStudy] 전체 응답:', res);
-        console.log('[getStudy] 응답 상태:', res.status);
-        console.log('[getStudy] 응답 헤더:', res.headers);
-        console.log('[getStudy] 응답 데이터:', JSON.stringify(res.data, null, 2)); 
 
         return res.data; 
     } catch (error) {

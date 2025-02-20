@@ -24,7 +24,7 @@ export default function StudyRecruit() {
   
   const { data: study, isLoading, error, fetchNextPage, hasNextPage } = useInfiniteQuery({
     queryKey: ['study', selectSort,selectCategory, selectPosition, selectStatus],
-    initialPageParam: { lastStudyId: 0, lastSortValue: 0 },  // 추가
+    initialPageParam: { lastStudyId: 0, lastSortValue: 0 },  
     queryFn: async ({ pageParam = { lastStudyId: 0, lastSortValue: 0 } }) => {
       const params: SearchStudyParams = {
         sortCriteria: selectSort as SortCriteria,
@@ -38,8 +38,7 @@ export default function StudyRecruit() {
         }),
         ...(pageParam?.lastStudyId && { lastStudyId: pageParam.lastStudyId }),
         ...(pageParam?.lastSortValue && { lastSortValue: pageParam.lastSortValue })
-      };
-      console.log('실제 API 요청 파라미터:', JSON.stringify(params, null, 2));
+      };  
 
       return await getStudy(params);
     },
@@ -169,11 +168,8 @@ export default function StudyRecruit() {
     }))
   ];
 
-  console.log('studyData 구조:', JSON.stringify(study, null, 2));
-
- 
   const studyData = study?.pages[0].data.data; 
-  console.log('studyData type:', typeof studyData, 'value:', studyData);
+  // console.log('studyData type:', typeof studyData, 'value:', studyData);
 
   return (
     <section className='pt-10 pb-[110px] max-w-screen-xl px-5 xl:px-0  mx-auto'>
