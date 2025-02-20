@@ -13,10 +13,7 @@ export const getStudy = async (params: SearchStudyParams) => {
         };
 
         const res = await axios.get<ApiResponse<Study>>(url, { 
-            params: queryParams,
-            paramsSerializer: {
-                indexes: null  
-            } 
+            params: queryParams, 
         }); 
         console.log('[getStudy] 응답 데이터 내용:', res.data);
 
