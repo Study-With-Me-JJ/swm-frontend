@@ -28,13 +28,14 @@ export default function StudyRecruit() {
     queryFn: async ({ pageParam = { lastStudyId: 0, lastSortValue: 0 } }) => {
       const params: SearchStudyParams = {
         sortCriteria: selectSort as SortCriteria,
+        // 각 필터가 'ALL'이 아닐 때만 파라미터 추가
         ...(selectCategory !== 'ALL' && { category: selectCategory as StudyCategory }),
         ...(selectStatus !== 'ALL' && { status: selectStatus as StudyStatus }),
-        ...(selectPosition !== 'ALL' && { 
-          // 배열이 이미 들어온 경우와 단일 값인 경우를 구분
-          recruitmentPositionTitleList: Array.isArray(selectPosition) 
-            ? selectPosition as RecruitmentPositionTitle[]
-            : [selectPosition as RecruitmentPositionTitle]
+        ...(selectPosition !== 'ALL' && Array.isArray(selectPosition) && selectPosition.length > 0 && { 
+          recruitmentPositionTitleList: selectPosition as RecruitmentPositionTitle[]
+        }),
+        ...(selectPosition !== 'ALL' && !Array.isArray(selectPosition) && { 
+          recruitmentPositionTitleList: [selectPosition as RecruitmentPositionTitle]
         }),
         ...(pageParam?.lastStudyId && { lastStudyId: pageParam.lastStudyId }),
         ...(pageParam?.lastSortValue && { lastSortValue: pageParam.lastSortValue })
