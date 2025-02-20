@@ -17,7 +17,7 @@ export const INPUT_ERROR_MESSAGE = {
     },
     PASSWORD: {
       REQUIRED: "비밀번호를 입력해 주세요.",
-      HELPER_TEXT: "영문, 숫자, 특수문자를 포함한 8~20자리의 비밀번호를 입력해 주세요.\n아이디와 같은 비밀번호는 사용하실 수 없습니다.",
+      HELPER_TEXT: "영문, 숫자, 특수문자를 포함한 8~20자리의 비밀번호를 입력해 주세요.",
     },
     PASSWORD_CHECK: "비밀번호가 일치하지 않습니다. 다시 입력해 주세요."
   };
