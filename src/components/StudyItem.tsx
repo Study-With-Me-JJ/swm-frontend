@@ -5,8 +5,7 @@ import { useState } from 'react';
 import Link from 'next/link'; 
 import Toast from './ui/Toast';
 import BookMarkIcon from './ui/BookMarkIcon';
-import InteractionStatus from './InteractionStatus'; 
-import { positionOptions } from '@/types/filters/study-filter';
+import InteractionStatus from './InteractionStatus';  
 
 export default function StudyItem({data}: {data: Study}) {
     const [isBookmark, setIsBookmark] = useState(false);
