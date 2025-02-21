@@ -1,31 +1,31 @@
 import { axiosInstance } from './axios';
-import { API_ENDPOINTS } from './endpoints'; 
+import { API_ENDPOINTS } from './endpoints';
 
 export const login = async (email: string, password: string) => {
   try {
-    const response = await axiosInstance.post(API_ENDPOINTS.USER.LOGIN, {
+    const response = await axiosInstance.post(API_ENDPOINTS.AUTH.LOGIN, {
       loginId: email,
       password: password,
     });
 
-  return response;
+    return response;
   } catch (error) {
     throw error;
   }
 };
 
 export const logout = async () => {
-  const clearAuthData = () => { 
+  const clearAuthData = () => {
     delete axiosInstance.defaults.headers.common['Authorization'];
   };
 
   try {
-    await axiosInstance.patch(API_ENDPOINTS.USER.LOGOUT);
+    await axiosInstance.patch(API_ENDPOINTS.AUTH.LOGOUT);
     clearAuthData();
     return { success: true };
-  } catch { 
+  } catch {
     clearAuthData();
-    
-    return { success: true };  
+
+    return { success: true };
   }
 };
