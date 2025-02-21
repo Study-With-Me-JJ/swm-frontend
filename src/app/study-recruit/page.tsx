@@ -13,11 +13,11 @@ import {
   StudyCategory,
   StudyStatus,
 } from '@/types/api/study';
-import StudyItem from '@/components/StudyItem';
-import CategoryFilter from '@/components/filters/CategoryFilter';
-import PositionFilter from '@/components/filters/PositionFilter';
-import SortFilter from '@/components/filters/SortFilter';
-import StatusFilter from '@/components/filters/StatusFilter';
+import CategoryFilter from '@/components/study-recruit/filter/CategoryFilter';
+import PositionFilter from '@/components/study-recruit/filter/PositionFilter';
+import SortFilter from '@/components/study-recruit/filter/SortFilter';
+import StatusFilter from '@/components/study-recruit/filter/StatusFilter';
+import StudyItem from '@/components/study-recruit/list/StudyItem';
 import Loadingbar from '@/components/ui/Loadingbar';
 
 export default function StudyRecruit() {
