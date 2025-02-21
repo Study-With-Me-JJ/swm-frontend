@@ -1,6 +1,6 @@
 'use client';
 
-import Link from 'next/link';
+// import Link from 'next/link';
 import { useState } from 'react';
 import { Study } from '@/types/api/study';
 import InteractionStatus from '@/components/study-recruit/ui/InteractionStatus';
@@ -33,10 +33,7 @@ export default function StudyItem({ data }: { data: Study }) {
 
   return (
     <>
-      <Link
-        href={`/study-detail/${data.studyId}`}
-        className="flex h-[340px] flex-col justify-between gap-[10px] rounded-[8px] bg-[#f9f9f9] px-[24px] py-[26px]"
-      >
+      <div className="flex h-[340px] flex-col justify-between gap-[10px] rounded-[8px] bg-[#f9f9f9] px-[24px] py-[26px]">
         <div className="flex h-full flex-col gap-4">
           <div className="flex items-center justify-between">
             {data.status === 'ACTIVE' ? (
@@ -93,7 +90,7 @@ export default function StudyItem({ data }: { data: Study }) {
             viewCount={viewCount}
           />
         </div>
-      </Link>
+      </div>
       <Toast
         isToast={isToast}
         message={isBookmark ? '스터디 북마크 완료!' : '스터디 북마크 해제'}
