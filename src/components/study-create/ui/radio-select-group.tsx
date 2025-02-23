@@ -8,13 +8,13 @@ export default function RadioSelectGroup({
   subLabel,
   name,
   options,
-  onOptionChange,
+  onOptionChange, 
 }: {
   label: string;
   subLabel: string;
   name: string;
   options: { id: number; name: string }[];
-  onOptionChange: (id: number) => void;
+  onOptionChange: (id: number) => void; 
 }) {
   const { control } = useFormContext();
 

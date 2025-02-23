@@ -11,9 +11,7 @@ import Toast from '@/components/ui/Toast';
 export default function StudyCreate() {
   const methods = useForm();
   const category = getCategoryList();
-  const [selectedCategory, setSelectedCategory] = useState<number>(
-    category[0].id,
-  );
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [previewImages, setPreviewImages] = useState<string[]>([]);
   const [isToast, setIsToast] = useState(false);
 
@@ -65,7 +63,7 @@ export default function StudyCreate() {
                 subLabel="1개의 카테고리를 선택해 주세요."
                 name="category"
                 options={category}
-                onOptionChange={handleCategoryChange}
+                onOptionChange={handleCategoryChange} 
               />
               <ImageUploader
                 name="image"
