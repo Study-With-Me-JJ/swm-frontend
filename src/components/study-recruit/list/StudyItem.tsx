@@ -3,7 +3,7 @@
 // import Link from 'next/link';
 import { useState } from 'react';
 import { Study } from '@/types/api/study';
-import InteractionStatus from '@/components/study-recruit/ui/InteractionStatus';
+import InteractionStatus from '@/components/ui/InteractionStatus';
 import BookMarkIcon from '@/components/ui/BookMarkIcon';
 import Toast from '@/components/ui/Toast';
 

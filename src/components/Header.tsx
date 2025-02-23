@@ -14,6 +14,7 @@ export default function Header() {
     { name: '스터디 룸', href: '/studyroom' },
     { name: '외부 스터디 룸', href: '/external-studyrooms' },
     { name: '외부 스터디', href: '/external-studies' },
+    { name: '스터디 생성', href: '/study-create' },
   ];
 
   const logoOnlyPaths = ['/login/', '/join/', '/find-id/', '/find-password/'];
