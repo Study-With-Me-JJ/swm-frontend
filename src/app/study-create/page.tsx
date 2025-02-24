@@ -20,7 +20,7 @@ export default function StudyCreate() {
       name: string;
     }[]
   >([]);
-  const [isToast, setIsToast] = useState(false);
+  const [isToast, setIsToast] = useState(false); 
 
   const handleCategoryChange = (id: number) => {
     setSelectedCategory(id);

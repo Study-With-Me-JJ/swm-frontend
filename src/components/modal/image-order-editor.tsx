@@ -3,7 +3,7 @@
 import { DndContext } from '@dnd-kit/core';
 import { SortableContext, arrayMove, useSortable } from '@dnd-kit/sortable';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 function SortableItem({
   image,
@@ -19,10 +19,8 @@ function SortableItem({
   return (
     <div
       ref={setNodeRef}
-      {...attributes}
-      {...listeners}
-      key={image.url}
       className="flex w-full cursor-move items-center justify-between gap-[5px] border-t border-[#e0e0e0] bg-white py-[20px]"
+      role="listitem"
     >
       <div className="flex w-full items-center justify-start gap-[16px]">
         <div className="relative h-[80px] w-[80px] flex-shrink-0 overflow-hidden">
@@ -36,17 +34,42 @@ function SortableItem({
         <span className="max-w-[150px] truncate text-[14px] text-gray-600">
           {image.name}
         </span>
-        <button className="flex h-[24px] w-[24px] items-center justify-center">
-          <Image src="/icons/Edit.svg" alt="수정" width={24} height={24} />
-        </button>
-        <button
-          className="flex h-[24px] w-[24px] items-center justify-center"
-          onClick={() => handleDeleteImage(image.url)}
-        >
-          <Image src="/icons/Delete.svg" alt="삭제" width={24} height={24} />
-        </button>
+        <div className="flex items-center justify-center gap-[10px]">
+          <button
+            type="button"
+            className="flex h-[24px] w-[24px] items-center justify-center"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              // setIsEditMode(true);
+            }}
+          >
+            <Image src="/icons/Edit.svg" alt="수정" width={24} height={24} />
+          </button>
+        </div>
+        <div className="flex items-center justify-center gap-[10px]">
+          <button
+            type="button"
+            className="flex h-[24px] w-[24px] items-center justify-center"
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              console.log('삭제 버튼 클릭됨');
+              handleDeleteImage(image.url);
+            }}
+          >
+            <Image src="/icons/Delete.svg" alt="삭제" width={24} height={24} />
+          </button>
+        </div>
       </div>
-      <Image src="/icons/Menu.svg" alt="메뉴" width={24} height={24} />
+      <Image
+        src="/icons/Menu.svg"
+        alt="메뉴"
+        width={24}
+        height={24}
+        {...attributes}
+        {...listeners}
+      />
     </div>
   );
 }
@@ -62,9 +85,18 @@ export default function ImageOrderEditor({
   ) => void;
   handleCloseModal: () => void;
 }) {
-  const [orderedImages, setOrderedImages] = useState(images);
-  const handleDeleteImage = (url: string) => {
-    setOrderedImages((prev) => prev.filter((image) => image.url !== url));
+  const [orderedImages, setOrderedImages] = useState([...images]);
+
+  useEffect(() => {
+    console.log('orderedImages 변경됨:', orderedImages);
+  }, [orderedImages]);
+
+  const handleDeleteImage = (urlToDelete: string) => {
+    console.log('삭제 전:', orderedImages);
+    setOrderedImages(
+      orderedImages.filter((image) => image.url !== urlToDelete),
+    );
+    console.log('삭제할 URL:', urlToDelete);
   };
 
   const handleConfirm = () => {
@@ -117,12 +149,14 @@ export default function ImageOrderEditor({
           </div>
           <div className="flex w-full items-center justify-center gap-[10px]">
             <button
+              type="button"
               className="h-[40px] w-[120px] flex-shrink-0 rounded-[4px] bg-[#E7F3FF] text-[14px] font-semibold text-link-default"
               onClick={handleCloseModal}
             >
               취소
             </button>
             <button
+              type="button"
               className="h-[40px] flex-1 rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
               onClick={handleConfirm}
             >
