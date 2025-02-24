@@ -3,11 +3,14 @@
 import { DndContext } from '@dnd-kit/core';
 import { SortableContext, arrayMove, useSortable } from '@dnd-kit/sortable';
 import Image from 'next/image';
+import { useState } from 'react';
 
 function SortableItem({
   image,
+  handleDeleteImage,
 }: {
   image: { url: string; width: number; height: number; name: string };
+  handleDeleteImage: (url: string) => void;
 }) {
   const { attributes, listeners, setNodeRef } = useSortable({
     id: image.url,
@@ -33,14 +36,22 @@ function SortableItem({
         <span className="max-w-[150px] truncate text-[14px] text-gray-600">
           {image.name}
         </span>
+        <button className="flex h-[24px] w-[24px] items-center justify-center">
+          <Image src="/icons/Edit.svg" alt="수정" width={24} height={24} />
+        </button>
+        <button
+          className="flex h-[24px] w-[24px] items-center justify-center"
+          onClick={() => handleDeleteImage(image.url)}
+        >
+          <Image src="/icons/Delete.svg" alt="삭제" width={24} height={24} />
+        </button>
       </div>
-      <Image src="/icons/Menu.svg" alt="" width={28} height={28} />
+      <Image src="/icons/Menu.svg" alt="메뉴" width={24} height={24} />
     </div>
   );
 }
 
 export default function ImageOrderEditor({
-  //간단한 상태관리만 필요하므로 클라이언트사이드 모달로 구현
   images,
   handleOrderEdit,
   handleCloseModal,
@@ -51,6 +62,16 @@ export default function ImageOrderEditor({
   ) => void;
   handleCloseModal: () => void;
 }) {
+  const [orderedImages, setOrderedImages] = useState(images);
+  const handleDeleteImage = (url: string) => {
+    setOrderedImages((prev) => prev.filter((image) => image.url !== url));
+  };
+
+  const handleConfirm = () => {
+    handleOrderEdit(orderedImages);
+    handleCloseModal();
+  };
+
   return (
     <>
       <div className="fixed inset-0 left-1/2 top-1/2 z-20 flex h-[590px] w-[480px] -translate-x-1/2 -translate-y-1/2 flex-col gap-[10px] overflow-hidden rounded-[8px] bg-white px-[50px] py-[40px]">
@@ -68,19 +89,28 @@ export default function ImageOrderEditor({
               onDragEnd={(event) => {
                 const { active, over } = event;
                 if (over && active.id !== over.id) {
-                  const oldIndex = images.findIndex(
+                  const oldIndex = orderedImages.findIndex(
                     (img) => img.url === active.id,
                   );
-                  const newIndex = images.findIndex(
+                  const newIndex = orderedImages.findIndex(
                     (img) => img.url === over.id,
                   );
-                  handleOrderEdit(arrayMove(images, oldIndex, newIndex));
+                  const newOrderedImages = arrayMove(
+                    orderedImages,
+                    oldIndex,
+                    newIndex,
+                  );
+                  setOrderedImages(newOrderedImages);
                 }
               }}
             >
-              <SortableContext items={images.map((image) => image.url)}>
-                {images.map((image) => (
-                  <SortableItem key={image.url} image={image} />
+              <SortableContext items={orderedImages.map((image) => image.url)}>
+                {orderedImages.map((image) => (
+                  <SortableItem
+                    key={image.url}
+                    image={image}
+                    handleDeleteImage={handleDeleteImage}
+                  />
                 ))}
               </SortableContext>
             </DndContext>
@@ -92,7 +122,10 @@ export default function ImageOrderEditor({
             >
               취소
             </button>
-            <button className="h-[40px] flex-1 rounded-[4px] bg-link-default text-[14px] font-semibold text-white">
+            <button
+              className="h-[40px] flex-1 rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+              onClick={handleConfirm}
+            >
               변경
             </button>
           </div>

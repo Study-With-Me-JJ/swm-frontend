@@ -11,7 +11,7 @@ export default function ImageUploader({
   onImageChange,
   previewImages,
   msg,
-  handleOrderEdit,
+  handleOrderEdit, 
 }: {
   name: string;
   label: string;
@@ -21,7 +21,7 @@ export default function ImageUploader({
   msg?: string;
   handleOrderEdit: (
     newOrder: { url: string; width: number; height: number; name: string }[],
-  ) => void;
+  ) => void; 
 }) {
   const { control } = useFormContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -105,7 +105,7 @@ export default function ImageUploader({
             name: image.name.split('/').pop() || '',
           })) || []}
           handleOrderEdit={handleOrderEdit}
-          handleCloseModal={handleCloseModal}
+          handleCloseModal={handleCloseModal} 
         />
       )}
     </div>

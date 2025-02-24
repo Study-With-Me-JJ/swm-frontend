@@ -12,12 +12,14 @@ export default function StudyCreate() {
   const methods = useForm();
   const category = getCategoryList();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [previewImages, setPreviewImages] = useState<{
-    url: string;
-    width: number;
-    height: number;
-    name: string;
-  }[]>([]);
+  const [previewImages, setPreviewImages] = useState<
+    {
+      url: string;
+      width: number;
+      height: number;
+      name: string;
+    }[]
+  >([]);
   const [isToast, setIsToast] = useState(false);
 
   const handleCategoryChange = (id: number) => {
@@ -46,6 +48,7 @@ export default function StudyCreate() {
   ) => {
     setPreviewImages(newOrder);
   };
+
 
   return (
     <>
