@@ -12,7 +12,12 @@ export default function StudyCreate() {
   const methods = useForm();
   const category = getCategoryList();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [previewImages, setPreviewImages] = useState<{ url: string }[]>([]);
+  const [previewImages, setPreviewImages] = useState<{
+    url: string;
+    width: number;
+    height: number;
+    name: string;
+  }[]>([]);
   const [isToast, setIsToast] = useState(false);
 
   const handleCategoryChange = (id: number) => {
@@ -31,13 +36,13 @@ export default function StudyCreate() {
       const imageUrl = URL.createObjectURL(file);
       setPreviewImages((prev) => [
         ...prev,
-        { url: imageUrl, width: 200, height: 200 },
+        { url: imageUrl, width: 200, height: 200, name: file.name },
       ]);
     }
   };
 
   const handleOrderEdit = (
-    newOrder: { url: string; width: number; height: number }[],
+    newOrder: { url: string; width: number; height: number; name: string }[],
   ) => {
     setPreviewImages(newOrder);
   };
@@ -81,8 +86,9 @@ export default function StudyCreate() {
                 onImageChange={handleImageChange}
                 previewImages={previewImages.map((image) => ({
                   url: image.url,
-                  width: 200,
-                  height: 200,
+                  width: image.width,
+                  height: image.height,
+                  name: image.name,
                 }))}
                 msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
                 handleOrderEdit={handleOrderEdit}

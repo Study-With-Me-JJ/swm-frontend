@@ -17,10 +17,10 @@ export default function ImageUploader({
   label: string;
   subLabel: string;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  previewImages?: { url: string; width: number; height: number }[];
+  previewImages?: { url: string; width: number; height: number; name: string }[];
   msg?: string;
   handleOrderEdit: (
-    newOrder: { url: string; width: number; height: number }[],
+    newOrder: { url: string; width: number; height: number; name: string }[],
   ) => void;
 }) {
   const { control } = useFormContext();
@@ -54,9 +54,8 @@ export default function ImageUploader({
                   <Image
                     src={imageUrl.url}
                     alt={`Preview ${index + 1}`}
-                    width={imageUrl.width}
-                    height={imageUrl.height}
-                    className="object-cover"
+                    fill
+                    className="object-contain"
                   />
                 </div>
               ))}
@@ -101,7 +100,10 @@ export default function ImageUploader({
       </div>
       {isModalOpen && (
         <ImageOrderEditor
-          images={previewImages?.map((image) => image) || []}
+          images={previewImages?.map((image) => ({
+            ...image,
+            name: image.name.split('/').pop() || '',
+          })) || []}
           handleOrderEdit={handleOrderEdit}
           handleCloseModal={handleCloseModal}
         />

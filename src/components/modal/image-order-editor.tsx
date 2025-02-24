@@ -7,7 +7,7 @@ import Image from 'next/image';
 function SortableItem({
   image,
 }: {
-  image: { url: string; width: number; height: number };
+  image: { url: string; width: number; height: number; name: string };
 }) {
   const { attributes, listeners, setNodeRef } = useSortable({
     id: image.url,
@@ -19,35 +19,22 @@ function SortableItem({
       {...attributes}
       {...listeners}
       key={image.url}
-      className="mb-[10px] flex w-full cursor-move items-center gap-[12px] border border-[#e0e0e0] bg-white py-[20px]"
+      className="flex w-full cursor-move items-center justify-between gap-[5px] border-t border-[#e0e0e0] bg-white py-[20px]"
     >
-      <svg
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        className="flex-shrink-0 text-gray-400"
-      >
-        <path
-          d="M8 6H16M8 12H16M8 18H16"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-      </svg>
-      <div className="relative h-[100px] w-[100px] flex-shrink-0">
-        <Image
-          src={image.url}
-          alt="image"
-          width={200}
-          height={200}
-          style={{ width: '100%', height: 'auto' }}
-          className="rounded-[4px] object-cover"
-        />
+      <div className="flex w-full items-center justify-start gap-[16px]">
+        <div className="relative h-[80px] w-[80px] flex-shrink-0 overflow-hidden">
+          <Image
+            src={image.url}
+            alt="image"
+            fill
+            className="rounded-[8px] object-contain"
+          />
+        </div>
+        <span className="max-w-[150px] truncate text-[14px] text-gray-600">
+          {image.name}
+        </span>
       </div>
-      <span className="flex-1 truncate text-[14px] text-gray-600">
-        {image.url}
-      </span>
+      <Image src="/icons/Menu.svg" alt="" width={28} height={28} />
     </div>
   );
 }
@@ -58,9 +45,9 @@ export default function ImageOrderEditor({
   handleOrderEdit,
   handleCloseModal,
 }: {
-  images: { url: string; width: number; height: number }[];
+  images: { url: string; width: number; height: number; name: string }[];
   handleOrderEdit: (
-    newOrder: { url: string; width: number; height: number }[],
+    newOrder: { url: string; width: number; height: number; name: string }[],
   ) => void;
   handleCloseModal: () => void;
 }) {
