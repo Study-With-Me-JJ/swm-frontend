@@ -38,9 +38,7 @@ function SortableItem({
           <button
             type="button"
             className="flex h-[24px] w-[24px] items-center justify-center"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
+            onClick={() => {
               // setIsEditMode(true);
             }}
           >
@@ -51,10 +49,7 @@ function SortableItem({
           <button
             type="button"
             className="flex h-[24px] w-[24px] items-center justify-center"
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              console.log('삭제 버튼 클릭됨');
+            onClick={() => {
               handleDeleteImage(image.url);
             }}
           >
