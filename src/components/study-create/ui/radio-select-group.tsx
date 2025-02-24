@@ -8,13 +8,13 @@ export default function RadioSelectGroup({
   subLabel,
   name,
   options,
-  onOptionChange, 
+  onOptionChange,
 }: {
   label: string;
   subLabel: string;
   name: string;
   options: { id: number; name: string }[];
-  onOptionChange: (id: number) => void; 
+  onOptionChange: (id: number) => void;
 }) {
   const { control } = useFormContext();
 
@@ -49,7 +49,7 @@ export default function RadioSelectGroup({
                     />
                     <label
                       htmlFor={item.id.toString()}
-                      className="border-box flex min-w-[60px] cursor-pointer items-center justify-center rounded-[8px] border border-[#E0E0E0] p-[16px] text-[16px] font-medium text-[#bbbbbb] hover:bg-gray-50 peer-checked:border-blue-500 peer-checked:bg-blue-50 peer-checked:text-blue-600"
+                      className="border-box flex min-w-[60px] cursor-pointer items-center justify-center rounded-[8px] border border-[#E0E0E0] p-[16px] text-[16px] font-medium text-[#bbbbbb] hover:bg-gray-50 peer-checked:border-black peer-checked:bg-black peer-checked:text-white"
                     >
                       {item.name}
                     </label>

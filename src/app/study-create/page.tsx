@@ -12,7 +12,7 @@ export default function StudyCreate() {
   const methods = useForm();
   const category = getCategoryList();
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [previewImages, setPreviewImages] = useState<{ url: string }[]>([]);
   const [isToast, setIsToast] = useState(false);
 
   const handleCategoryChange = (id: number) => {
@@ -29,8 +29,17 @@ export default function StudyCreate() {
         return;
       }
       const imageUrl = URL.createObjectURL(file);
-      setPreviewImages((prev) => [...prev, imageUrl]);
+      setPreviewImages((prev) => [
+        ...prev,
+        { url: imageUrl, width: 200, height: 200 },
+      ]);
     }
+  };
+
+  const handleOrderEdit = (
+    newOrder: { url: string; width: number; height: number }[],
+  ) => {
+    setPreviewImages(newOrder);
   };
 
   return (
@@ -63,15 +72,20 @@ export default function StudyCreate() {
                 subLabel="1개의 카테고리를 선택해 주세요."
                 name="category"
                 options={category}
-                onOptionChange={handleCategoryChange} 
+                onOptionChange={handleCategoryChange}
               />
               <ImageUploader
                 name="image"
                 label="이미지"
                 subLabel="스터디에 관련된 이미지를 추가해 주세요."
                 onImageChange={handleImageChange}
-                previewImages={previewImages}
+                previewImages={previewImages.map((image) => ({
+                  url: image.url,
+                  width: 200,
+                  height: 200,
+                }))}
                 msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
+                handleOrderEdit={handleOrderEdit}
               />
             </div>
           </form>
