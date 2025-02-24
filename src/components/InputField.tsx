@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { Input } from "@/components/ui/input";
-import { useEffect } from "react";
-import { useFormContext, Controller } from "react-hook-form";
-import { Button } from "./ui/button";
-import { useState } from "react";
+import { useEffect } from 'react';
+import { useState } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { Button } from './ui/button';
+import { Input } from '@/components/ui/input';
 
 interface InputFieldProps {
   name: string;
@@ -19,12 +19,27 @@ interface InputFieldProps {
   onAuthCodeCheck?: () => void;
 }
 
-
-export function InputField({ name, label, type, placeholder, helperText, maxLength, buttonText, onButtonClick, disabled, onAuthCodeCheck }: InputFieldProps) {
-  const { control, formState: { errors }} = useFormContext();
+export function InputField({
+  name,
+  label,
+  type,
+  placeholder,
+  helperText,
+  maxLength,
+  buttonText,
+  onButtonClick,
+  disabled,
+  onAuthCodeCheck,
+}: InputFieldProps) {
+  const {
+    control,
+    formState: { errors },
+    getValues,
+  } = useFormContext();
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(600);
-  const [isAuthCodeInputEnabled, setIsAuthCodeInputEnabled] = useState<boolean>(false);
+  const [isAuthCodeInputEnabled, setIsAuthCodeInputEnabled] =
+    useState<boolean>(false);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -56,52 +71,74 @@ export function InputField({ name, label, type, placeholder, helperText, maxLeng
     }
   };
 
+  const handleAuthCodeCheck = () => {
+    if (onAuthCodeCheck) {
+      onAuthCodeCheck();
+      if (getValues('authCodeVerified')) {
+        setIsCountdownActive(false);
+      }
+    }
+  };
+
   return (
-    <div className='flex flex-col gap-2'>
-      {label && <h3 className='font-medium'>{label}</h3>}
-      <div className='flex gap-2'>
-      <Controller
-        name={name}
-        control={control}
-        render={({ field }) => {
-          const isValid = !errors[name] && field.value;
-          return (
-          <Input
-            {...field}
-            value={field.value ?? ''}
-            type={type}
-            placeholder={placeholder}
-            maxLength={maxLength}
-            disabled={(name === 'authCode' && !isAuthCodeInputEnabled)}
-            className={`flex-grow disabled:cursor-default
-              ${errors[name]
-              ? 'border-red-error'
-              : isValid
-              ? 'border-gray-light'
-              : ''}`}
-          />
-        );
-      }}
-      />
-      {buttonText && onButtonClick && (
-        <Button
-          type="button"
-          className="bg-blue-default w-36 flex-shrink-0"
-          onClick={handleButtonClick}
-          disabled={disabled}
-        >
-          {buttonText}
+    <div className="flex flex-col gap-2">
+      {label && <h3 className="font-medium">{label}</h3>}
+      <div className="flex gap-2">
+        <Controller
+          name={name}
+          control={control}
+          render={({ field }) => {
+            const isValid = !errors[name] && field.value;
+            return (
+              <Input
+                {...field}
+                value={field.value ?? ''}
+                type={type}
+                placeholder={placeholder}
+                maxLength={maxLength}
+                disabled={name === 'authCode' && !isAuthCodeInputEnabled}
+                className={`flex-grow disabled:cursor-default ${
+                  errors[name]
+                    ? 'border-red-error'
+                    : isValid
+                      ? 'border-gray-light'
+                      : ''
+                }`}
+              />
+            );
+          }}
+        />
+        {buttonText && onButtonClick && (
+          <Button
+            type="button"
+            className="w-36 flex-shrink-0 bg-blue-default"
+            onClick={handleButtonClick}
+            disabled={disabled}
+          >
+            {buttonText}
           </Button>
         )}
       </div>
       {name === 'authCode' && (
-        <Button type="button" className="bg-blue-default" onClick={onAuthCodeCheck} disabled={!isCountdownActive}>
+        <Button
+          type="button"
+          className="bg-blue-default"
+          onClick={handleAuthCodeCheck}
+          disabled={!isCountdownActive}
+        >
           인증번호 확인 {isCountdownActive && `(${formatTime(countdown)})`}
         </Button>
       )}
-      {helperText && !errors[name] && <p className='text-xs text-blue-default whitespace-pre-line'>{helperText}</p>}
-      {errors[name] && <p className="text-xs text-red-error whitespace-pre-line">{errors[name]?.message?.toString()}</p>}
+      {helperText && !errors[name] && (
+        <p className="whitespace-pre-line text-xs text-blue-default">
+          {helperText}
+        </p>
+      )}
+      {errors[name] && (
+        <p className="whitespace-pre-line text-xs text-red-error">
+          {errors[name]?.message?.toString()}
+        </p>
+      )}
     </div>
-
   );
 }
