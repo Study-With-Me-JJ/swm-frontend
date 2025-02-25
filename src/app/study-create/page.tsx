@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { getCategoryList } from '@/types/api/study';
+import { getCategoryList, getPositionOptions } from '@/types/api/study';
 import { InputField } from '@/components/InputField';
 import ImageUploader from '@/components/study-create/ui/image-uploader';
+import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
 import Toast from '@/components/ui/Toast';
 
@@ -80,6 +81,19 @@ export default function StudyCreate() {
     }
   };
 
+  const handlePositionChange = (value: string | string[]) => {
+    if (Array.isArray(value)) {
+      setSelectPosition(value.join(',') || 'ALL');
+    } else {
+      setSelectPosition(value || 'ALL');
+    }
+  };
+  const positionOptions = getPositionOptions();
+
+  const [selectPosition, setSelectPosition] = useState<string | string[]>(
+    'ALL',
+  );
+  const [openSelectId, setOpenSelectId] = useState<string | null>(null);
   return (
     <>
       <section className="mx-auto max-w-screen-xl px-5 pb-[110px] pt-10 xl:px-0">
@@ -126,6 +140,18 @@ export default function StudyCreate() {
                 msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
                 handleOrderEdit={handleOrderEdit}
                 handleImageEdit={handleImageEdit}
+              />
+              <PositionFieldGroup
+                name="position"
+                label="모집 직무"
+                type="default"
+                onChange={handlePositionChange}
+                defaultValue={selectPosition}
+                options={positionOptions}
+                isOpen={openSelectId === 'select1'}
+                onToggle={() =>
+                  setOpenSelectId(openSelectId === 'select1' ? null : 'select1')
+                }
               />
             </div>
           </form>
