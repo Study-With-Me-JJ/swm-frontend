@@ -8,14 +8,22 @@ import { useEffect, useState } from 'react';
 function SortableItem({
   image,
   handleDeleteImage,
-  handleEditImage,
+  handleChangeImage,
+  handleModalImageChange,
 }: {
-  image: { url: string; width: number; height: number; name: string };
+  image: {
+    url: string;
+    width: number;
+    height: number;
+    name: string;
+    id: string;
+  };
   handleDeleteImage: (url: string) => void;
-  handleEditImage: (oldUrl: string) => void;
+  handleChangeImage: (oldUrl: string) => void;
+  handleModalImageChange: (oldUrl: string) => void;
 }) {
   const { attributes, listeners, setNodeRef } = useSortable({
-    id: image.url,
+    id: image.id,
   });
 
   return (
@@ -41,7 +49,7 @@ function SortableItem({
             type="button"
             className="flex h-[24px] w-[24px] items-center justify-center"
             onClick={() => {
-              handleEditImage(image.url);
+              handleChangeImage(image.url);
             }}
           >
             <Image src="/icons/Edit.svg" alt="수정" width={24} height={24} />
@@ -75,22 +83,57 @@ export default function ImageOrderEditor({
   images,
   handleOrderEdit,
   handleCloseModal,
-  handleEditImage,
+  handleChangeImage,
 }: {
   images: { url: string; width: number; height: number; name: string }[];
   handleOrderEdit: (
     newOrder: { url: string; width: number; height: number; name: string }[],
   ) => void;
-  handleCloseModal: () => void; 
-  handleEditImage: (oldUrl: string) => void;
+  handleCloseModal: () => void;
+  handleChangeImage: (oldUrl: string) => void;
 }) {
-  const [orderedImages, setOrderedImages] = useState([...images]);
+  const [orderedImages, setOrderedImages] = useState(
+    images.map((img, index) => ({
+      ...img,
+      id: `${img.url}-${index}`,
+    })),
+  );
+
+  useEffect(() => {
+    const updatedImages = images.map((img, index) => ({
+      ...img,
+      id: `${img.url}-${index}`,
+    }));
+    setOrderedImages(updatedImages);
+  }, [images]);
 
   const handleDeleteImage = (urlToDelete: string) => {
     setOrderedImages(
       orderedImages.filter((image) => image.url !== urlToDelete),
     );
-  }; 
+  };
+  const handleModalImageChange = (oldUrl: string) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+
+    fileInput.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        const newUrl = URL.createObjectURL(file);
+        setOrderedImages((prev) =>
+          prev.map((image) =>
+            image.url === oldUrl
+              ? { ...image, url: newUrl, name: file.name }
+              : image,
+          ),
+        );
+      }
+    };
+
+    fileInput.click();
+  };
+
   const handleConfirm = () => {
     handleOrderEdit(orderedImages);
     handleCloseModal();
@@ -114,10 +157,10 @@ export default function ImageOrderEditor({
                 const { active, over } = event;
                 if (over && active.id !== over.id) {
                   const oldIndex = orderedImages.findIndex(
-                    (img) => img.url === active.id,
+                    (img) => img.id === active.id,
                   );
                   const newIndex = orderedImages.findIndex(
-                    (img) => img.url === over.id,
+                    (img) => img.id === over.id,
                   );
                   const newOrderedImages = arrayMove(
                     orderedImages,
@@ -128,13 +171,14 @@ export default function ImageOrderEditor({
                 }
               }}
             >
-              <SortableContext items={orderedImages.map((image) => image.url)}>
+              <SortableContext items={orderedImages.map((image) => image.id)}>
                 {orderedImages.map((image) => (
                   <SortableItem
-                    key={image.url}
+                    key={image.id}
                     image={image}
                     handleDeleteImage={handleDeleteImage}
-                    handleEditImage={handleEditImage}
+                    handleChangeImage={handleModalImageChange}
+                    handleModalImageChange={handleModalImageChange}
                   />
                 ))}
               </SortableContext>

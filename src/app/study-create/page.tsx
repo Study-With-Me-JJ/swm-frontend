@@ -27,6 +27,7 @@ export default function StudyCreate() {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // console.log('handleImageChange 호출됨');
     const file = e.target.files?.[0];
 
     if (file) {
@@ -49,17 +50,11 @@ export default function StudyCreate() {
     setPreviewImages(newOrder);
   };
 
-  const [tempPreviewImage, setTempPreviewImage] = useState<{
-    url: string;
-    width: number;
-    height: number;
-    name: string;
-  } | null>(null);
-
   const handleImageEdit = (
     oldUrl: string,
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
+    // console.log('handleImageEdit 호출됨');
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
@@ -67,27 +62,22 @@ export default function StudyCreate() {
         e.target.value = '';
         return;
       }
+      const targetImage = previewImages.find((img) => img.url === oldUrl);
+      if (targetImage) {
+        URL.revokeObjectURL(targetImage.url);
+      }
+
       const imageUrl = URL.createObjectURL(file);
-      setTempPreviewImage({
+      const newImage = {
         url: imageUrl,
         width: 200,
         height: 200,
         name: file.name,
-      });
-    }
-  };
-
-  const handleConfirmEdit = (oldUrl: string) => {
-    if (tempPreviewImage) {
+      };
       setPreviewImages((prev) =>
-        prev.map((img) => (img.url === oldUrl ? tempPreviewImage : img)),
+        prev.map((img) => (img.url === oldUrl ? newImage : img)),
       );
-      setTempPreviewImage(null);
     }
-  };
-
-  const handleCancelEdit = () => {
-    setTempPreviewImage(null);
   };
 
   return (
@@ -136,9 +126,6 @@ export default function StudyCreate() {
                 msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
                 handleOrderEdit={handleOrderEdit}
                 handleImageEdit={handleImageEdit}
-                handleConfirmEdit={handleConfirmEdit}
-                handleCancelEdit={handleCancelEdit}
-                tempPreviewImage={tempPreviewImage}
               />
             </div>
           </form>

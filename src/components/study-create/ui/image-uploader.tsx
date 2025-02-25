@@ -12,10 +12,7 @@ export default function ImageUploader({
   previewImages,
   msg,
   handleOrderEdit,
-  handleImageEdit,
-  handleConfirmEdit,
-  handleCancelEdit,
-  tempPreviewImage,
+  handleImageEdit, 
 }: {
   name: string;
   label: string;
@@ -34,15 +31,7 @@ export default function ImageUploader({
   handleImageEdit: (
     oldUrl: string,
     e: React.ChangeEvent<HTMLInputElement>,
-  ) => void;
-  handleConfirmEdit: (oldUrl: string) => void;
-  handleCancelEdit: () => void;
-  tempPreviewImage: {
-    url: string;
-    width: number;
-    height: number;
-    name: string;
-  } | null;
+  ) => void; 
 }) {
   const { control } = useFormContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,14 +39,14 @@ export default function ImageUploader({
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
-  const handleEditImage = (oldUrl: string) => {
-    const fileInput = document.getElementById(
-      'file-upload',
-    ) as HTMLInputElement;
+  const handleChangeImage = (oldUrl: string) => {
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
 
     const handleChange = (e: Event) => {
       const changeEvent = e as unknown as React.ChangeEvent<HTMLInputElement>;
-      handleImageEdit(oldUrl, changeEvent); // 상위 컴포넌트의 함수 호출
+      handleImageEdit(oldUrl, changeEvent);
       fileInput.removeEventListener('change', handleChange);
     };
 
@@ -143,7 +132,7 @@ export default function ImageUploader({
           }
           handleOrderEdit={handleOrderEdit}
           handleCloseModal={handleCloseModal}
-          handleEditImage={handleEditImage}
+          handleChangeImage={handleChangeImage} 
         />
       )}
     </div>
