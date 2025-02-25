@@ -8,9 +8,11 @@ import { useEffect, useState } from 'react';
 function SortableItem({
   image,
   handleDeleteImage,
+  handleEditImage,
 }: {
   image: { url: string; width: number; height: number; name: string };
   handleDeleteImage: (url: string) => void;
+  handleEditImage: (oldUrl: string) => void;
 }) {
   const { attributes, listeners, setNodeRef } = useSortable({
     id: image.url,
@@ -39,7 +41,7 @@ function SortableItem({
             type="button"
             className="flex h-[24px] w-[24px] items-center justify-center"
             onClick={() => {
-              // setIsEditMode(true);
+              handleEditImage(image.url);
             }}
           >
             <Image src="/icons/Edit.svg" alt="수정" width={24} height={24} />
@@ -73,27 +75,22 @@ export default function ImageOrderEditor({
   images,
   handleOrderEdit,
   handleCloseModal,
+  handleEditImage,
 }: {
   images: { url: string; width: number; height: number; name: string }[];
   handleOrderEdit: (
     newOrder: { url: string; width: number; height: number; name: string }[],
   ) => void;
-  handleCloseModal: () => void;
+  handleCloseModal: () => void; 
+  handleEditImage: (oldUrl: string) => void;
 }) {
   const [orderedImages, setOrderedImages] = useState([...images]);
 
-  useEffect(() => {
-    console.log('orderedImages 변경됨:', orderedImages);
-  }, [orderedImages]);
-
   const handleDeleteImage = (urlToDelete: string) => {
-    console.log('삭제 전:', orderedImages);
     setOrderedImages(
       orderedImages.filter((image) => image.url !== urlToDelete),
     );
-    console.log('삭제할 URL:', urlToDelete);
-  };
-
+  }; 
   const handleConfirm = () => {
     handleOrderEdit(orderedImages);
     handleCloseModal();
@@ -137,6 +134,7 @@ export default function ImageOrderEditor({
                     key={image.url}
                     image={image}
                     handleDeleteImage={handleDeleteImage}
+                    handleEditImage={handleEditImage}
                   />
                 ))}
               </SortableContext>

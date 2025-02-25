@@ -11,23 +11,58 @@ export default function ImageUploader({
   onImageChange,
   previewImages,
   msg,
-  handleOrderEdit, 
+  handleOrderEdit,
+  handleImageEdit,
+  handleConfirmEdit,
+  handleCancelEdit,
+  tempPreviewImage,
 }: {
   name: string;
   label: string;
   subLabel: string;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  previewImages?: { url: string; width: number; height: number; name: string }[];
+  previewImages?: {
+    url: string;
+    width: number;
+    height: number;
+    name: string;
+  }[];
   msg?: string;
   handleOrderEdit: (
     newOrder: { url: string; width: number; height: number; name: string }[],
-  ) => void; 
+  ) => void;
+  handleImageEdit: (
+    oldUrl: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => void;
+  handleConfirmEdit: (oldUrl: string) => void;
+  handleCancelEdit: () => void;
+  tempPreviewImage: {
+    url: string;
+    width: number;
+    height: number;
+    name: string;
+  } | null;
 }) {
   const { control } = useFormContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+  };
+  const handleEditImage = (oldUrl: string) => {
+    const fileInput = document.getElementById(
+      'file-upload',
+    ) as HTMLInputElement;
+
+    const handleChange = (e: Event) => {
+      const changeEvent = e as unknown as React.ChangeEvent<HTMLInputElement>;
+      handleImageEdit(oldUrl, changeEvent); // 상위 컴포넌트의 함수 호출
+      fileInput.removeEventListener('change', handleChange);
+    };
+
+    fileInput.addEventListener('change', handleChange);
+    fileInput.click();
   };
 
   return (
@@ -100,12 +135,15 @@ export default function ImageUploader({
       </div>
       {isModalOpen && (
         <ImageOrderEditor
-          images={previewImages?.map((image) => ({
-            ...image,
-            name: image.name.split('/').pop() || '',
-          })) || []}
+          images={
+            previewImages?.map((image) => ({
+              ...image,
+              name: image.name.split('/').pop() || '',
+            })) || []
+          }
           handleOrderEdit={handleOrderEdit}
-          handleCloseModal={handleCloseModal} 
+          handleCloseModal={handleCloseModal}
+          handleEditImage={handleEditImage}
         />
       )}
     </div>

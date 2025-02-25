@@ -20,7 +20,7 @@ export default function StudyCreate() {
       name: string;
     }[]
   >([]);
-  const [isToast, setIsToast] = useState(false); 
+  const [isToast, setIsToast] = useState(false);
 
   const handleCategoryChange = (id: number) => {
     setSelectedCategory(id);
@@ -49,6 +49,46 @@ export default function StudyCreate() {
     setPreviewImages(newOrder);
   };
 
+  const [tempPreviewImage, setTempPreviewImage] = useState<{
+    url: string;
+    width: number;
+    height: number;
+    name: string;
+  } | null>(null);
+
+  const handleImageEdit = (
+    oldUrl: string,
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setIsToast(true);
+        e.target.value = '';
+        return;
+      }
+      const imageUrl = URL.createObjectURL(file);
+      setTempPreviewImage({
+        url: imageUrl,
+        width: 200,
+        height: 200,
+        name: file.name,
+      });
+    }
+  };
+
+  const handleConfirmEdit = (oldUrl: string) => {
+    if (tempPreviewImage) {
+      setPreviewImages((prev) =>
+        prev.map((img) => (img.url === oldUrl ? tempPreviewImage : img)),
+      );
+      setTempPreviewImage(null);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setTempPreviewImage(null);
+  };
 
   return (
     <>
@@ -95,6 +135,10 @@ export default function StudyCreate() {
                 }))}
                 msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
                 handleOrderEdit={handleOrderEdit}
+                handleImageEdit={handleImageEdit}
+                handleConfirmEdit={handleConfirmEdit}
+                handleCancelEdit={handleCancelEdit}
+                tempPreviewImage={tempPreviewImage}
               />
             </div>
           </form>
