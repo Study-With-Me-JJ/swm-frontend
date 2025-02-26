@@ -1,11 +1,10 @@
 'use client';
 
-import Image from 'next/image';
+import Image from 'next/image'; 
 import { useFormContext } from 'react-hook-form';
 import { Controller } from 'react-hook-form';
 import { InputField } from '@/components/InputField';
 import FilterSelect from '@/components/ui/FilterSelect';
-import { useState } from 'react';
 
 interface Option {
   id: number;
@@ -15,16 +14,16 @@ interface Option {
 
 export default function PositionFieldGroup({
   name,
-  label, 
+  label,
   onChange,
   defaultValue,
   options,
   isOpen,
   onToggle,
-  type
+  type,
 }: {
   name: string;
-  label: string; 
+  label: string;
   onChange: (value: string | string[]) => void;
   defaultValue: string | string[];
   options: Option[];
@@ -32,10 +31,10 @@ export default function PositionFieldGroup({
   onToggle: () => void;
   type: 'default' | 'button';
 }) {
-  const { control } = useFormContext(); 
+  const { control } = useFormContext();
   const handlePositionChange = (value: string | string[]) => {
-        onChange(value || 'ALL');
-      };
+    onChange(value || 'ALL');
+  };
 
   return (
     <>
@@ -46,29 +45,36 @@ export default function PositionFieldGroup({
           name={name}
           render={() => (
             <div className="flex gap-2">
-                <div className="flex-1">
-                    <FilterSelect type="default" onChange={handlePositionChange} defaultValue={defaultValue} options={options} isOpen={isOpen} onToggle={onToggle} />
-                </div>
-                <div className="flex-1">
-                    <InputField
-                        name={name} 
-                        type="text" 
-                    placeholder="모집 인원 (숫자로 입력해 주세요.)" 
-                    />
-                </div>
-                <button
-                    type="button"
-                    className="flex w-[140px] h-[60px] flex-shrink-0 items-center justify-center rounded-[8px] bg-link-default text-[16px] font-semibold text-white gap-2"
-                >
-                    추가{' '}
-                    <Image
-                    src="/icons/Add.svg"
-                    alt="추가"
-                    width={18}
-                    height={18}
-                    className="text-link-default"
-                    />
-                </button>
+              <div className="flex-1">
+                <FilterSelect
+                  type={type as 'default'}
+                  onChange={handlePositionChange}
+                  defaultValue={defaultValue}
+                  options={options}
+                  isOpen={isOpen}
+                  onToggle={onToggle}
+                />
+              </div>
+              <div className="flex-1">
+                <InputField
+                  name={name}
+                  type="text"
+                  placeholder="모집 인원 (숫자로 입력해 주세요.)"
+                />
+              </div>
+              <button
+                type="button"
+                className="flex h-[60px] w-[140px] flex-shrink-0 items-center justify-center gap-2 rounded-[8px] bg-link-default text-[16px] font-semibold text-white"
+              >
+                추가{' '}
+                <Image
+                  src="/icons/Add.svg"
+                  alt="추가"
+                  width={18}
+                  height={18}
+                  className="text-link-default"
+                />
+              </button>
             </div>
           )}
         />

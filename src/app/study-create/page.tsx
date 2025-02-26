@@ -9,6 +9,10 @@ import PositionFieldGroup from '@/components/study-create/ui/position-field-grou
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
 import Toast from '@/components/ui/Toast';
 
+const SELECT_IDS = {
+  POSITION: 'POSITION',
+} as const;
+
 export default function StudyCreate() {
   const methods = useForm();
   const category = getCategoryList();
@@ -93,13 +97,21 @@ export default function StudyCreate() {
   const [selectPosition, setSelectPosition] = useState<string | string[]>(
     'ALL',
   );
-  const [openSelectId, setOpenSelectId] = useState<string | null>(null);
+  const [openSelectId, setOpenSelectId] = useState<
+    keyof typeof SELECT_IDS | null
+  >(null);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // 폼 제출 로직을 여기에 구현
+  };
+
   return (
     <>
       <section className="mx-auto max-w-screen-xl px-5 pb-[110px] pt-10 xl:px-0">
         <h2 className="mb-[40px] text-2xl font-semibold">스터디 생성하기</h2>
         <FormProvider {...methods}>
-          <form action="">
+          <form onSubmit={handleSubmit}>
             <div className="flex flex-col gap-[30px]">
               <InputField
                 name="title"
@@ -148,9 +160,13 @@ export default function StudyCreate() {
                 onChange={handlePositionChange}
                 defaultValue={selectPosition}
                 options={positionOptions}
-                isOpen={openSelectId === 'select1'}
+                isOpen={openSelectId === SELECT_IDS.POSITION}
                 onToggle={() =>
-                  setOpenSelectId(openSelectId === 'select1' ? null : 'select1')
+                  setOpenSelectId(
+                    openSelectId === SELECT_IDS.POSITION
+                      ? null
+                      : SELECT_IDS.POSITION,
+                  )
                 }
               />
             </div>

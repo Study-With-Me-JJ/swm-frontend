@@ -39,15 +39,17 @@ export default function PositionFilter({
 
   return (
     <>
-      <FilterSelect
-        type={type as 'button'}
-        onChange={handlePositionChange}
-        defaultValue={displayValue}
-        options={displayOptions}
-        isOpen={isOpen}
-        onToggle={onToggle}
-        title="원하는 직무를 골라주세요."
-      />
+      <div className="h-[50px] w-[220px]">
+        <FilterSelect
+          type={type as 'button'}
+          onChange={handlePositionChange}
+          defaultValue={displayValue}
+          options={displayOptions}
+          isOpen={isOpen}
+          onToggle={onToggle}
+          title="원하는 직무를 골라주세요."
+        />
+      </div>
     </>
   );
 }
