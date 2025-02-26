@@ -6,17 +6,13 @@ import { Input } from '@/components/ui/input';
 
 export default function ImageUploader({
   name,
-  label,
-  subLabel,
   onImageChange,
   previewImages,
   msg,
   handleOrderEdit,
-  handleImageEdit, 
+  handleImageEdit,
 }: {
   name: string;
-  label: string;
-  subLabel: string;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   previewImages?: {
     url: string;
@@ -31,7 +27,7 @@ export default function ImageUploader({
   handleImageEdit: (
     oldUrl: string,
     e: React.ChangeEvent<HTMLInputElement>,
-  ) => void; 
+  ) => void;
 }) {
   const { control } = useFormContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -56,14 +52,6 @@ export default function ImageUploader({
 
   return (
     <div className="flex flex-col gap-2">
-      {label && (
-        <h3 className="font-semibold">
-          {label}{' '}
-          <span className="ml-[12px] text-[12px] font-medium text-[#bbbbbb]">
-            {subLabel}
-          </span>
-        </h3>
-      )}
       <div className="flex flex-col gap-2">
         <Controller
           control={control}
@@ -132,7 +120,7 @@ export default function ImageUploader({
           }
           handleOrderEdit={handleOrderEdit}
           handleCloseModal={handleCloseModal}
-          handleChangeImage={handleChangeImage} 
+          handleChangeImage={handleChangeImage}
         />
       )}
     </div>

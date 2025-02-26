@@ -1,9 +1,7 @@
 'use client';
 
-import Image from 'next/image'; 
+import Image from 'next/image';
 import { useFormContext } from 'react-hook-form';
-import { Controller } from 'react-hook-form';
-import { InputField } from '@/components/InputField';
 import FilterSelect from '@/components/ui/FilterSelect';
 
 interface Option {
@@ -14,70 +12,90 @@ interface Option {
 
 export default function PositionFieldGroup({
   name,
-  label,
   onChange,
-  defaultValue,
   options,
   isOpen,
   onToggle,
   type,
+  isLastField,
+  onAdd,
+  onDelete,
+  onCapacityChange,
+  capacity,
+  value,
+  id,
 }: {
   name: string;
-  label: string;
   onChange: (value: string | string[]) => void;
-  defaultValue: string | string[];
   options: Option[];
   isOpen: boolean;
   onToggle: () => void;
   type: 'default' | 'button';
+  isLastField: boolean;
+  onAdd: () => void;
+  onDelete: () => void;
+  onCapacityChange: (value: number) => void;
+  value: string;
+  capacity: number | null;
+  id: string;
 }) {
-  const { control } = useFormContext();
+  const { register } = useFormContext();
   const handlePositionChange = (value: string | string[]) => {
     onChange(value || 'ALL');
   };
 
   return (
     <>
-      {label && <h3 className="font-semibold">{label} </h3>}
       <div className="flex flex-col gap-2">
-        <Controller
-          control={control}
-          name={name}
-          render={() => (
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <FilterSelect
-                  type={type as 'default'}
-                  onChange={handlePositionChange}
-                  defaultValue={defaultValue}
-                  options={options}
-                  isOpen={isOpen}
-                  onToggle={onToggle}
-                />
-              </div>
-              <div className="flex-1">
-                <InputField
-                  name={name}
-                  type="text"
-                  placeholder="모집 인원 (숫자로 입력해 주세요.)"
-                />
-              </div>
-              <button
-                type="button"
-                className="flex h-[60px] w-[140px] flex-shrink-0 items-center justify-center gap-2 rounded-[8px] bg-link-default text-[16px] font-semibold text-white"
-              >
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <FilterSelect
+              type={type as 'default'}
+              onChange={handlePositionChange}
+              defaultValue={value}
+              options={options}
+              isOpen={isOpen}
+              onToggle={onToggle}
+            />
+          </div>
+          <div className="flex-1">
+            <input
+              type="text"
+              className="h-[60px] w-full rounded-lg border border-gray-300 px-4"
+              placeholder="모집 인원 (숫자로 입력해 주세요.)"
+              {...register(`${name}-capacity-${id}`, {
+                onChange: (e) => onCapacityChange(Number(e.target.value)),
+                value: capacity ? capacity.toString() : '',
+              })}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={isLastField ? onAdd : onDelete}
+            className={`flex h-[60px] w-[140px] flex-shrink-0 items-center justify-center gap-2 rounded-[8px] ${
+              isLastField
+                ? 'bg-link-default text-white'
+                : 'border border-[#e0e0e0] bg-[#f9f9f9] text-[#6e6e6e]'
+            } text-[16px] font-semibold`}
+          >
+            {isLastField ? (
+              <>
                 추가{' '}
+                <Image src="/icons/Add.svg" alt="추가" width={18} height={18} />
+              </>
+            ) : (
+              <>
+                삭제{' '}
                 <Image
-                  src="/icons/Add.svg"
-                  alt="추가"
+                  src="/icons/Clear.svg"
+                  alt="삭제"
                   width={18}
                   height={18}
-                  className="text-link-default"
                 />
-              </button>
-            </div>
-          )}
-        />
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </>
   );

@@ -75,6 +75,7 @@ export default function FilterSelect({
   return (
     <div className="w-inherit relative h-full" ref={containerRef}>
       <button
+        type="button"
         className={`flex h-full w-full items-center justify-between gap-1 rounded-[8px] border px-[13px] text-[16px] font-semibold text-gray-default ${
           isOpen ? 'border-link-default' : 'border-gray-disabled'
         }`}

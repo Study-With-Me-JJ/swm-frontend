@@ -9,14 +9,16 @@ import PositionFieldGroup from '@/components/study-create/ui/position-field-grou
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
 import Toast from '@/components/ui/Toast';
 
-const SELECT_IDS = {
-  POSITION: 'POSITION',
-} as const;
+interface PositionField {
+  id: string;
+  position: string;
+  capacity: number | undefined;
+}
 
 export default function StudyCreate() {
   const methods = useForm();
+  const { watch } = methods;
   const category = getCategoryList();
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [previewImages, setPreviewImages] = useState<
     {
       url: string;
@@ -25,10 +27,34 @@ export default function StudyCreate() {
       name: string;
     }[]
   >([]);
+
+  const [positionFields, setPositionFields] = useState<PositionField[]>([
+    { id: '1', position: 'ALL', capacity: undefined },
+  ]);
+
+  //필수입력값 유효성검사
+  const formTitle = watch('title');
+  const formContent = watch('content');
+  const formOpenChatUrl = watch('openChatUrl');
+  const formCategory = watch('category');
+
+  const isFormValid =
+    formTitle &&
+    formContent &&
+    formOpenChatUrl &&
+    formCategory &&
+    positionFields.length > 0 &&
+    positionFields.every(
+      (field: PositionField) =>
+        field.position !== 'ALL' &&
+        field.capacity !== undefined &&
+        field.capacity > 0,
+    );
+
   const [isToast, setIsToast] = useState(false);
 
   const handleCategoryChange = (id: number) => {
-    setSelectedCategory(id);
+    methods.setValue('category', id);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +72,8 @@ export default function StudyCreate() {
         ...prev,
         { url: imageUrl, width: 200, height: 200, name: file.name },
       ]);
+      methods.setValue('image', previewImages);
+      console.log('previewImages', previewImages);
     }
   };
 
@@ -85,33 +113,63 @@ export default function StudyCreate() {
     }
   };
 
-  const handlePositionChange = (value: string | string[]) => {
-    if (Array.isArray(value)) {
-      setSelectPosition(value.join(',') || 'ALL');
-    } else {
-      setSelectPosition(value || 'ALL');
-    }
-  };
   const positionOptions = getPositionOptions();
 
-  const [selectPosition, setSelectPosition] = useState<string | string[]>(
-    'ALL',
-  );
-  const [openSelectId, setOpenSelectId] = useState<
-    keyof typeof SELECT_IDS | null
-  >(null);
+  const [openSelects, setOpenSelects] = useState<Record<string, boolean>>({});
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // 폼 제출 로직을 여기에 구현
+  const handleToggle = (fieldId: string) => {
+    setOpenSelects((prev) => ({
+      ...prev,
+      [fieldId]: !prev[fieldId],
+    }));
   };
+
+  const handlePositionChange = (id: string, value: string | string[]) => {
+    setPositionFields((prev) =>
+      prev.map((field) =>
+        field.id === id
+          ? {
+              ...field,
+              position: Array.isArray(value) ? value.join(',') : value || 'ALL',
+            }
+          : field,
+      ),
+    );
+  };
+
+  const handleCapacityChange = (id: string, value: string) => {
+    setPositionFields((prev) =>
+      prev.map((field) =>
+        field.id === id ? { ...field, capacity: parseInt(value) || 0 } : field,
+      ),
+    );
+  };
+
+  const handleAddPosition = () => {
+    setPositionFields((prev) => [
+      ...prev,
+      {
+        id: (prev.length + 1).toString(),
+        position: 'ALL',
+        capacity: undefined,
+      },
+    ]);
+  };
+
+  const handleDeletePosition = (id: string) => {
+    setPositionFields((prev) => prev.filter((field) => field.id !== id));
+  };
+
+  const onSubmit = methods.handleSubmit((data) => {
+    console.log('data', data);
+  });
 
   return (
     <>
       <section className="mx-auto max-w-screen-xl px-5 pb-[110px] pt-10 xl:px-0">
         <h2 className="mb-[40px] text-2xl font-semibold">스터디 생성하기</h2>
         <FormProvider {...methods}>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={onSubmit}>
             <div className="flex flex-col gap-[30px]">
               <InputField
                 name="title"
@@ -138,37 +196,63 @@ export default function StudyCreate() {
                 options={category}
                 onOptionChange={handleCategoryChange}
               />
-              <ImageUploader
-                name="image"
-                label="이미지"
-                subLabel="스터디에 관련된 이미지를 추가해 주세요."
-                onImageChange={handleImageChange}
-                previewImages={previewImages.map((image) => ({
-                  url: image.url,
-                  width: image.width,
-                  height: image.height,
-                  name: image.name,
-                }))}
-                msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
-                handleOrderEdit={handleOrderEdit}
-                handleImageEdit={handleImageEdit}
-              />
-              <PositionFieldGroup
-                name="position"
-                label="모집 직무"
-                type="default"
-                onChange={handlePositionChange}
-                defaultValue={selectPosition}
-                options={positionOptions}
-                isOpen={openSelectId === SELECT_IDS.POSITION}
-                onToggle={() =>
-                  setOpenSelectId(
-                    openSelectId === SELECT_IDS.POSITION
-                      ? null
-                      : SELECT_IDS.POSITION,
-                  )
-                }
-              />
+              <div className="flex flex-col gap-[12px]">
+                <div className="flex items-center gap-[12px]">
+                  <h3 className="font-semibold">이미지</h3>
+                  <span className="text-[12px] text-[#bbb]">
+                    스터디에 관련된 이미지를 추가해 주세요.
+                  </span>
+                </div>
+                <ImageUploader
+                  name="image"
+                  onImageChange={handleImageChange}
+                  previewImages={previewImages.map((image) => ({
+                    url: image.url,
+                    width: image.width,
+                    height: image.height,
+                    name: image.name,
+                  }))}
+                  msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
+                  handleOrderEdit={handleOrderEdit}
+                  handleImageEdit={handleImageEdit}
+                />
+              </div>
+              <div className="flex flex-col gap-[12px]">
+                <h3 className="font-semibold">모집 직무</h3>
+                {[...positionFields].map(
+                  (field: PositionField, index: number) => (
+                    <PositionFieldGroup
+                      key={field.id}
+                      name="position"
+                      type="default"
+                      value={field.position}
+                      onChange={(value) =>
+                        handlePositionChange(field.id, value)
+                      }
+                      onCapacityChange={(value) =>
+                        handleCapacityChange(field.id, value.toString())
+                      }
+                      capacity={field.capacity || 0}
+                      options={positionOptions}
+                      isOpen={openSelects[field.id] || false}
+                      onToggle={() => handleToggle(field.id)}
+                      isLastField={index === 0}
+                      onAdd={handleAddPosition}
+                      onDelete={() => handleDeletePosition(field.id)}
+                      id={field.id}
+                    />
+                  ),
+                )}
+              </div>
+              <button
+                type="submit"
+                className={`mt-[10px] h-[60px] w-full rounded-[8px] px-4 py-2 text-[16px] font-semibold text-white ${
+                  !isFormValid ? 'bg-[#e0e0e0]' : 'bg-link-default'
+                }`}
+                disabled={!isFormValid}
+              >
+                스터디 생성 요청하기
+              </button>
             </div>
           </form>
         </FormProvider>
