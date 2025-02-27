@@ -1,7 +1,6 @@
 'use client';
 
 import Image from 'next/image';
-import { useFormContext } from 'react-hook-form';
 import FilterSelect from '@/components/ui/FilterSelect';
 
 interface Option {
@@ -11,7 +10,6 @@ interface Option {
 }
 
 export default function PositionFieldGroup({
-  name,
   onChange,
   options,
   isOpen,
@@ -23,7 +21,6 @@ export default function PositionFieldGroup({
   onCapacityChange,
   capacity,
   value,
-  id,
 }: {
   name: string;
   onChange: (value: string | string[]) => void;
@@ -35,11 +32,10 @@ export default function PositionFieldGroup({
   onAdd: () => void;
   onDelete: () => void;
   onCapacityChange: (value: number) => void;
-  value: string;
-  capacity: number | null;
+  value: string; //직무 선택값
+  capacity: number | null; //모집 인원
   id: string;
 }) {
-  const { register } = useFormContext();
   const handlePositionChange = (value: string | string[]) => {
     onChange(value || 'ALL');
   };
@@ -63,10 +59,8 @@ export default function PositionFieldGroup({
               type="text"
               className="h-[60px] w-full rounded-lg border border-gray-300 px-4"
               placeholder="모집 인원 (숫자로 입력해 주세요.)"
-              {...register(`${name}-capacity-${id}`, {
-                onChange: (e) => onCapacityChange(Number(e.target.value)),
-                value: capacity ? capacity.toString() : '',
-              })}
+              value={capacity ? capacity.toString() : ''}
+              onChange={(e) => onCapacityChange(Number(e.target.value))}
             />
           </div>
           <button

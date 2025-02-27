@@ -13,8 +13,8 @@ export default function RadioSelectGroup({
   label: string;
   subLabel: string;
   name: string;
-  options: { id: number; name: string }[];
-  onOptionChange: (id: number) => void;
+  options: { id: number; value: string; name: string }[];
+  onOptionChange: (value: string) => void;
 }) {
   const { control } = useFormContext();
 
@@ -39,16 +39,16 @@ export default function RadioSelectGroup({
                   <div key={item.id} className="relative">
                     <Input
                       type="radio"
-                      checked={field.value === item.id}
-                      id={item.id.toString()}
+                      checked={field.value === item.value}
+                      id={item.value}
                       onChange={() => {
-                        field.onChange(item.id);
-                        onOptionChange(item.id);
+                        field.onChange(item.value);
+                        onOptionChange(item.value);
                       }}
                       className="peer absolute h-0 w-0 opacity-0"
                     />
                     <label
-                      htmlFor={item.id.toString()}
+                      htmlFor={item.value}
                       className="border-box flex min-w-[60px] cursor-pointer items-center justify-center rounded-[8px] border border-[#E0E0E0] p-[16px] text-[16px] font-medium text-[#bbbbbb] hover:bg-gray-50 peer-checked:border-black peer-checked:bg-black peer-checked:text-white"
                     >
                       {item.name}
