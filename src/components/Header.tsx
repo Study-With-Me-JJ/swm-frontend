@@ -1,31 +1,55 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation'; 
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import HeaderUser from './HeaderUser';
-import Image from 'next/image'; 
 
 export default function Header() {
-  const path = usePathname();  
+  const path = usePathname();
   const logo = '/icons/swm_logo.svg';
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('accessToken');
+      setIsLoggedIn(!!token);
+    }; 
+    checkLoginStatus(); 
+    window.addEventListener('storage', checkLoginStatus); 
+    window.addEventListener('login', checkLoginStatus);
+    window.addEventListener('logout', checkLoginStatus);
+
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
+      window.removeEventListener('login', checkLoginStatus);
+      window.removeEventListener('logout', checkLoginStatus);
+    };
+  }, []);
 
   const navList = [
     { name: '스터디 모집', href: '/study-recruit' },
     { name: '스터디 룸', href: '/studyroom' },
     { name: '외부 스터디 룸', href: '/external-studyrooms' },
     { name: '외부 스터디', href: '/external-studies' },
-    { name: '스터디 생성', href: '/study-create' },
+    ...(isLoggedIn ? [{ name: '스터디 생성', href: '/study-create' }] : []),
   ];
 
   const logoOnlyPaths = ['/login/', '/join/', '/find-id/', '/find-password/'];
 
   if (logoOnlyPaths.includes(path)) {
     return (
-      <div className='border-b-2 border-border'>
-        <div className='flex justify-between items-center py-5 max-w-screen-xl px-5 xl:px-0 mx-auto'>
-          <h2 className='font-semibold text-2xl text-black w-[197px]'>
-            <Link href='/'>
-              <Image src={logo} alt='study with me logo' width={182} height={28} />
+      <div className="border-b-2 border-border">
+        <div className="mx-auto flex max-w-screen-xl items-center justify-between px-5 py-5 xl:px-0">
+          <h2 className="w-[197px] text-2xl font-semibold text-black">
+            <Link href="/">
+              <Image
+                src={logo}
+                alt="study with me logo"
+                width={182}
+                height={28}
+              />
             </Link>
           </h2>
         </div>
@@ -34,18 +58,34 @@ export default function Header() {
   }
 
   return (
-   <div className='border-b-2 border-border'>
-      <div className='flex justify-between items-center py-5 max-w-screen-xl px-5 xl:px-0 mx-auto'>
-        <div className='flex items-center gap-5'>
-          <h2 className='font-semibold text-2xl text-black w-[197px]'><Link href='/'><Image src={logo} alt='study with me logo' width={182} height={28} /></Link></h2> 
-          <ul className='flex items-center'>
+    <div className="border-b-2 border-border">
+      <div className="mx-auto flex max-w-screen-xl items-center justify-between px-5 py-5 xl:px-0">
+        <div className="flex items-center gap-5">
+          <h2 className="w-[197px] text-2xl font-semibold text-black">
+            <Link href="/">
+              <Image
+                src={logo}
+                alt="study with me logo"
+                width={182}
+                height={28}
+              />
+            </Link>
+          </h2>
+          <ul className="flex items-center">
             {navList.map((nav, index) => (
-              <li key={index} className='px-4'><Link href={nav.href} className={`text-base font-medium text-gray-default ${path?.startsWith(nav.href) ? "text-primary-default" : ""}`}>{nav.name}</Link></li>
-            ))} 
-            </ul>
+              <li key={index} className="px-4">
+                <Link
+                  href={nav.href}
+                  className={`text-base font-medium text-gray-default ${path?.startsWith(nav.href) ? 'text-primary-default' : ''}`}
+                >
+                  {nav.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
         <HeaderUser />
       </div>
     </div>
-  );    
-}   
+  );
+}

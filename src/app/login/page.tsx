@@ -40,6 +40,7 @@ export default function Login() {
         const expirationTime = new Date(decodedToken.exp * 1000).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).replace('T', ' ');
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('expirationTime', expirationTime);
+        window.dispatchEvent(new Event('login'));
         router.push('/');
       }
     } catch (error) {

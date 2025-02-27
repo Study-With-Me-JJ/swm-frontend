@@ -26,6 +26,7 @@ export default function HeaderUser() {
       setIsLoggedIn(false);
       localStorage.removeItem('accessToken');
       localStorage.removeItem('expirationTime');
+      window.dispatchEvent(new Event('logout'));
       router.push('/');
     }
   };
