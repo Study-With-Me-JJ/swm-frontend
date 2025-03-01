@@ -69,8 +69,7 @@ export default function StudyCreate() {
 
       setIsToast(true);
       setMessage('스터디 생성 요청이 완료되었습니다.');
-
-      // 생성된 스터디 ID 확인
+ 
       const studyId = response;
       console.log('생성된 스터디 ID:', studyId);
 
