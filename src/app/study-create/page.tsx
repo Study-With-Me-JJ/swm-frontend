@@ -3,6 +3,7 @@
 import { postStudy } from '@/lib/api/study/postStudy';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -18,11 +19,17 @@ interface PositionField {
   position: string;
   capacity: number | undefined;
 }
+interface ImageFile {
+  url: string;
+  file: File;
+  width: number;
+  height: number;
+  name: string;
+}
 
 export default function StudyCreate() {
   const router = useRouter();
   const queryClient = useQueryClient();
-
   const methods = useForm();
   const { watch } = methods;
   const category = getCategoryList();
@@ -38,6 +45,15 @@ export default function StudyCreate() {
   const [positionFields, setPositionFields] = useState<PositionField[]>([
     { id: '1', position: 'ALL', capacity: undefined },
   ]);
+
+  const [isToast, setIsToast] = useState(false);
+  const [message, setMessage] = useState('');
+
+  const positionOptions = getPositionOptions();
+
+  const [openSelects, setOpenSelects] = useState<Record<string, boolean>>({});
+
+  const [tagList, setTagList] = useState<string[]>([]);
 
   const { mutate } = useMutation({
     mutationFn: (formData: FormData) => postStudy(formData),
@@ -91,20 +107,9 @@ export default function StudyCreate() {
         field.capacity > 0,
     );
 
-  const [isToast, setIsToast] = useState(false);
-  const [message, setMessage] = useState('');
-
   const handleCategoryChange = (value: string) => {
     methods.setValue('category', value);
   };
-
-  interface ImageFile {
-    url: string;
-    file: File;
-    width: number;
-    height: number;
-    name: string;
-  }
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -167,10 +172,6 @@ export default function StudyCreate() {
     }
   };
 
-  const positionOptions = getPositionOptions();
-
-  const [openSelects, setOpenSelects] = useState<Record<string, boolean>>({});
-
   const handleToggle = (fieldId: string) => {
     setOpenSelects((prev) => ({
       ...prev,
@@ -214,10 +215,45 @@ export default function StudyCreate() {
     );
   };
 
-  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    const tags = value.split(',').map((tag) => tag.trim());
-    methods.setValue('tagList', tags);
+  const [inputValue, setInputValue] = useState('');
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      const value = inputValue.trim().replace(/,/g, '');
+      if (!value) return;
+  
+      const newTag = value.startsWith('#') ? value : `#${value}`;
+      if (tagList.length >= 10) {
+        setIsToast(true);
+        setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+        return;
+      }
+  
+      setTagList([...tagList, newTag]);
+      methods.setValue('tagList', [...tagList, newTag].map(tag => tag.slice(1)));
+      setInputValue('');
+    }
+  };
+
+  const handleTagDelete = (index: number) => {
+    const newTags = [...tagList];
+
+    newTags.splice(index, 1);
+    setTagList(newTags);
+    methods.setValue('tagList', newTags);
+
+    if (newTags.length === 0) {
+      methods.setValue('tagList', []);
+      setTagList([]);
+
+      const textarea = document.querySelector(
+        'textarea[name="tagList"]',
+      ) as HTMLTextAreaElement;
+      if (textarea) {
+        textarea.style.lineHeight = '34px';
+      }
+    }
   };
 
   const onSubmit = methods.handleSubmit((data) => {
@@ -230,7 +266,7 @@ export default function StudyCreate() {
       category: data.category,
       tagList: data.tagList || [],
       imageUrlList: [],
-      createRecruitmentPositionRequestList: data.positions.map(
+      createRecruitmentPositionRequestList: (data.positions || []).map(
         (pos: PositionField) => ({
           title: pos.position,
           headcount: pos.capacity,
@@ -302,12 +338,41 @@ export default function StudyCreate() {
                     컴마(,)로 구분해 주세요. (ex. #태그1,#태그2,#태그3,...)
                   </span>
                 </div>
-                <input
-                  type="text"
-                  className="w-full rounded-[8px] border border-[#e0e0e0] p-[12px] text-[16px] text-[#333]"
-                  placeholder="#태그를 입력해 주세요. (최대 10개)"
-                  onChange={handleTagChange}
-                />
+                <div className="box-border min-h-[60px] rounded-lg border border-[#e0e0e0] px-[16px] py-[13px]">
+                  <div className="flex flex-wrap gap-1">
+                    {tagList.map((tag, index) => (
+                      <span
+                        key={index}
+                        className="flex items-center rounded-[4px] bg-[#eee] px-2 py-1 text-[16px] font-medium text-[#a5a5a5]"
+                      >
+                        {tag}
+                        <button
+                          onClick={() => handleTagDelete(index)}
+                          className="ml-2 text-gray-500 hover:text-gray-700"
+                        >
+                          <Image
+                            src="/icons/Clear-gray.svg"
+                            alt="태그삭제"
+                            width={18}
+                            height={18}
+                          />
+                        </button>
+                      </span>
+                    ))}
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      placeholder={
+                        tagList.length === 0
+                          ? '#태그를 입력해 주세요. (최대 10개)'
+                          : ''
+                      }
+                      className="min-w-[100px] flex-grow border-none text-[16px] outline-none leading-[34px]"
+                    />
+                  </div>
+                </div>
               </div>
               <div className="flex flex-col gap-[12px]">
                 <div className="flex items-center gap-[12px]">
