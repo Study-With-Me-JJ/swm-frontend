@@ -217,36 +217,71 @@ export default function StudyCreate() {
 
   const [inputValue, setInputValue] = useState('');
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value.includes(',')) {
+      const tagValue = value.replace(',', '').trim();
+      if (tagValue) {
+        if (tagList.length >= 10) {
+          setIsToast(true);
+          setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+          setInputValue('');
+          return;
+        }
+
+        const newTag = tagValue.startsWith('#') ? tagValue : `#${tagValue}`;
+        setTagList([...tagList, newTag]);
+        methods.setValue(
+          'tagList',
+          [...tagList, newTag].map((tag) => tag.slice(1)),
+        );
+        setInputValue('');
+      } else {
+        setInputValue('');
+      }
+    } else {
+      setInputValue(value);
+    }
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ',') {
+    if (e.key === 'Enter') {
       e.preventDefault();
-      const value = inputValue.trim().replace(/,/g, '');
+      const value = inputValue.trim();
       if (!value) return;
-  
-      const newTag = value.startsWith('#') ? value : `#${value}`;
+
       if (tagList.length >= 10) {
         setIsToast(true);
         setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
         return;
       }
-  
+
+      const newTag = value.startsWith('#') ? value : `#${value}`;
       setTagList([...tagList, newTag]);
-      methods.setValue('tagList', [...tagList, newTag].map(tag => tag.slice(1)));
+      methods.setValue(
+        'tagList',
+        [...tagList, newTag].map((tag) => tag.slice(1)),
+      );
       setInputValue('');
     }
   };
 
   const handleTagDelete = (index: number) => {
     const newTags = [...tagList];
-
     newTags.splice(index, 1);
+
+    const saveTags = (newTags || [])
+      .filter((tag) => tag && typeof tag === 'string')
+      .map((tag) => (tag.startsWith('#') ? tag.slice(1) : tag));
+
     setTagList(newTags);
-    methods.setValue('tagList', newTags);
+    methods.setValue('tagList', saveTags, {
+      shouldValidate: true,
+      shouldDirty: true,
+      shouldTouch: true,
+    });
 
     if (newTags.length === 0) {
-      methods.setValue('tagList', []);
-      setTagList([]);
-
       const textarea = document.querySelector(
         'textarea[name="tagList"]',
       ) as HTMLTextAreaElement;
@@ -264,7 +299,9 @@ export default function StudyCreate() {
       content: data.content,
       openChatUrl: data.openChatUrl,
       category: data.category,
-      tagList: data.tagList || [],
+      tagList: (data.tagList || [])
+        .filter((tag: string) => tag && typeof tag === 'string')
+        .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
       imageUrlList: [],
       createRecruitmentPositionRequestList: (data.positions || []).map(
         (pos: PositionField) => ({
@@ -347,6 +384,7 @@ export default function StudyCreate() {
                       >
                         {tag}
                         <button
+                          type="button" 
                           onClick={() => handleTagDelete(index)}
                           className="ml-2 text-gray-500 hover:text-gray-700"
                         >
@@ -362,14 +400,14 @@ export default function StudyCreate() {
                     <input
                       type="text"
                       value={inputValue}
-                      onChange={(e) => setInputValue(e.target.value)}
+                      onChange={handleInputChange}
                       onKeyDown={handleKeyDown}
                       placeholder={
                         tagList.length === 0
                           ? '#태그를 입력해 주세요. (최대 10개)'
                           : ''
                       }
-                      className="min-w-[100px] flex-grow border-none text-[16px] outline-none leading-[34px]"
+                      className="min-w-[100px] flex-grow border-none text-[16px] leading-[34px] outline-none"
                     />
                   </div>
                 </div>

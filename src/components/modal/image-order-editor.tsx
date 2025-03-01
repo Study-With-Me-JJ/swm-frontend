@@ -8,8 +8,7 @@ import { useEffect, useState } from 'react';
 function SortableItem({
   image,
   handleDeleteImage,
-  handleChangeImage,
-  handleModalImageChange,
+  handleChangeImage,  
 }: {
   image: {
     url: string;
@@ -19,8 +18,7 @@ function SortableItem({
     id: string;
   };
   handleDeleteImage: (url: string) => void;
-  handleChangeImage: (oldUrl: string) => void;
-  handleModalImageChange: (oldUrl: string) => void;
+  handleChangeImage: (oldUrl: string) => void;  
 }) {
   const { attributes, listeners, setNodeRef } = useSortable({
     id: image.id,
@@ -82,8 +80,7 @@ function SortableItem({
 export default function ImageOrderEditor({
   images,
   handleOrderEdit,
-  handleCloseModal,
-  handleChangeImage,
+  handleCloseModal, 
 }: {
   images: { url: string; width: number; height: number; name: string }[];
   handleOrderEdit: (
@@ -178,7 +175,6 @@ export default function ImageOrderEditor({
                     image={image}
                     handleDeleteImage={handleDeleteImage}
                     handleChangeImage={handleModalImageChange}
-                    handleModalImageChange={handleModalImageChange}
                   />
                 ))}
               </SortableContext>
