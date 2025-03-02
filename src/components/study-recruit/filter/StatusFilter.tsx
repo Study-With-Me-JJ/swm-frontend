@@ -9,6 +9,8 @@ export default function StatusFilter({type,onChange,defaultValue,options,isOpen,
     };
 
     return <>
-        <FilterSelect type={type as "default"} onChange={handleStatusChange} defaultValue={defaultValue} options={options} isOpen={isOpen} onToggle={onToggle}  />
+        <div className="h-[50px] w-[220px]">
+            <FilterSelect type={type as "default"} onChange={handleStatusChange} defaultValue={defaultValue} options={options} isOpen={isOpen} onToggle={onToggle}  />
+        </div>
     </>
 }

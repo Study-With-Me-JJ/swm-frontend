@@ -3,17 +3,37 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import HeaderUser from './HeaderUser';
 
 export default function Header() {
   const path = usePathname();
   const logo = '/icons/swm_logo.svg';
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const checkLoginStatus = () => {
+      const token = localStorage.getItem('accessToken');
+      setIsLoggedIn(!!token);
+    }; 
+    checkLoginStatus(); 
+    window.addEventListener('storage', checkLoginStatus); 
+    window.addEventListener('login', checkLoginStatus);
+    window.addEventListener('logout', checkLoginStatus);
+
+    return () => {
+      window.removeEventListener('storage', checkLoginStatus);
+      window.removeEventListener('login', checkLoginStatus);
+      window.removeEventListener('logout', checkLoginStatus);
+    };
+  }, []);
 
   const navList = [
     { name: '스터디 모집', href: '/study-recruit' },
     { name: '스터디 룸', href: '/studyroom' },
     { name: '외부 스터디 룸', href: '/external-studyrooms' },
     { name: '외부 스터디', href: '/external-studies' },
+    ...(isLoggedIn ? [{ name: '스터디 생성', href: '/study-create' }] : []),
   ];
 
   const logoOnlyPaths = [

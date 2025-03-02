@@ -3,8 +3,8 @@
 // import Link from 'next/link';
 import { useState } from 'react';
 import { Study } from '@/types/api/study';
-import InteractionStatus from '@/components/study-recruit/ui/InteractionStatus';
 import BookMarkIcon from '@/components/ui/BookMarkIcon';
+import InteractionStatus from '@/components/ui/InteractionStatus';
 import Toast from '@/components/ui/Toast';
 
 export default function StudyItem({ data }: { data: Study }) {
@@ -33,7 +33,7 @@ export default function StudyItem({ data }: { data: Study }) {
 
   return (
     <>
-      <div className="flex h-[340px] flex-col justify-between gap-[10px] rounded-[8px] bg-[#f9f9f9] px-[24px] py-[26px]">
+      <div className="flex min-h-[340px] flex-col justify-between gap-[10px] rounded-[8px] bg-[#f9f9f9] px-[24px] py-[26px]">
         <div className="flex h-full flex-col gap-4">
           <div className="flex items-center justify-between">
             {data.status === 'ACTIVE' ? (
