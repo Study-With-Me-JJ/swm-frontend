@@ -1,5 +1,7 @@
 import { axiosInstance } from './axios';
 import { API_ENDPOINTS } from './endpoints';
+import axios from 'axios';
+import { UserInfoResponse } from '@/types/api/user-info';
 
 export const login = async (email: string, password: string) => {
   try {
@@ -35,26 +37,27 @@ export const logout = async () => {
   }
 };
 
-export const getUserInfo = async () => {
-  const token = localStorage.getItem('accessToken');
-  if (!token) {
-    return null;
+export async function getUserInfo(): Promise<UserInfoResponse> {
+  const accessToken = localStorage.getItem('accessToken');
+  if (!accessToken) {
+      throw new Error('Access token not found');
   }
-
   try {
-    const response = await axiosInstance.get(API_ENDPOINTS.USER.INFO, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.data) {
-      throw new Error('사용자 정보를 불러오는데 실패했습니다.');
-    }
-
-    return response.data;
+      const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+      const url = `${baseUrl}${API_ENDPOINTS.USER.INFO}`; 
+      const res = await axios.get<UserInfoResponse>(url, {
+          headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json'
+            }
+      });
+      return res.data;
   } catch (error) {
-    throw error;
+      if (axios.isAxiosError(error)) {
+          console.error('Error fetching user info:', error.response?.data || error.message);
+      } else {
+          console.error('Unexpected error:', error);
+      }
+      throw error;
   }
-};
+}

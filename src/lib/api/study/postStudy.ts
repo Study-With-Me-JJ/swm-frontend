@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import axios from 'axios';
-import { ApiResponse } from '@/types/api/postStudy';
+import { ApiResponse } from '@/types/api/study-recruit/postStudy';
 
 export const postStudy = async (data: FormData): Promise<ApiResponse> => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;

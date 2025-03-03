@@ -16,7 +16,7 @@ import {
   getPositionOptions,
   getSortOptions,
   getStatusOptions,
-} from '@/types/api/study';
+} from '@/types/api/study-recruit/study';
 import CategoryFilter from '@/components/study-recruit/filter/CategoryFilter';
 import PositionFilter from '@/components/study-recruit/filter/PositionFilter';
 import SortFilter from '@/components/study-recruit/filter/SortFilter';
@@ -28,7 +28,7 @@ const SELECT_IDS = {
   CATEGORY: 'CATEGORY',
   POSITION: 'POSITION',
   STATUS: 'STATUS',
-  SORT: 'SORT'
+  SORT: 'SORT',
 } as const;
 
 export default function StudyRecruit() {
@@ -43,7 +43,9 @@ export default function StudyRecruit() {
     SortCriteria.NEWEST,
   );
 
-  const [openSelectId, setOpenSelectId] = useState<keyof typeof SELECT_IDS | null>(null);
+  const [openSelectId, setOpenSelectId] = useState<
+    keyof typeof SELECT_IDS | null
+  >(null);
 
   const {
     data: study,
@@ -186,7 +188,11 @@ export default function StudyRecruit() {
             options={categoryOptions}
             isOpen={openSelectId === SELECT_IDS.CATEGORY}
             onToggle={() =>
-              setOpenSelectId(openSelectId === SELECT_IDS.CATEGORY ? null : SELECT_IDS.CATEGORY)
+              setOpenSelectId(
+                openSelectId === SELECT_IDS.CATEGORY
+                  ? null
+                  : SELECT_IDS.CATEGORY,
+              )
             }
           />
           <PositionFilter
@@ -196,7 +202,11 @@ export default function StudyRecruit() {
             options={positionOptions}
             isOpen={openSelectId === SELECT_IDS.POSITION}
             onToggle={() =>
-              setOpenSelectId(openSelectId === SELECT_IDS.POSITION ? null : SELECT_IDS.POSITION)
+              setOpenSelectId(
+                openSelectId === SELECT_IDS.POSITION
+                  ? null
+                  : SELECT_IDS.POSITION,
+              )
             }
           />
           <StatusFilter
@@ -206,7 +216,9 @@ export default function StudyRecruit() {
             options={statusOptions}
             isOpen={openSelectId === SELECT_IDS.STATUS}
             onToggle={() =>
-              setOpenSelectId(openSelectId === SELECT_IDS.STATUS ? null : SELECT_IDS.STATUS)
+              setOpenSelectId(
+                openSelectId === SELECT_IDS.STATUS ? null : SELECT_IDS.STATUS,
+              )
             }
           />
         </div>
@@ -223,7 +235,9 @@ export default function StudyRecruit() {
             }))}
             isOpen={openSelectId === SELECT_IDS.SORT}
             onToggle={() =>
-              setOpenSelectId(openSelectId === SELECT_IDS.SORT ? null : SELECT_IDS.SORT)
+              setOpenSelectId(
+                openSelectId === SELECT_IDS.SORT ? null : SELECT_IDS.SORT,
+              )
             }
             filterName="최신순"
           />

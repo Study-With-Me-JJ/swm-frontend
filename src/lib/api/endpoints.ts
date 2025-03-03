@@ -12,6 +12,8 @@ export const API_ENDPOINTS = {
   STUDY: {
     LIST: '/api/v1/study',
     CREATE: '/api/v1/study',
+    DETAIL: (studyId: string) => `/api/v1/study/${studyId}`,
+    DELETE: (studyId: string) => `/api/v1/study/${studyId}`,
   },
   USER: {
     INFO: '/api/v1/user',

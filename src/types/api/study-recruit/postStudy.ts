@@ -1,4 +1,4 @@
-import { RecruitmentPositionTitle, StudyCategory } from './study';
+import { RecruitmentPositionTitle, StudyCategory } from '@/types/api/study-recruit/study';
 
 export interface ApiResponse {
   message: string;

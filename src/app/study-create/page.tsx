@@ -7,7 +7,10 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { getCategoryList, getPositionOptions } from '@/types/api/study';
+import {
+  getCategoryList,
+  getPositionOptions,
+} from '@/types/api/study-recruit/study';
 import { InputField } from '@/components/InputField';
 import ImageUploader from '@/components/study-create/ui/image-uploader';
 import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
@@ -69,7 +72,7 @@ export default function StudyCreate() {
 
       setIsToast(true);
       setMessage('스터디 생성 요청이 완료되었습니다.');
- 
+
       const studyId = response;
       console.log('생성된 스터디 ID:', studyId);
 
@@ -383,7 +386,7 @@ export default function StudyCreate() {
                       >
                         {tag}
                         <button
-                          type="button" 
+                          type="button"
                           onClick={() => handleTagDelete(index)}
                           className="ml-2 text-gray-500 hover:text-gray-700"
                         >
