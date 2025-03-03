@@ -144,52 +144,53 @@ export default function StudyRecruitPage({
                     strokeColor={isBookmark ? '#4998E9' : '#c8c8c8'}
                   />
                 </button>
-                {data?.data.userId === user?.data.userId && (
-                  <div className="relative h-[24px] w-[24px]">
-                    <button
-                      onClick={handleOptionsClick}
-                      className="cursor-pointer"
-                    >
-                      <Image
-                        src="/icons/options.svg"
-                        alt="options"
-                        width={24}
-                        height={24}
-                      />
-                    </button>
-                    {isEditModalOpen && (
-                      <div className="z-5 absolute right-0 top-[40px]">
-                        <ul className="flex w-[220px] flex-col rounded-[8px] border border-link-default bg-white px-[8px] py-[4px]">
-                          <li className="border-b border-gray-disabled">
-                            <button className="flex w-full items-center justify-between px-[16px] py-[10px] text-sm font-semibold text-gray-default">
-                              <Image
-                                src="/icons/mode_edit.svg"
-                                alt="edit"
-                                width={20}
-                                height={20}
-                              />
-                              스터디 수정
-                            </button>
-                          </li>
-                          <li className="border-b border-gray-disabled last:border-b-0">
-                            <button
-                              onClick={handleDeleteStudy}
-                              className="flex w-full items-center justify-between px-[16px] py-[10px] text-sm font-semibold text-red-error"
-                            >
-                              <Image
-                                src="/icons/Delete_red.svg"
-                                alt="delete"
-                                width={20}
-                                height={20}
-                              />
-                              스터디 삭제
-                            </button>
-                          </li>
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
+                {user?.data?.userId &&
+                  data?.data.userId === user?.data.userId && (
+                    <div className="relative h-[24px] w-[24px]">
+                      <button
+                        onClick={handleOptionsClick}
+                        className="cursor-pointer"
+                      >
+                        <Image
+                          src="/icons/options.svg"
+                          alt="options"
+                          width={24}
+                          height={24}
+                        />
+                      </button>
+                      {isEditModalOpen && (
+                        <div className="z-5 absolute right-0 top-[40px]">
+                          <ul className="flex w-[220px] flex-col rounded-[8px] border border-link-default bg-white px-[8px] py-[4px]">
+                            <li className="border-b border-gray-disabled">
+                              <button className="flex w-full items-center justify-between px-[16px] py-[10px] text-sm font-semibold text-gray-default">
+                                <Image
+                                  src="/icons/mode_edit.svg"
+                                  alt="edit"
+                                  width={20}
+                                  height={20}
+                                />
+                                스터디 수정
+                              </button>
+                            </li>
+                            <li className="border-b border-gray-disabled last:border-b-0">
+                              <button
+                                onClick={handleDeleteStudy}
+                                className="flex w-full items-center justify-between px-[16px] py-[10px] text-sm font-semibold text-red-error"
+                              >
+                                <Image
+                                  src="/icons/Delete_red.svg"
+                                  alt="delete"
+                                  width={20}
+                                  height={20}
+                                />
+                                스터디 삭제
+                              </button>
+                            </li>
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
               </div>
             </div>
             <div className="font-regular text-sm text-gray-light">{date}</div>
@@ -303,12 +304,12 @@ export default function StudyRecruitPage({
           <div className="tab-container">
             <div className="tab-item flex h-[50px] items-center">
               <div className="tab-item-title tab-item-title-active h-[50px] min-w-[100px] border-b-2 border-link-default px-[18px] py-[15px]">
-                <div className="tab-item-title-text text-sm font-semibold text-gray-default">
+                <div className="tab-item-title-text cursor-pointer text-sm font-semibold text-gray-default">
                   스터디 소개
                 </div>
               </div>
               <div className="tab-item-title h-[50px] min-w-[100px] border-b-2 border-gray-disabled px-[18px] py-[15px]">
-                <div className="tab-item-title-text flex items-center gap-[8px] text-sm font-semibold text-gray-default">
+                <div className="tab-item-title-text flex cursor-pointer items-center gap-[8px] text-sm font-semibold text-gray-default">
                   댓글{' '}
                   <span className="text-link-default">
                     {data?.data.commentCount || 0}
@@ -326,8 +327,9 @@ export default function StudyRecruitPage({
                 </div>
               </div>
               <div className="tab-item-content-text pt-[40px]">
-                <div className="text-[20px] font-semibold text-black pb-[24px]">
-                  댓글 <span className="text-link-default">
+                <div className="pb-[24px] text-[20px] font-semibold text-black">
+                  댓글{' '}
+                  <span className="text-link-default">
                     {data?.data.commentCount || 0}
                   </span>
                 </div>
