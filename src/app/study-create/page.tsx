@@ -1,5 +1,6 @@
 'use client';
 
+import { uploadFileToPresignedUrl } from '@/lib/api/study/getPresignedUrl';
 import { postStudy } from '@/lib/api/study/postStudy';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -16,7 +17,7 @@ import ImageUploader from '@/components/study-create/ui/image-uploader';
 import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
 import Toast from '@/components/ui/Toast';
-import { uploadFileToPresignedUrl } from '@/lib/api/study/getPresignedUrl';
+
 interface PositionField {
   id: string;
   position: string;
@@ -68,13 +69,10 @@ export default function StudyCreate() {
         return;
       }
 
-      console.log('생성 성공 응답:', response);
+      // console.log('생성 성공 응답:', response);
 
       setIsToast(true);
       setMessage('스터디 생성 요청이 완료되었습니다.');
-
-      const studyId = response;
-      console.log('생성된 스터디 ID:', studyId);
 
       await queryClient.invalidateQueries({ queryKey: ['study'] });
       await queryClient.refetchQueries({ queryKey: ['study'] });
@@ -293,12 +291,12 @@ export default function StudyCreate() {
     }
   };
 
-  const onSubmit = methods.handleSubmit(async (data) => { 
+  const onSubmit = methods.handleSubmit(async (data) => {
     try {
       const uploadedUrls = await Promise.all(
         (data.image || []).map(async (img: ImageFile) => {
           return await uploadFileToPresignedUrl(img.file);
-        })
+        }),
       );
 
       const studyData = {
@@ -319,12 +317,11 @@ export default function StudyCreate() {
       };
 
       mutate(studyData);
-
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
       setIsToast(true);
       setMessage('이미지 업로드에 실패했습니다.');
-    } 
+    }
   });
 
   return (
