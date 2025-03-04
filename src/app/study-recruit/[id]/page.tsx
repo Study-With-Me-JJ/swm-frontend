@@ -276,7 +276,7 @@ export default function StudyRecruitPage({
                   >
                     {data?.data.getImageResponseList.map((item) => (
                       <SwiperSlide key={item.imageId}>
-                        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px]">
+                        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-gray-disabled">
                           <Image
                             src={item.imageUrl || '/no-image.png'}
                             alt={item.imageUrl || 'study-recruit-image'}
