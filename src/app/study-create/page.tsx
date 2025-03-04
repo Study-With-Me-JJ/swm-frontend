@@ -293,8 +293,7 @@ export default function StudyCreate() {
     }
   };
 
-  const onSubmit = methods.handleSubmit(async (data) => {
-    // const formData = new FormData();
+  const onSubmit = methods.handleSubmit(async (data) => { 
     try {
       const uploadedUrls = await Promise.all(
         (data.image || []).map(async (img: ImageFile) => {
@@ -325,20 +324,7 @@ export default function StudyCreate() {
       console.error('이미지 업로드 실패:', error);
       setIsToast(true);
       setMessage('이미지 업로드에 실패했습니다.');
-    }
-
-    // Array.from(formData.entries()).forEach(([key, value]) => {
-    //   if (key === 'request') {
-    //     const reader = new FileReader();
-    //     reader.onload = () => {
-    //       const jsonContent = JSON.parse(reader.result as string);
-    //       console.log('Study Data:', jsonContent);
-    //     };
-    //     reader.readAsText(value as Blob);
-    //   } else if (key === 'files') {
-    //     console.log('File:', (value as File).name);
-    //   }
-    // });
+    } 
   });
 
   return (

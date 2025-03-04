@@ -12,7 +12,7 @@ export const getPresignedUrl = async () => {
   return response.data;
 };
 
-// 파일 업로드 함수도 추가
+// 파일 업로드 함수
 export const uploadFileToPresignedUrl = async (file: File) => {
   const { data } = await getPresignedUrl();
 
