@@ -15,6 +15,9 @@ export const API_ENDPOINTS = {
     DETAIL: (studyId: string) => `/api/v1/study/${studyId}`,
     DELETE: (studyId: string) => `/api/v1/study/${studyId}`,
   },
+  FILES: { 
+    PRESIGNED_URL: '/api/v1/files/presigned-url',
+  },
   USER: {
     INFO: '/api/v1/user',
     CREATE: '/api/v1/user',

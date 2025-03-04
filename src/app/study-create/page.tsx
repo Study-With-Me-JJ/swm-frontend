@@ -16,7 +16,7 @@ import ImageUploader from '@/components/study-create/ui/image-uploader';
 import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
 import Toast from '@/components/ui/Toast';
-
+import { uploadFileToPresignedUrl } from '@/lib/api/study/getPresignedUrl';
 interface PositionField {
   id: string;
   position: string;
@@ -59,7 +59,7 @@ export default function StudyCreate() {
   const [tagList, setTagList] = useState<string[]>([]);
 
   const { mutate } = useMutation({
-    mutationFn: (formData: FormData) => postStudy(formData),
+    mutationFn: (studyData: any) => postStudy(studyData),
     onSuccess: async (response) => {
       if (response.message === 'Expired Token') {
         setIsToast(true);
@@ -293,36 +293,39 @@ export default function StudyCreate() {
     }
   };
 
-  const onSubmit = methods.handleSubmit((data) => {
-    const formData = new FormData();
+  const onSubmit = methods.handleSubmit(async (data) => {
+    // const formData = new FormData();
+    try {
+      const uploadedUrls = await Promise.all(
+        (data.image || []).map(async (img: ImageFile) => {
+          return await uploadFileToPresignedUrl(img.file);
+        })
+      );
 
-    const studyData = {
-      title: data.title,
-      content: data.content,
-      openChatUrl: data.openChatUrl,
-      category: data.category,
-      tagList: (data.tagList || [])
-        .filter((tag: string) => tag && typeof tag === 'string')
-        .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
-      imageUrlList: [],
-      createRecruitmentPositionRequestList: (data.positions || []).map(
-        (pos: PositionField) => ({
-          title: pos.position,
-          headcount: pos.capacity,
-        }),
-      ),
-    };
+      const studyData = {
+        title: data.title,
+        content: data.content,
+        openChatUrl: data.openChatUrl,
+        category: data.category,
+        tagList: (data.tagList || [])
+          .filter((tag: string) => tag && typeof tag === 'string')
+          .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
+        imageUrlList: uploadedUrls,
+        createRecruitmentPositionRequestList: (data.positions || []).map(
+          (pos: PositionField) => ({
+            title: pos.position,
+            headcount: pos.capacity,
+          }),
+        ),
+      };
 
-    formData.append(
-      'request',
-      new Blob([JSON.stringify(studyData)], { type: 'application/json' }),
-    );
+      mutate(studyData);
 
-    data.image?.forEach((img: ImageFile) => {
-      formData.append('files', img.file);
-    });
-
-    mutate(formData);
+    } catch (error) {
+      console.error('이미지 업로드 실패:', error);
+      setIsToast(true);
+      setMessage('이미지 업로드에 실패했습니다.');
+    }
 
     // Array.from(formData.entries()).forEach(([key, value]) => {
     //   if (key === 'request') {
