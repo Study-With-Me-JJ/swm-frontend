@@ -8,9 +8,6 @@ export const getComment = async (studyId: string, pageNo: number) => {
     const url = `${baseUrl}${API_ENDPOINTS.STUDY.COMMENT(studyId)}`;
     const res = await axios.get<ApiResponse<Comment>>(url, {
       params: { pageNo },
-      paramsSerializer: {
-        indexes: null,
-      },
     });
     return res.data;
   } catch (error) {

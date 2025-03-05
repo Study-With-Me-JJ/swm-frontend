@@ -3,6 +3,7 @@
 import { getComment } from '@/lib/api/study/getComment';
 import { useQuery } from '@tanstack/react-query';
 import { Suspense } from 'react';
+import CommentForm from './CommentForm';
 
 export default function Comment({ studyId }: { studyId: string }) {
   const { data, isError } = useQuery({
@@ -21,9 +22,11 @@ export default function Comment({ studyId }: { studyId: string }) {
         {data?.data.data.map((comment) => (
           <div key={comment.commentId}>
             <p>{comment.content}</p>
+            <p>{comment.nickname}</p>
           </div>
         ))}
       </div>
+      <CommentForm studyId={studyId} />
     </Suspense>
   );
 }
