@@ -1,4 +1,8 @@
-import { RecruitmentPositionTitle, StudyCategory, StudyStatus } from '@/types/api/study-recruit/study';
+import {
+  RecruitmentPositionTitle,
+  StudyCategory,
+  StudyStatus,
+} from '@/types/api/study-recruit/study';
 
 export interface ApiResponse {
   message: string;
@@ -45,7 +49,7 @@ export interface StudyDetailRequest {
       userId: string;
       nickname: string;
       profileImageUrl: string | null;
-      createdAt: string;
+      createdAt: string | number[];
       updatedAt: string;
       replyCount: number;
     }[];

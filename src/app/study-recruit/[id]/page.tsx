@@ -34,13 +34,19 @@ export default function StudyRecruitPage({
 
   const router = useRouter();
 
-  const date = new Date().toLocaleDateString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+  const date = new Date()
+    .toLocaleDateString('ko-KR', {
+      year: '2-digit',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    })
+    .replace(/\. /g, '.')
+    .replace(/\.$/, '')
+    .replace(/:/g, ':');
+
   const [isBookmark, setIsBookmark] = useState(false);
   const [isToast, setIsToast] = useState(false);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
@@ -98,6 +104,22 @@ export default function StudyRecruitPage({
 
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
+
+  const formatDate = (date: string) => {
+    const commentDate = new Date(date)
+      .toLocaleString('ko-KR', {
+        year: '2-digit',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+      .replace(/\. /g, '.')
+      .replace(/:/g, ':')
+      .replace(/\.$/, '');
+    return commentDate;
+  };
 
   const { data: user } = useQuery({
     queryKey: ['userInfo'],
@@ -218,7 +240,7 @@ export default function StudyRecruitPage({
                 {data?.data.getTagResponseList.map((item) => (
                   <span
                     key={item.tagId}
-                    className="h-[30px] min-w-[50px] rounded-[4px] border border-[#eee] bg-white px-[7px] py-[5px] text-sm font-medium text-[#a5a5a5]"
+                    className="h-[30px] min-w-[30px] rounded-[4px] border border-[#eee] bg-white px-[7px] py-[5px] text-sm font-medium text-[#a5a5a5]"
                   >
                     #{item.name}
                   </span>
