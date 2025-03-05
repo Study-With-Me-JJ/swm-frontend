@@ -15,6 +15,7 @@ import { Navigation } from 'swiper/modules';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { NavigationOptions } from 'swiper/types';
 import { getPositionOptions } from '@/types/api/study-recruit/study';
+import Comment from '@/components/study-recruit/detail/Comment';
 import BookMarkIcon from '@/components/ui/BookMarkIcon';
 import InteractionStatus from '@/components/ui/InteractionStatus';
 import Toast from '@/components/ui/Toast';
@@ -334,7 +335,7 @@ export default function StudyRecruitPage({
                   </span>
                 </div>
                 <div className="font-regular border-t border-gray-disabled pt-[24px] text-sm text-gray-light">
-                  {data?.data.content}
+                  <Comment studyId={params.id} />
                 </div>
               </div>
             </div>
