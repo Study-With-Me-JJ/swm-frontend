@@ -384,9 +384,9 @@ export default function StudyRecruitPage({
                     </span>{' '}
                     모집중
                   </div>
-                  <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
+                  {/* <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
                     신청함
-                  </div>
+                  </div> */}
                 </div>
                 <div>
                   <span className="box-border block h-[30px] min-w-[50px] rounded-[4px] border border-[#eee] px-[6px] py-[4px] text-[14px] font-medium text-[#a5a5a5]">

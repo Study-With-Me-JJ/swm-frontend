@@ -3,7 +3,7 @@
 import { getUserInfo } from '@/lib/api/auth';
 import { getComment, getReply } from '@/lib/api/study/getComment';
 import { postReply } from '@/lib/api/study/postComment';
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
@@ -24,18 +24,39 @@ export default function Comment({ studyId }: { studyId: string }) {
     queryFn: () => getUserInfo(),
   });
 
-  const { data: replies } = useQuery({
-    queryKey: ['replies'],
-    queryFn: async () => {
-      if (!comments?.data.data) return [];
-      const commentIds = comments.data.data.map((comment) =>
-        String(comment.commentId),
+  const [parentId, setParentId] = useState<string>('');
+
+  const { data: allReplies } = useInfiniteQuery({
+    queryKey: ['replies', comments?.data?.data?.map((c) => c.commentId)],
+    queryFn: async ({ pageParam = 0 }) => {
+      if (!comments?.data?.data) return null;
+      return Promise.all(
+        comments.data.data.map((comment) =>
+          getReply(String(comment.commentId), { lastReplyId: pageParam }),
+        ),
       );
-      console.log('commentIds', commentIds);
-      return Promise.all(commentIds.map((id) => getReply(id)));
     },
-    enabled: !!comments?.data.data,
+    enabled: !!comments?.data?.data,
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => {
+      if (!lastPage) return undefined;
+      const hasMore = lastPage.some((reply) => reply.data.data.length > 0);
+      return hasMore ? lastPage[0]?.data?.data[0]?.commentId : undefined;
+    },
   });
+
+  //   const getRepliesForComment = (commentId: string) => {
+  //     return (
+  //       allReplies?.pages?.[0]?.find(
+  //         (reply) =>
+  //           // 해당 댓글의 답글 데이터를 바로 반환
+  //           reply?.data?.data?.length > 0,
+  //       )?.data?.data || []
+  //     );
+  //   };
+  const getRepliesForComment = (commentId: string, index: number) => {
+    return allReplies?.pages?.[0]?.[index]?.data?.data || [];
+  };
 
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -47,7 +68,6 @@ export default function Comment({ studyId }: { studyId: string }) {
     setReplyContent(e.target.value);
   };
 
-  const [parentId, setParentId] = useState<string>('');
   const { mutate: submitReply } = useMutation({
     mutationFn: () => postReply(studyId, parentId, replyContent),
     onSuccess: (response) => {
@@ -75,6 +95,7 @@ export default function Comment({ studyId }: { studyId: string }) {
   });
 
   console.log('Query State:', { comments, isError });
+  console.log('allReplies', allReplies);
 
   const [showReplyId, setShowReplyId] = useState<string | null>(null);
   const handleReplyClick = (commentId: string) => {
@@ -113,114 +134,201 @@ export default function Comment({ studyId }: { studyId: string }) {
   return (
     <Suspense fallback={<div>로딩중...</div>}>
       <div>
-        {comments?.data.data.map((comment) => (
-          <div key={comment.commentId} className="">
-            <div className="flex flex-col gap-[16px] border-b border-gray-disabled py-[24px]">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-[4px]">
-                  <Image
-                    src="/icons/icon_no_profile.svg"
-                    alt="user"
-                    width={18}
-                    height={18}
-                  />
-                  <p className="text-[14px] font-bold text-link-default">
-                    {comment.nickname}
-                  </p>
-                </div>
-                {comment.nickname === user?.data?.nickname && (
+        {comments?.data.data.map((comment, index) => {
+          const commentReplies = getRepliesForComment(
+            String(comment.commentId),
+            index,
+          );
+          return (
+            <div key={comment.commentId}>
+              <div className="flex flex-col gap-[16px] border-b border-gray-disabled py-[24px]">
+                <div className="flex items-center justify-between">
                   <div className="flex items-center gap-[4px]">
-                    <button
-                      type="button"
-                      className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
-                    >
-                      <Image
-                        src="/icons/Edit-deepgray.svg"
-                        alt="수정"
-                        width={16}
-                        height={16}
-                      />
-                      수정
-                    </button>
-                    <button
-                      type="button"
-                      className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
-                    >
-                      <Image
-                        src="/icons/Delete-deepgray.svg"
-                        alt="삭제"
-                        width={16}
-                        height={16}
-                      />
-                      삭제
-                    </button>
+                    <Image
+                      src="/icons/icon_no_profile.svg"
+                      alt="user"
+                      width={18}
+                      height={18}
+                    />
+                    <p className="text-[14px] font-bold text-link-default">
+                      {comment.nickname}
+                    </p>
                   </div>
-                )}
-              </div>
-              <p className="font-regular text-[14px] text-black">
-                {comment.content}
-              </p>
-              <div className="flex items-center justify-between">
-                <p className="font-regular text-[14px] text-gray-light">
-                  {formatDate(comment.createdAt)}
+                  {comment.nickname === user?.data?.nickname && (
+                    <div className="flex items-center gap-[4px]">
+                      <button
+                        type="button"
+                        className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
+                      >
+                        <Image
+                          src="/icons/Edit-deepgray.svg"
+                          alt="수정"
+                          width={16}
+                          height={16}
+                        />
+                        수정
+                      </button>
+                      <button
+                        type="button"
+                        className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
+                      >
+                        <Image
+                          src="/icons/Delete-deepgray.svg"
+                          alt="삭제"
+                          width={16}
+                          height={16}
+                        />
+                        삭제
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <p className="font-regular text-[14px] text-black">
+                  {comment.content}
                 </p>
-                <button className="flex items-center gap-[4px]">
-                  <Image
-                    src="/icons/Favorite.svg"
-                    alt="favorite"
-                    width={18}
-                    height={18}
-                  />
-                  {/* <p className="font-regular text-[14px] text-gray-light">
+                <div className="flex items-center justify-between">
+                  <p className="font-regular text-[14px] text-gray-light">
+                    {formatDate(comment.createdAt)}
+                  </p>
+                  <button className="flex items-center gap-[4px]">
+                    <Image
+                      src="/icons/Favorite.svg"
+                      alt="favorite"
+                      width={18}
+                      height={18}
+                    />
+                    {/* <p className="font-regular text-[14px] text-gray-light">
                     {comment.likeCount}
                     </p> */}
-                </button>
+                  </button>
+                </div>
+                <div className="flex justify-start">
+                  <button
+                    onClick={() => handleReplyClick(String(comment.commentId))}
+                    type="button"
+                    className="h-[33px] w-[57px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+                  >
+                    답글
+                  </button>
+                </div>
               </div>
-              <div className="flex justify-start">
-                <button
-                  onClick={() => handleReplyClick(String(comment.commentId))}
-                  type="button"
-                  className="h-[33px] w-[57px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
-                >
-                  답글
-                </button>
-              </div>
-            </div>
-            {/* 답글 입력 영역 */}
-            {showReplyId === String(comment.commentId) && (
-              <div className="relative flex flex-col gap-[16px] py-[24px] pl-[48px] before:absolute before:left-[18px] before:top-[24px] before:h-[10px] before:w-[10px] before:border-b before:border-l before:border-link-default">
-                <form onSubmit={() => submitReply()}>
-                  <div>
-                    <textarea
-                      value={replyContent}
-                      onChange={handleReplyChange}
-                      className="h-[120px] w-full resize-none rounded-[8px] border border-gray-disabled p-[16px] text-sm text-gray-light"
-                      placeholder="스터디에 관한 질문을 댓글로 남겨주세요."
-                    />
-                  </div>
-                  <div className="flex justify-end">
-                    <button
-                      type="submit"
-                      className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
-                    >
-                      답글 등록
-                    </button>
-                  </div>
-                </form>
-              </div>
-            )}
-            <div className="py-[24px] pl-[48px] before:absolute before:left-[18px] before:top-[24px] before:h-[10px] before:w-[10px] before:border-b before:border-l before:border-link-default">
-              {replies?.map((reply: ApiReplyResponse<Reply>) =>
-                reply.data.data.map((reply) => (
-                  <div key={reply.commentId}>
-                    <p>{reply.nickname}</p>
-                    <p>{reply.content}</p>
-                  </div>
-                )),
+              {/* 답글 입력 영역 */}
+              {showReplyId === String(comment.commentId) && (
+                <div className="relative flex flex-col gap-[16px] py-[24px] pl-[48px] before:absolute before:left-[18px] before:top-[24px] before:h-[10px] before:w-[10px] before:border-b before:border-l before:border-link-default">
+                  <form onSubmit={() => submitReply()}>
+                    <div>
+                      <textarea
+                        value={replyContent}
+                        onChange={handleReplyChange}
+                        className="h-[120px] w-full resize-none rounded-[8px] border border-gray-disabled p-[16px] text-sm text-gray-light"
+                        placeholder="스터디에 관한 질문을 댓글로 남겨주세요."
+                      />
+                    </div>
+                    <div className="flex justify-end">
+                      <button
+                        type="submit"
+                        className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+                      >
+                        답글 등록
+                      </button>
+                    </div>
+                  </form>
+                </div>
               )}
+              <div>
+                {commentReplies.map((replyItem: Reply) => (
+                  <div
+                    key={replyItem.commentId}
+                    className="relative flex flex-col gap-[16px] border-b border-gray-disabled py-[24px] pl-[48px] before:absolute before:left-[18px] before:top-[32px] before:h-[10px] before:w-[10px] before:border-b before:border-l before:border-link-default"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-[4px]">
+                        <Image
+                          src="/icons/icon_no_profile.svg"
+                          alt="user"
+                          width={18}
+                          height={18}
+                        />
+                        <p className="text-[14px] font-bold text-link-default">
+                          {replyItem.nickname}
+                        </p>
+                        {replyItem.nickname === user?.data?.nickname && (
+                          <span className="flex h-[33px] w-[60px] items-center justify-center rounded-[4px] bg-[#E7F3FF] text-[14px] font-medium text-link-default">
+                            내 댓글
+                          </span>
+                        )}
+                      </div>
+                      {replyItem.nickname === user?.data?.nickname && (
+                        <div className="flex items-center gap-[4px]">
+                          <button
+                            type="button"
+                            className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
+                          >
+                            <Image
+                              src="/icons/Edit-deepgray.svg"
+                              alt="수정"
+                              width={16}
+                              height={16}
+                            />
+                            수정
+                          </button>
+                          <button
+                            type="button"
+                            className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
+                          >
+                            <Image
+                              src="/icons/Delete-deepgray.svg"
+                              alt="삭제"
+                              width={16}
+                              height={16}
+                            />
+                            삭제
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <p className="font-regular text-[14px] text-black">
+                      {replyItem.content}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="font-regular text-[14px] text-gray-light">
+                        {formatDate(replyItem.createdAt)}
+                      </p>
+                      <button
+                        type="button"
+                        className="flex items-center gap-[4px]"
+                      >
+                        <Image
+                          src="/icons/Favorite.svg"
+                          alt="favorite"
+                          width={18}
+                          height={18}
+                        />
+                        {/* <p className="font-regular text-[14px] text-gray-light">
+                          {reply.likeCount}
+                        </p> */}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="px-[16px] py-[27px]">
+                <button
+                  type="button"
+                  className="flex cursor-pointer items-center gap-[4px] text-[14px] font-semibold text-[#828282]"
+                >
+                  답글 3개 더보기
+                  <Image
+                    src="/icons/icon_select_arrow.svg"
+                    alt="arrow"
+                    width={24}
+                    height={24}
+                  />
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       <CommentForm studyId={studyId} />
       {isToast && <Toast isToast={isToast} message={message} />}

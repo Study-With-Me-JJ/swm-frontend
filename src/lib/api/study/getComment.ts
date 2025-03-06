@@ -18,11 +18,17 @@ export const getComment = async (studyId: string, pageNo: number) => {
 };
 
 // 답글 조회
-export const getReply = async (parentId: string) => {
+export const getReply = async (
+  parentId: string,
+  params: { lastReplyId: number },
+) => {
   try {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
     const url = `${baseUrl}${API_ENDPOINTS.STUDY.REPLY(parentId)}`;
-    const res = await axios.get<ApiReplyResponse<Reply>>(url);
+    // console.log('url', url);
+    const res = await axios.get<ApiReplyResponse<Reply>>(url, {
+      params,
+    });
     return res.data;
   } catch (error) {
     console.error('API Error:', error);
