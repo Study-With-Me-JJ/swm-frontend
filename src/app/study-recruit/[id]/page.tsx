@@ -356,7 +356,7 @@ export default function StudyRecruitPage({
                     {data?.data.commentCount || 0}
                   </span>
                 </div>
-                <div className="font-regular border-t border-gray-disabled pt-[24px] text-sm text-gray-light">
+                <div className="font-regular border-t border-gray-disabled text-sm text-gray-light">
                   <Comment studyId={params.id} />
                 </div>
               </div>

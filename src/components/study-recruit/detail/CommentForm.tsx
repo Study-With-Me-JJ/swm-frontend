@@ -49,7 +49,7 @@ export default function CommentForm({ studyId }: { studyId: string }) {
     submitComment();
   };
   return (
-    <div>
+    <div className="pt-[24px]">
       <form onSubmit={handleSubmit} className="flex flex-col gap-[16px]">
         <div className="flex h-[180px] flex-col gap-[16px] rounded-[8px] border border-gray-disabled p-[24px]">
           <div className="flex items-center gap-[4px]">

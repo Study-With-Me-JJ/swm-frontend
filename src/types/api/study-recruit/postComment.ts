@@ -6,4 +6,4 @@ export interface ApiResponse<T> {
 export interface PostCommentResponse {
   commentId: number;
   createdAt: string;
-}
+} 

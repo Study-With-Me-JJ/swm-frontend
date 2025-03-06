@@ -27,3 +27,28 @@ export const postComment = async (
     throw error;
   }
 };
+
+export const postReply = async (
+  studyId: string,
+  parentId: string,
+  content: string,
+): Promise<ApiResponse<PostCommentResponse>> => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const url = `${baseUrl}${API_ENDPOINTS.STUDY.CREATE_REPLY(studyId, parentId)}`;
+    const res = await axios.post(
+      url,
+      { content },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+    

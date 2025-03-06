@@ -1,4 +1,4 @@
-export interface ApiResponse<T> {
+export interface ApiReplyResponse<T> {
   message: string;
   data: PaginationResponse<T>;
 }
@@ -10,7 +10,7 @@ export interface PaginationResponse<T> {
   totalElements: number;
   hasNext: boolean;
 }
-export interface Comment {
+export interface Reply {
   commentId: number;
   content: string;
   userId: string;
@@ -18,6 +18,4 @@ export interface Comment {
   profileImageUrl: string;
   createdAt: string;
   updatedAt: string;
-  replyCount?: number;
 }
- 
