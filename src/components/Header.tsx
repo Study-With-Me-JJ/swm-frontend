@@ -16,13 +16,7 @@ export default function Header() {
     { name: '외부 스터디', href: '/external-studies' },
   ];
 
-  const logoOnlyPaths = [
-    '/login/',
-    '/join/',
-    '/join/complete/',
-    '/find-id/',
-    '/find-password/',
-  ];
+  const logoOnlyPaths = ['/login/', '/join/', '/join/complete/'];
 
   if (logoOnlyPaths.includes(path)) {
     return (
