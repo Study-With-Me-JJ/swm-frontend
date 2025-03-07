@@ -30,7 +30,7 @@ export default function StudyRecruitPage({
     queryFn: () => getStudyDetail(params.id),
   });
 
-  console.log('detail data', data);
+  // console.log('detail data', data);
 
   const router = useRouter();
 
@@ -99,21 +99,25 @@ export default function StudyRecruitPage({
   });
 
   const formatDate = (dateInput: number[] | string) => {
+    if (!dateInput) return '날짜 정보 없음';
+
     if (typeof dateInput === 'string') {
       const [date, time] = dateInput.split(' ');
       const [year, month, day] = date.split('.');
       const [hours, minutes] = time.split(':');
-      
+
       // UTC to KST (UTC + 9)
-      const utcDate = new Date(`20${year}-${month}-${day}T${hours}:${minutes}:00Z`);
+      const utcDate = new Date(
+        `20${year}-${month}-${day}T${hours}:${minutes}:00Z`,
+      );
       const kstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
-      
+
       const kstYear = String(kstDate.getUTCFullYear()).slice(-2); // 년도의 마지막 2자리만 사용
       const kstMonth = String(kstDate.getUTCMonth() + 1).padStart(2, '0');
       const kstDay = String(kstDate.getUTCDate()).padStart(2, '0');
       const kstHours = String(kstDate.getUTCHours()).padStart(2, '0');
       const kstMinutes = String(kstDate.getUTCMinutes()).padStart(2, '0');
-      
+
       const formattedDate = `${kstYear}.${kstMonth}.${kstDay} ${kstHours}:${kstMinutes}`;
       return formattedDate;
     }

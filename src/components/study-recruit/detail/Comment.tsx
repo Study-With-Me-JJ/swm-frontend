@@ -117,18 +117,11 @@ export default function Comment({ studyId }: { studyId: string }) {
       const [year, month, day] = date.split('.');
       const [hours, minutes] = time.split(':');
       
-      // UTC to KST (UTC + 9)
-      const utcDate = new Date(`20${year}-${month}-${day}T${hours}:${minutes}:00Z`);
-      const kstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+      // UTC를 KST로 변환 (9시간 추가)
+      const kstHours = (parseInt(hours) + 9) % 24;
+      const formattedHours = String(kstHours).padStart(2, '0');
       
-      const kstYear = String(kstDate.getUTCFullYear()).slice(-2); // 년도의 마지막 2자리만 사용
-      const kstMonth = String(kstDate.getUTCMonth() + 1).padStart(2, '0');
-      const kstDay = String(kstDate.getUTCDate()).padStart(2, '0');
-      const kstHours = String(kstDate.getUTCHours()).padStart(2, '0');
-      const kstMinutes = String(kstDate.getUTCMinutes()).padStart(2, '0');
-      
-      const formattedDate = `${kstYear}.${kstMonth}.${kstDay} ${kstHours}:${kstMinutes}`;
-      return formattedDate;
+      return `${year}.${month}.${day} ${formattedHours}:${minutes}`;
     }
     return '날짜 형식 오류';
   };
@@ -356,7 +349,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                     </p>
                     <div className="flex items-center justify-between">
                       <p className="font-regular text-[14px] text-gray-light">
-                        {replyItem.createdAt}
+                        {formatDate(replyItem.createdAt)}
                       </p>
                       {/* <button
                         type="button"
