@@ -26,18 +26,19 @@ export default function Comment({ studyId }: { studyId: string }) {
 
   const [parentId, setParentId] = useState<string>('');
 
-  const { data: allReplies } = useInfiniteQuery({
+  const { data: allReplies } = useInfiniteQuery<ApiReplyResponse<Reply>[]>({
     queryKey: ['replies', comments?.data?.data?.map((c) => c.commentId)],
-    queryFn: async ({ pageParam = 0 }) => {
-      if (!comments?.data?.data) return null;
+    initialPageParam: { lastReplyId: 0 },
+    queryFn: async ({ pageParam = { lastReplyId: 0 } }) => {
+      if (!comments?.data?.data) return [];
       return Promise.all(
         comments.data.data.map((comment) =>
-          getReply(String(comment.commentId), { lastReplyId: pageParam }),
+          getReply(String(comment.commentId), { lastReplyId: 0 }),
         ),
       );
     },
     enabled: !!comments?.data?.data,
-    initialPageParam: 0,
+
     getNextPageParam: (lastPage) => {
       if (!lastPage) return undefined;
       const hasMore = lastPage.some((reply) => reply.data.data.length > 0);
@@ -45,17 +46,11 @@ export default function Comment({ studyId }: { studyId: string }) {
     },
   });
 
-  //   const getRepliesForComment = (commentId: string) => {
-  //     return (
-  //       allReplies?.pages?.[0]?.find(
-  //         (reply) =>
-  //           // 해당 댓글의 답글 데이터를 바로 반환
-  //           reply?.data?.data?.length > 0,
-  //       )?.data?.data || []
-  //     );
-  //   };
   const getRepliesForComment = (commentId: string, index: number) => {
-    return allReplies?.pages?.[0]?.[index]?.data?.data || [];
+    const replies = allReplies?.pages?.[0] as
+      | ApiReplyResponse<Reply>[]
+      | undefined;
+    return replies?.[index]?.data?.data || [];
   };
 
   const router = useRouter();
@@ -127,6 +122,22 @@ export default function Comment({ studyId }: { studyId: string }) {
     }
   };
 
+  const [visibleReplyCounts, setVisibleReplyCounts] = useState<{
+    [key: string]: number;
+  }>({});
+
+  const getVisibleReplies = (commentId: string, replies: Reply[]) => {
+    const visibleCount = visibleReplyCounts[commentId] || 3;
+    return replies.slice(0, visibleCount);
+  };
+
+  const handleLoadMore = (commentId: string) => {
+    setVisibleReplyCounts((prev) => ({
+      ...prev,
+      [commentId]: (prev[commentId] || 3) + 3,
+    }));
+  };
+
   if (isError) {
     return <div>댓글 조회 실패</div>;
   }
@@ -139,6 +150,12 @@ export default function Comment({ studyId }: { studyId: string }) {
             String(comment.commentId),
             index,
           );
+          const visibleReplies = getVisibleReplies(
+            String(comment.commentId),
+            commentReplies,
+          );
+          const hasMoreReplies = commentReplies.length > visibleReplies.length;
+
           return (
             <div key={comment.commentId}>
               <div className="flex flex-col gap-[16px] border-b border-gray-disabled py-[24px]">
@@ -236,7 +253,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                 </div>
               )}
               <div>
-                {commentReplies.map((replyItem: Reply) => (
+                {visibleReplies.map((replyItem: Reply) => (
                   <div
                     key={replyItem.commentId}
                     className="relative flex flex-col gap-[16px] border-b border-gray-disabled py-[24px] pl-[48px] before:absolute before:left-[18px] before:top-[32px] before:h-[10px] before:w-[10px] before:border-b before:border-l before:border-link-default"
@@ -312,20 +329,23 @@ export default function Comment({ studyId }: { studyId: string }) {
                   </div>
                 ))}
               </div>
-              <div className="px-[16px] py-[27px]">
-                <button
-                  type="button"
-                  className="flex cursor-pointer items-center gap-[4px] text-[14px] font-semibold text-[#828282]"
-                >
-                  답글 3개 더보기
-                  <Image
-                    src="/icons/icon_select_arrow.svg"
-                    alt="arrow"
-                    width={24}
-                    height={24}
-                  />
-                </button>
-              </div>
+              {hasMoreReplies && (
+                <div className="px-[16px] py-[27px]">
+                  <button
+                    onClick={() => handleLoadMore(String(comment.commentId))}
+                    type="button"
+                    className="flex cursor-pointer items-center gap-[4px] text-[14px] font-semibold text-[#828282]"
+                  >
+                    답글 3개 더보기
+                    <Image
+                      src="/icons/icon_select_arrow.svg"
+                      alt="arrow"
+                      width={24}
+                      height={24}
+                    />
+                  </button>
+                </div>
+              )}
             </div>
           );
         })}
