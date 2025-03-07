@@ -1,7 +1,11 @@
 'use client';
 
 import { getUserInfo } from '@/lib/api/auth';
-import { getComment, getReply } from '@/lib/api/study/getComment';
+import {
+  deleteComment,
+  getComment,
+  getReply,
+} from '@/lib/api/study/getComment';
 import { postReply } from '@/lib/api/study/postComment';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
@@ -17,7 +21,7 @@ export default function Comment({ studyId }: { studyId: string }) {
   const [page, setPage] = useState(0);
   const handlePageChange = (newPage: number) => {
     const currentPosition = window.scrollY;
-    setPage(newPage); 
+    setPage(newPage);
     setTimeout(() => {
       window.scrollTo(0, currentPosition);
     }, 0);
@@ -113,21 +117,26 @@ export default function Comment({ studyId }: { studyId: string }) {
         typeof dateInput === 'string' ? JSON.parse(dateInput) : dateInput;
 
       const [year, month, day, hour, minute] = dateArray;
-      const date = new Date(year, month - 1, day, hour, minute);
-      return date
+      const date = new Date(year, month - 1, day, hour + 9, minute);
+
+      const formattedHour = date.getHours().toString().padStart(2, '0');
+      const formattedMinute = date.getMinutes().toString().padStart(2, '0');
+
+      const formattedDate = date
         .toLocaleDateString('ko-KR', {
           year: '2-digit',
           month: '2-digit',
           day: '2-digit',
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
         })
         .replace(/\. /g, '.')
         .replace(/\.$/, '');
+
+      console.log('date', date);
+
+      return `${formattedDate} ${formattedHour}:${formattedMinute}`;
     } catch (error) {
-      console.error('날짜 파싱 오류:', error);
-      return '날짜 형식 오류';
+      console.error('날짜 형식 변환 오류:', error);
+      return '날짜 형식 변환 오류';
     }
   };
 
@@ -145,6 +154,30 @@ export default function Comment({ studyId }: { studyId: string }) {
       ...prev,
       [commentId]: (prev[commentId] || 3) + 3,
     }));
+  };
+
+  const { mutate: deleteCommentMutation } = useMutation({
+    mutationFn: ({
+      studyId,
+      commentId,
+    }: {
+      studyId: string;
+      commentId: string;
+    }) => deleteComment(studyId, commentId),
+    onSuccess: () => {
+      setIsToast(true);
+      setMessage('댓글이 삭제되었습니다.');
+      queryClient.invalidateQueries({ queryKey: ['comment'] });
+      queryClient.invalidateQueries({ queryKey: ['replies'] });
+    },
+    onError: () => {
+      setIsToast(true);
+      setMessage('댓글 삭제에 실패했습니다.');
+    },
+  });
+
+  const handleDeleteComment = (studyId: string, commentId: string) => {
+    deleteCommentMutation({ studyId, commentId });
   };
 
   if (isError) {
@@ -195,6 +228,12 @@ export default function Comment({ studyId }: { studyId: string }) {
                         수정
                       </button>
                       <button
+                        onClick={() =>
+                          handleDeleteComment(
+                            studyId,
+                            String(comment.commentId),
+                          )
+                        }
                         type="button"
                         className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
                       >
@@ -299,6 +338,12 @@ export default function Comment({ studyId }: { studyId: string }) {
                             수정
                           </button>
                           <button
+                            onClick={() =>
+                              handleDeleteComment(
+                                studyId,
+                                String(replyItem.commentId),
+                              )
+                            }
                             type="button"
                             className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
                           >

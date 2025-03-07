@@ -15,6 +15,8 @@ export const API_ENDPOINTS = {
     DETAIL: (studyId: string) => `/api/v1/study/${studyId}`,
     DELETE: (studyId: string) => `/api/v1/study/${studyId}`,
     COMMENT: (studyId: string) => `/api/v1/study/${studyId}/comment`, //댓글생성,조회
+    DELETE_COMMENT: (studyId: string, commentId: string) =>
+      `/api/v1/study/${studyId}/comment/${commentId}`, //댓글삭제
     REPLY: (parentId: string) => `/api/v1/comment/${parentId}/reply`, //답글조회
     CREATE_REPLY: (studyId: string, parentId: string) =>
       `/api/v1/study/${studyId}/comment/${parentId}`, //답글생성

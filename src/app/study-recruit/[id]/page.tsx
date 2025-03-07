@@ -33,19 +33,8 @@ export default function StudyRecruitPage({
   // console.log('detail data', data);
 
   const router = useRouter();
+ 
 
-  const date = new Date()
-    .toLocaleDateString('ko-KR', {
-      year: '2-digit',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false,
-    })
-    .replace(/\. /g, '.')
-    .replace(/\.$/, '')
-    .replace(/:/g, ':');
 
   const [isBookmark, setIsBookmark] = useState(false);
   const [isToast, setIsToast] = useState(false);
@@ -200,7 +189,7 @@ export default function StudyRecruitPage({
                   )}
               </div>
             </div>
-            <div className="font-regular text-sm text-gray-light">{date}</div>
+            {/* <div className="font-regular text-sm text-gray-light">{date}</div> */}
             <div className="text-[24px] font-semibold text-black">
               {data?.data.title}
             </div>
