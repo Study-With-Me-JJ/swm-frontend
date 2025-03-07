@@ -54,4 +54,6 @@ export interface StudyDetailRequest {
       replyCount: number;
     }[];
   };
+  createdAt: string;
+  updatedAt: string;
 }

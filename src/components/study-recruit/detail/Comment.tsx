@@ -112,32 +112,25 @@ export default function Comment({ studyId }: { studyId: string }) {
   };
 
   const formatDate = (dateInput: number[] | string) => {
-    try {
-      const dateArray =
-        typeof dateInput === 'string' ? JSON.parse(dateInput) : dateInput;
-
-      const [year, month, day, hour, minute] = dateArray;
-      const date = new Date(year, month - 1, day, hour + 9, minute);
-
-      const formattedHour = date.getHours().toString().padStart(2, '0');
-      const formattedMinute = date.getMinutes().toString().padStart(2, '0');
-
-      const formattedDate = date
-        .toLocaleDateString('ko-KR', {
-          year: '2-digit',
-          month: '2-digit',
-          day: '2-digit',
-        })
-        .replace(/\. /g, '.')
-        .replace(/\.$/, '');
-
-      console.log('date', date);
-
-      return `${formattedDate} ${formattedHour}:${formattedMinute}`;
-    } catch (error) {
-      console.error('날짜 형식 변환 오류:', error);
-      return '날짜 형식 변환 오류';
+    if (typeof dateInput === 'string') {
+      const [date, time] = dateInput.split(' ');
+      const [year, month, day] = date.split('.');
+      const [hours, minutes] = time.split(':');
+      
+      // UTC to KST (UTC + 9)
+      const utcDate = new Date(`20${year}-${month}-${day}T${hours}:${minutes}:00Z`);
+      const kstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
+      
+      const kstYear = String(kstDate.getUTCFullYear()).slice(-2); // 년도의 마지막 2자리만 사용
+      const kstMonth = String(kstDate.getUTCMonth() + 1).padStart(2, '0');
+      const kstDay = String(kstDate.getUTCDate()).padStart(2, '0');
+      const kstHours = String(kstDate.getUTCHours()).padStart(2, '0');
+      const kstMinutes = String(kstDate.getUTCMinutes()).padStart(2, '0');
+      
+      const formattedDate = `${kstYear}.${kstMonth}.${kstDay} ${kstHours}:${kstMinutes}`;
+      return formattedDate;
     }
+    return '날짜 형식 오류';
   };
 
   const [visibleReplyCounts, setVisibleReplyCounts] = useState<{
@@ -363,7 +356,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                     </p>
                     <div className="flex items-center justify-between">
                       <p className="font-regular text-[14px] text-gray-light">
-                        {formatDate(replyItem.createdAt)}
+                        {replyItem.createdAt}
                       </p>
                       {/* <button
                         type="button"
