@@ -14,9 +14,11 @@ import { ApiReplyResponse, Reply } from '@/types/api/study-recruit/getReply';
 import Toast from '@/components/ui/Toast';
 
 export default function Comment({ studyId }: { studyId: string }) {
+  const [page, setPage] = useState(0);
+
   const { data: comments, isError } = useQuery({
-    queryKey: ['comment', studyId],
-    queryFn: () => getComment(studyId, 0),
+    queryKey: ['comment', studyId, page],
+    queryFn: () => getComment(studyId, page),
   });
 
   const { data: user } = useQuery({
@@ -207,17 +209,17 @@ export default function Comment({ studyId }: { studyId: string }) {
                   <p className="font-regular text-[14px] text-gray-light">
                     {formatDate(comment.createdAt)}
                   </p>
-                  <button className="flex items-center gap-[4px]">
+                  {/* <button className="flex items-center gap-[4px]">
                     <Image
                       src="/icons/Favorite.svg"
                       alt="favorite"
                       width={18}
                       height={18}
                     />
-                    {/* <p className="font-regular text-[14px] text-gray-light">
+                     <p className="font-regular text-[14px] text-gray-light">
                     {comment.likeCount}
-                    </p> */}
-                  </button>
+                    </p>  
+                  </button> */}
                 </div>
                 <div className="flex justify-start">
                   <button
@@ -311,7 +313,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                       <p className="font-regular text-[14px] text-gray-light">
                         {formatDate(replyItem.createdAt)}
                       </p>
-                      <button
+                      {/* <button
                         type="button"
                         className="flex items-center gap-[4px]"
                       >
@@ -321,10 +323,10 @@ export default function Comment({ studyId }: { studyId: string }) {
                           width={18}
                           height={18}
                         />
-                        {/* <p className="font-regular text-[14px] text-gray-light">
+                        <p className="font-regular text-[14px] text-gray-light">
                           {reply.likeCount}
-                        </p> */}
-                      </button>
+                        </p>
+                      </button> */}
                     </div>
                   </div>
                 ))}
@@ -352,6 +354,72 @@ export default function Comment({ studyId }: { studyId: string }) {
       </div>
       <CommentForm studyId={studyId} />
       {isToast && <Toast isToast={isToast} message={message} />}
+
+      <div className="mt-[24px] flex items-center justify-center gap-[10px]">
+        <button
+          onClick={() => setPage(0)}
+          disabled={page === 0}
+          className="cursor-pointer"
+        >
+          <Image
+            src="/icons/AngleLeft2.svg"
+            alt="arrow"
+            width={14}
+            height={14}
+            className="rotate-180 transform"
+          />
+        </button>
+        <button
+          onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+          disabled={page === 0}
+          className="cursor-pointer"
+        >
+          <Image
+            src="/icons/AngleLeft.svg"
+            alt="arrow"
+            width={14}
+            height={14}
+            className="rotate-180 transform"
+          />
+        </button>
+        {[...Array(Math.min(Math.ceil((comments?.data?.totalPages ?? 1)), 5))].map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setPage(i)}
+            className={`text-[14px] ${
+              page === i ? 'font-bold text-black' : 'text-[#828282]'
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => setPage((prev) => prev + 1)}
+          disabled={page >= (Math.ceil((comments?.data?.totalPages ?? 1) - 1))}
+          className="cursor-pointer"
+        >
+          <Image
+            src="/icons/AngleLeft.svg"
+            alt="arrow"
+            width={14}
+            height={14}
+          />
+        </button>
+        <button
+          onClick={() =>
+            setPage(Math.ceil((comments?.data?.totalPages ?? 1) - 1))
+          } 
+          disabled={page >= (Math.ceil((comments?.data?.totalPages ?? 1) - 1))}
+          className="cursor-pointer"
+        >
+          <Image
+            src="/icons/AngleLeft2.svg"
+            alt="arrow"
+            width={14}
+            height={14}
+          />
+        </button>
+      </div>
     </Suspense>
   );
 }
