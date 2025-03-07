@@ -15,6 +15,13 @@ import Toast from '@/components/ui/Toast';
 
 export default function Comment({ studyId }: { studyId: string }) {
   const [page, setPage] = useState(0);
+  const handlePageChange = (newPage: number) => {
+    const currentPosition = window.scrollY;
+    setPage(newPage); 
+    setTimeout(() => {
+      window.scrollTo(0, currentPosition);
+    }, 0);
+  };
 
   const { data: comments, isError } = useQuery({
     queryKey: ['comment', studyId, page],
@@ -357,7 +364,7 @@ export default function Comment({ studyId }: { studyId: string }) {
 
       <div className="mt-[24px] flex items-center justify-center gap-[10px]">
         <button
-          onClick={() => setPage(0)}
+          onClick={() => handlePageChange(0)}
           disabled={page === 0}
           className="cursor-pointer"
         >
@@ -370,7 +377,7 @@ export default function Comment({ studyId }: { studyId: string }) {
           />
         </button>
         <button
-          onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+          onClick={() => handlePageChange(page - 1)}
           disabled={page === 0}
           className="cursor-pointer"
         >
@@ -387,7 +394,7 @@ export default function Comment({ studyId }: { studyId: string }) {
         ].map((_, i) => (
           <button
             key={i}
-            onClick={() => setPage(i)}
+            onClick={() => handlePageChange(i)}
             className={`text-[14px] ${
               page === i ? 'font-bold text-black' : 'text-[#828282]'
             }`}
@@ -396,7 +403,7 @@ export default function Comment({ studyId }: { studyId: string }) {
           </button>
         ))}
         <button
-          onClick={() => setPage((prev) => prev + 1)}
+          onClick={() => handlePageChange(page + 1)}
           disabled={page >= Math.ceil((comments?.data?.totalPages ?? 1) - 1)}
           className="cursor-pointer"
         >

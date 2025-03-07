@@ -69,15 +69,19 @@ export default function CommentForm({ studyId }: { studyId: string }) {
               <div>로그인 후 댓글을 작성해주세요.</div>
             )}
           </div>
-          <textarea
-            name="content"
-            id="content"
-            placeholder="스터디에 관한 질문을 댓글로 남겨주세요."
-            value={content}
-            onChange={handleCommentChange}
-            className="h-[100px] w-full resize-none rounded-md border-0 placeholder:text-[14px] placeholder:text-gray-light focus:outline-none"
-          />
-        </div>
+          {user?.data?.nickname && (
+            <>
+              <textarea
+                name="content"
+                id="content"
+                placeholder="스터디에 관한 질문을 댓글로 남겨주세요."
+                value={content}
+                onChange={handleCommentChange}
+                className="h-[100px] w-full resize-none rounded-md border-0 placeholder:text-[14px] placeholder:text-gray-light focus:outline-none"
+              />
+            </>
+          )}
+        </div> 
         <div className="flex justify-end">
           <button
             type="submit"
