@@ -35,9 +35,9 @@ export default function CommentForm({ studyId }: { studyId: string }) {
         return;
       }
 
-      console.log('댓글 작성 성공', response);
+      //   console.log('댓글 작성 성공', response);
       setContent('');
-      queryClient.invalidateQueries({ queryKey: ['comment', studyId] }); //댓글목록 새침고침
+      queryClient.invalidateQueries({ queryKey: ['comment', studyId] });
       console.log('댓글 작성 성공');
     },
     onError: (error) => {

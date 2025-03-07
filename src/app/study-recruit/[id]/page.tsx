@@ -30,7 +30,7 @@ export default function StudyRecruitPage({
     queryFn: () => getStudyDetail(params.id),
   });
 
-  console.log('detail data', data);
+  // console.log('detail data', data);
 
   const router = useRouter();
 
@@ -104,22 +104,6 @@ export default function StudyRecruitPage({
 
   const prevRef = useRef<HTMLButtonElement>(null);
   const nextRef = useRef<HTMLButtonElement>(null);
-
-  const formatDate = (date: string) => {
-    const commentDate = new Date(date)
-      .toLocaleString('ko-KR', {
-        year: '2-digit',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })
-      .replace(/\. /g, '.')
-      .replace(/:/g, ':')
-      .replace(/\.$/, '');
-    return commentDate;
-  };
 
   const { data: user } = useQuery({
     queryKey: ['userInfo'],

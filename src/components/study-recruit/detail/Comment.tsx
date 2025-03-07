@@ -31,7 +31,7 @@ export default function Comment({ studyId }: { studyId: string }) {
   const { data: allReplies } = useInfiniteQuery<ApiReplyResponse<Reply>[]>({
     queryKey: ['replies', comments?.data?.data?.map((c) => c.commentId)],
     initialPageParam: { lastReplyId: 0 },
-    queryFn: async ({ pageParam = { lastReplyId: 0 } }) => {
+    queryFn: async () => {
       if (!comments?.data?.data) return [];
       return Promise.all(
         comments.data.data.map((comment) =>
@@ -91,8 +91,8 @@ export default function Comment({ studyId }: { studyId: string }) {
     },
   });
 
-  console.log('Query State:', { comments, isError });
-  console.log('allReplies', allReplies);
+  //   console.log('Query State:', { comments, isError });
+  //   console.log('allReplies', allReplies);
 
   const [showReplyId, setShowReplyId] = useState<string | null>(null);
   const handleReplyClick = (commentId: string) => {
@@ -382,7 +382,9 @@ export default function Comment({ studyId }: { studyId: string }) {
             className="rotate-180 transform"
           />
         </button>
-        {[...Array(Math.min(Math.ceil((comments?.data?.totalPages ?? 1)), 5))].map((_, i) => (
+        {[
+          ...Array(Math.min(Math.ceil(comments?.data?.totalPages ?? 1), 5)),
+        ].map((_, i) => (
           <button
             key={i}
             onClick={() => setPage(i)}
@@ -395,7 +397,7 @@ export default function Comment({ studyId }: { studyId: string }) {
         ))}
         <button
           onClick={() => setPage((prev) => prev + 1)}
-          disabled={page >= (Math.ceil((comments?.data?.totalPages ?? 1) - 1))}
+          disabled={page >= Math.ceil((comments?.data?.totalPages ?? 1) - 1)}
           className="cursor-pointer"
         >
           <Image
@@ -408,8 +410,8 @@ export default function Comment({ studyId }: { studyId: string }) {
         <button
           onClick={() =>
             setPage(Math.ceil((comments?.data?.totalPages ?? 1) - 1))
-          } 
-          disabled={page >= (Math.ceil((comments?.data?.totalPages ?? 1) - 1))}
+          }
+          disabled={page >= Math.ceil((comments?.data?.totalPages ?? 1) - 1)}
           className="cursor-pointer"
         >
           <Image
