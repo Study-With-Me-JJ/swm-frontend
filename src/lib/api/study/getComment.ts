@@ -35,6 +35,27 @@ export const deleteComment = async (studyId: string, commentId: string) => {
   }
 };
 
+// 댓글 수정
+export const editComment = async (commentId: string, content: string) => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const url = `${baseUrl}${API_ENDPOINTS.STUDY.PATCH_COMMENT(commentId)}`;
+    const res = await axios.patch(
+      url,
+      { content },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      },
+    );
+    return res.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
 // 답글 조회
 export const getReply = async (
   parentId: string,

@@ -3,6 +3,7 @@
 import { getUserInfo } from '@/lib/api/auth';
 import {
   deleteComment,
+  editComment,
   getComment,
   getReply,
 } from '@/lib/api/study/getComment';
@@ -116,11 +117,11 @@ export default function Comment({ studyId }: { studyId: string }) {
       const [date, time] = dateInput.split(' ');
       const [year, month, day] = date.split('.');
       const [hours, minutes] = time.split(':');
-      
+
       // UTC를 KST로 변환 (9시간 추가)
       const kstHours = (parseInt(hours) + 9) % 24;
       const formattedHours = String(kstHours).padStart(2, '0');
-      
+
       return `${year}.${month}.${day} ${formattedHours}:${minutes}`;
     }
     return '날짜 형식 오류';
@@ -166,6 +167,22 @@ export default function Comment({ studyId }: { studyId: string }) {
     deleteCommentMutation({ studyId, commentId });
   };
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
+  const [editContent, setEditContent] = useState('');
+
+  const handleEditStart = (commentId: string) => {
+    setEditingCommentId(commentId);
+    setIsEditing(!isEditing);
+  };
+
+  const handleEditSubmit = (commentId: string) => {
+    if (editingCommentId) {
+      editComment(commentId, editContent);
+    }
+    setIsEditing(!isEditing);
+  };
+
   if (isError) {
     return <div>댓글 조회 실패</div>;
   }
@@ -202,6 +219,9 @@ export default function Comment({ studyId }: { studyId: string }) {
                   {comment.nickname === user?.data?.nickname && (
                     <div className="flex items-center gap-[4px]">
                       <button
+                        onClick={() =>
+                          handleEditStart(String(comment.commentId))
+                        }
                         type="button"
                         className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
                       >
@@ -211,7 +231,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                           width={16}
                           height={16}
                         />
-                        수정
+                        {isEditing ? '취소' : '수정'}
                       </button>
                       <button
                         onClick={() =>
@@ -234,9 +254,31 @@ export default function Comment({ studyId }: { studyId: string }) {
                     </div>
                   )}
                 </div>
-                <p className="font-regular text-[14px] text-black">
-                  {comment.content}
-                </p>
+                {isEditing ? (
+                  <div>
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="h-[120px] w-full resize-none rounded-[8px] border border-gray-disabled p-[16px] text-sm text-gray-light"
+                      placeholder="댓글을 수정해주세요."
+                    />
+                    <div className="flex justify-end">
+                      <button
+                        onClick={() =>
+                          handleEditSubmit(String(comment.commentId))
+                        }
+                        type="button"
+                        className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+                      >
+                        수정 완료
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <p className="font-regular text-[14px] text-black">
+                    {comment.content}
+                  </p>
+                )}
                 <div className="flex items-center justify-between">
                   <p className="font-regular text-[14px] text-gray-light">
                     {formatDate(comment.createdAt)}
