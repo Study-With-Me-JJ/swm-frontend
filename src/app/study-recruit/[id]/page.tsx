@@ -124,6 +124,15 @@ export default function StudyRecruitPage({
     return '날짜 형식 오류';
   };
 
+  const [activeTab, setActiveTab] = useState('info');
+  const moveActiveTab = (tab: string) => {
+    setActiveTab(tab);
+    const tabItemContent = document.getElementById('tab-item-content-' + tab);
+    if (tabItemContent) {
+      tabItemContent.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <>
       <div className="mx-auto flex max-w-screen-xl items-start justify-between gap-[40px] px-5 pb-[100px] pt-[60px] xl:px-0">
@@ -324,14 +333,24 @@ export default function StudyRecruitPage({
             </div>
           </div>
           <div className="tab-container">
-            <div className="tab-item flex h-[50px] items-center">
-              <div className="tab-item-title tab-item-title-active h-[50px] min-w-[100px] border-b-2 border-link-default px-[18px] py-[15px]">
-                <div className="tab-item-title-text cursor-pointer text-sm font-semibold text-gray-default">
+            <div className="sticky top-[0px] flex h-[50px] items-center bg-white">
+              <div
+                className={`tab-item-title ${activeTab === 'info' ? 'tab-item-title-active border-link-default' : 'border-gray-disabled'} h-[50px] min-w-[100px] border-b-2 px-[18px] py-[15px]`}
+              >
+                <div
+                  onClick={() => moveActiveTab('info')}
+                  className="tab-item-title-text cursor-pointer text-sm font-semibold text-gray-default"
+                >
                   스터디 소개
                 </div>
               </div>
-              <div className="tab-item-title h-[50px] min-w-[100px] border-b-2 border-gray-disabled px-[18px] py-[15px]">
-                <div className="tab-item-title-text flex cursor-pointer items-center gap-[8px] text-sm font-semibold text-gray-default">
+              <div
+                className={`tab-item-title ${activeTab === 'comment' ? 'tab-item-title-active border-link-default' : 'border-gray-disabled'} h-[50px] min-w-[100px] border-b-2 px-[18px] py-[15px]`}
+              >
+                <div
+                  onClick={() => moveActiveTab('comment')}
+                  className="tab-item-title-text flex cursor-pointer items-center justify-center gap-[8px] text-sm font-semibold text-gray-default"
+                >
                   댓글{' '}
                   <span className="text-link-default">
                     {data?.data.commentCount || 0}
@@ -339,7 +358,7 @@ export default function StudyRecruitPage({
                 </div>
               </div>
             </div>
-            <div className="tab-item-content">
+            <div className="tab-item-content" id="tab-item-content-info">
               <div className="tab-item-content-text pt-[40px]">
                 <div className="rounded-[8px] pb-[24px] text-[20px] font-semibold text-black">
                   스터디 소개
@@ -348,7 +367,10 @@ export default function StudyRecruitPage({
                   {data?.data.content}
                 </div>
               </div>
-              <div className="tab-item-content-text pt-[40px]">
+              <div
+                className="tab-item-content-text pt-[40px]"
+                id="tab-item-content-comment"
+              >
                 <div className="pb-[24px] text-[20px] font-semibold text-black">
                   댓글{' '}
                   <span className="text-link-default">
@@ -363,7 +385,7 @@ export default function StudyRecruitPage({
           </div>
         </div>
         {/* 오른쪽 영역 */}
-        <div className="flex w-[380px] flex-shrink-0 flex-col gap-[30px]">
+        <div className="sticky top-[0px] flex w-[380px] flex-shrink-0 flex-col gap-[30px]">
           <div className="text-[24px] font-semibold text-black">모집 현황</div>
           <ul>
             {data?.data.getRecruitmentPositionResponseList.map((item) => (
