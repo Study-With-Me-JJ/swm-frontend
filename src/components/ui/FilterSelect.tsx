@@ -10,7 +10,6 @@ interface Option {
   value: string;
   label: string;
 }
-
 interface FilterSelectProps {
   onChange: (value: string | string[]) => void;
   defaultValue: string | string[];
@@ -20,6 +19,7 @@ interface FilterSelectProps {
   type?: 'default' | 'button';
   title?: string;
   closeOnSelect?: boolean;
+  disabled?: boolean;
 }
 
 export default function FilterSelect({
@@ -31,6 +31,7 @@ export default function FilterSelect({
   type = 'default',
   title = 'default',
   closeOnSelect = true,
+  disabled = false,
 }: FilterSelectProps) {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -98,7 +99,7 @@ export default function FilterSelect({
         </span>
         <Image
           src={
-            isOpen
+            isOpen && !disabled
               ? '/icons/icon_select_arrow_up.svg'
               : '/icons/icon_select_arrow.svg'
           }
@@ -107,7 +108,7 @@ export default function FilterSelect({
           height={28}
         />
       </button>
-      {isOpen && renderDropDown()}
+      {isOpen && !disabled && renderDropDown()}
     </div>
   );
 

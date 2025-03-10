@@ -14,6 +14,7 @@ export const API_ENDPOINTS = {
     CREATE: '/api/v1/study',
     DETAIL: (studyId: string) => `/api/v1/study/${studyId}`,
     DELETE: (studyId: string) => `/api/v1/study/${studyId}`,
+    PATCH: (studyId: string) => `/api/v1/study/${studyId}`,
     COMMENT: (studyId: string) => `/api/v1/study/${studyId}/comment`, //댓글생성,조회
     DELETE_COMMENT: (studyId: string, commentId: string) =>
       `/api/v1/study/${studyId}/comment/${commentId}`, //댓글삭제

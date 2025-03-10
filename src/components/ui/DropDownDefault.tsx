@@ -15,7 +15,7 @@ export default function DropDownDefault({
   return (
     <>
       <ul
-        className={`absolute left-0 top-full z-10 mt-[10px] h-auto w-full rounded-[8px] border bg-white p-1 ${filterType === 'text' ? 'border-[#e0e0e0]' : 'border-link-default'}`}
+        className={`absolute left-0 top-full z-20 mt-[10px] h-auto w-full rounded-[8px] border bg-white p-1 ${filterType === 'text' ? 'border-[#e0e0e0]' : 'border-link-default'}`}
         role="listbox"
       >
         {options.map((option) => (

@@ -9,12 +9,14 @@ export default function RadioSelectGroup({
   name,
   options,
   onOptionChange,
+  value,  
 }: {
   label: string;
   subLabel: string;
   name: string;
   options: { id: number; value: string; name: string }[];
   onOptionChange: (value: string) => void;
+  value: string;
 }) {
   const { control } = useFormContext();
 
@@ -32,6 +34,7 @@ export default function RadioSelectGroup({
         <Controller
           name={name}
           control={control}
+          defaultValue={value}
           render={({ field }) => {
             return (
               <div className="flex flex-wrap justify-start gap-2">
@@ -39,7 +42,7 @@ export default function RadioSelectGroup({
                   <div key={item.id} className="relative">
                     <Input
                       type="radio"
-                      checked={field.value === item.value}
+                      checked={field.value === item.value} 
                       id={item.value}
                       onChange={() => {
                         field.onChange(item.value);

@@ -16,7 +16,8 @@ interface InputFieldProps {
   buttonText?: string;
   onButtonClick?: () => void;
   disabled?: boolean;
-  onAuthCodeCheck?: () => void;
+  onAuthCodeCheck?: () => void; 
+  value?: string;
 }
 
 export function InputField({
@@ -29,7 +30,8 @@ export function InputField({
   buttonText,
   onButtonClick,
   disabled,
-  onAuthCodeCheck,
+  value,
+  onAuthCodeCheck, 
 }: InputFieldProps) {
   const {
     control,
@@ -91,8 +93,8 @@ export function InputField({
             const isValid = !errors[name] && field.value;
             return (
               <Input
-                {...field}
-                value={field.value ?? ''}
+                {...field}   
+                value={value ?? field.value ?? ''}
                 type={type}
                 placeholder={placeholder}
                 maxLength={maxLength}

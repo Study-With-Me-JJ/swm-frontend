@@ -86,7 +86,7 @@ export default function DropDownButton({
   return (
     <>
       <div
-        className={`dropdown-button-content absolute ${position.left} ${position.right} mt-[10px] h-auto w-fit rounded-[8px] border border-link-default bg-white px-[30px] py-[40px]`}
+        className={`dropdown-button-content absolute z-20 ${position.left} ${position.right} mt-[10px] h-auto w-fit rounded-[8px] border border-link-default bg-white px-[30px] py-[40px]`}
       >
         <h3 className="mb-[24px] text-center text-sm font-semibold text-gray-default">
           {title}

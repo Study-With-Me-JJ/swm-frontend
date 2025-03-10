@@ -1,12 +1,15 @@
 'use client';
 
+import { editStudy } from '@/lib/api/study/editStudy';
 import { uploadFileToPresignedUrl } from '@/lib/api/study/getPresignedUrl';
-import { postStudy } from '@/lib/api/study/postStudy';
-import { useMutation } from '@tanstack/react-query';
+import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import { useQueryClient } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import {
   getCategoryList,
@@ -31,12 +34,23 @@ interface ImageFile {
   name: string;
 }
 
-export default function StudyCreate() {
+export default function StudyRecruitEditPage({
+  params,
+}: {
+  params: { id: string };
+}) {
   const router = useRouter();
+  const [isToast, setIsToast] = useState(false);
+  const [message, setMessage] = useState('');
   const queryClient = useQueryClient();
-  const methods = useForm();
-  const { watch } = methods;
+
+  const positionOptions = getPositionOptions();
+
+  const [openSelects, setOpenSelects] = useState<Record<string, boolean>>({});
+
+  const [tagList, setTagList] = useState<string[]>([]);
   const category = getCategoryList();
+
   const [previewImages, setPreviewImages] = useState<
     {
       url: string;
@@ -50,43 +64,57 @@ export default function StudyCreate() {
     { id: '1', position: 'ALL', capacity: undefined },
   ]);
 
-  const [isToast, setIsToast] = useState(false);
-  const [message, setMessage] = useState('');
+  const methods = useForm();
+  const { watch } = methods;
 
-  const positionOptions = getPositionOptions();
-
-  const [openSelects, setOpenSelects] = useState<Record<string, boolean>>({});
-
-  const [tagList, setTagList] = useState<string[]>([]);
-
-  const { mutate } = useMutation({
-    mutationFn: (studyData: any) => postStudy(studyData),
-    onSuccess: async (response) => {
-      if (response.message === 'Expired Token') {
-        setIsToast(true);
-        setMessage('로그인이 만료되었습니다. 다시 로그인해주세요.');
-        router.push('/login');
-        return;
-      }
-
-      // console.log('생성 성공 응답:', response);
-
-      setIsToast(true);
-      setMessage('스터디 생성 요청이 완료되었습니다.');
-
-      await queryClient.invalidateQueries({ queryKey: ['study'] });
-      await queryClient.refetchQueries({ queryKey: ['study'] });
-
-      setTimeout(() => {
-        router.push('/study-recruit');
-      }, 500);
-    },
-    onError: (error) => {
-      console.error('생성 실패:', error);
-      setIsToast(true);
-      setMessage('스터디 생성 요청에 실패했습니다.');
-    },
+  const { data } = useQuery({
+    queryKey: ['studyDetail', params.id],
+    queryFn: () => getStudyDetail(params.id as string),
   });
+
+  useEffect(() => {
+    if (data) {
+      const tags = (data.data.getTagResponseList || [])
+        .filter((tag: { tagId: number; name: string }) => tag && tag.name)
+        .map((tag: { tagId: number; name: string }) =>
+          tag.name.startsWith('#') ? tag.name : `#${tag.name}`,
+        );
+      const imageUrlList = (data.data.getImageResponseList || []).map(
+        (image: { imageId: number; imageUrl: string | null }) =>
+          image.imageUrl || '',
+      );
+      const positions = (data.data.getRecruitmentPositionResponseList || []).map(
+        (pos: {
+          recruitmentPositionId: number;        
+          title: string;
+          headcount: number;
+        }) => ({
+          id: pos.recruitmentPositionId.toString(),
+          position: pos.title,
+          capacity: pos.headcount,
+        }),
+      );
+
+      setTagList(tags);
+      setPreviewImages(imageUrlList.map((url) => ({
+        url: url,
+        width: 200,
+        height: 200,
+        name: 'image',
+      })));
+      setPositionFields(positions);
+
+      methods.reset({
+        title: data.data.title,
+        content: data.data.content,
+        openChatUrl: data.data.openChatUrl,
+        category: data.data.category,
+        tagList: tags.map((tag) => tag.slice(1)),
+        imageUrlList: imageUrlList,
+        createRecruitmentPositionRequestList: positions, 
+      });
+    }
+  }, [data]);
 
   //필수입력값 유효성검사
   const formTitle = watch('title');
@@ -291,6 +319,35 @@ export default function StudyCreate() {
     }
   };
 
+  const { mutate } = useMutation({
+    mutationFn: (studyData: any) => editStudy(params.id as string, studyData),
+    onSuccess: async (response) => {
+      if (response.message === 'Expired Token') {
+        setIsToast(true);
+        setMessage('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        router.push('/login');
+        return;
+      }
+
+      // console.log('생성 성공 응답:', response);
+
+      setIsToast(true);
+      setMessage('스터디 생성 요청이 완료되었습니다.');
+
+      await queryClient.invalidateQueries({ queryKey: ['study'] });
+      await queryClient.refetchQueries({ queryKey: ['study'] });
+
+      setTimeout(() => {
+        router.push('/study-recruit');
+      }, 500);
+    },
+    onError: (error) => {
+      console.error('생성 실패:', error);
+      setIsToast(true);
+      setMessage('스터디 생성 요청에 실패했습니다.');
+    },
+  });
+
   const onSubmit = methods.handleSubmit(async (data) => {
     try {
       const uploadedUrls = await Promise.all(
@@ -431,7 +488,6 @@ export default function StudyCreate() {
                       name="positions"
                       type="default"
                       value={field.position}
-                      disabled={false}
                       capacity={field.capacity || 0}
                       onChange={(value) =>
                         handlePositionChange(
@@ -454,6 +510,7 @@ export default function StudyCreate() {
                       onAdd={handleAddPosition}
                       onDelete={() => handleDeletePosition(field.id)}
                       id={field.id}
+                      disabled={true}
                     />
                   ),
                 )}

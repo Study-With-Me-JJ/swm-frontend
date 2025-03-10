@@ -1,0 +1,17 @@
+import { API_ENDPOINTS } from '@/lib/api/endpoints';
+import axios from 'axios';
+import { ApiResponse } from '@/types/api/study-recruit/editStudy';
+
+export const editStudy = async (
+  studyId: string,
+  studyData: any,
+): Promise<ApiResponse> => {
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const url = `${baseUrl}${API_ENDPOINTS.STUDY.PATCH(studyId)}`;
+  const res = await axios.put(url, studyData, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+    },
+  });
+  return res.data;
+};

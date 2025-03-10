@@ -4,6 +4,7 @@ import { getUserInfo } from '@/lib/api/auth';
 import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import { deleteStudy } from '@/lib/api/study/getStudyDetail';
 import { useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -64,9 +65,14 @@ export default function StudyRecruitPage({
     setIsEditModalOpen(!isEditModalOpen);
   };
 
+  const queryClient = useQueryClient();
   const handleDeleteStudy = async () => {
     try {
       await deleteStudy(params.id);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['study'] }),
+      ]);
+
       router.push('/study-recruit');
     } catch (error) {
       console.error(error);
@@ -106,13 +112,12 @@ export default function StudyRecruitPage({
       const [year, month, day] = date.split('.');
       const [hours, minutes] = time.split(':');
 
-      // UTC to KST (UTC + 9)
       const utcDate = new Date(
         `20${year}-${month}-${day}T${hours}:${minutes}:00Z`,
       );
       const kstDate = new Date(utcDate.getTime() + 9 * 60 * 60 * 1000);
 
-      const kstYear = String(kstDate.getUTCFullYear()).slice(-2); // 년도의 마지막 2자리만 사용
+      const kstYear = String(kstDate.getUTCFullYear()).slice(-2);
       const kstMonth = String(kstDate.getUTCMonth() + 1).padStart(2, '0');
       const kstDay = String(kstDate.getUTCDate()).padStart(2, '0');
       const kstHours = String(kstDate.getUTCHours()).padStart(2, '0');
@@ -156,6 +161,10 @@ export default function StudyRecruitPage({
     if (tabItemContent) {
       tabItemContent.scrollIntoView({ behavior: 'smooth' });
     }
+  };
+
+  const moveEditPage = () => {
+    router.push(`/study-recruit/${params.id}/edit`);
   };
 
   return (
@@ -216,7 +225,10 @@ export default function StudyRecruitPage({
                         <div className="z-5 absolute right-0 top-[40px]">
                           <ul className="flex w-[220px] flex-col rounded-[8px] border border-link-default bg-white px-[8px] py-[4px]">
                             <li className="border-b border-gray-disabled">
-                              <button className="flex w-full items-center justify-between px-[16px] py-[10px] text-sm font-semibold text-gray-default">
+                              <button
+                                onClick={moveEditPage}
+                                className="flex w-full items-center justify-between px-[16px] py-[10px] text-sm font-semibold text-gray-default"
+                              >
                                 <Image
                                   src="/icons/mode_edit.svg"
                                   alt="edit"
