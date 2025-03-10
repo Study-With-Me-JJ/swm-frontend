@@ -83,9 +83,11 @@ export default function StudyRecruitEditPage({
         (image: { imageId: number; imageUrl: string | null }) =>
           image.imageUrl || '',
       );
-      const positions = (data.data.getRecruitmentPositionResponseList || []).map(
+      const positions = (
+        data.data.getRecruitmentPositionResponseList || []
+      ).map(
         (pos: {
-          recruitmentPositionId: number;        
+          recruitmentPositionId: number;
           title: string;
           headcount: number;
         }) => ({
@@ -96,12 +98,14 @@ export default function StudyRecruitEditPage({
       );
 
       setTagList(tags);
-      setPreviewImages(imageUrlList.map((url) => ({
-        url: url,
-        width: 200,
-        height: 200,
-        name: 'image',
-      })));
+      setPreviewImages(
+        imageUrlList.map((url) => ({
+          url: url,
+          width: 200,
+          height: 200,
+          name: 'image',
+        })),
+      );
       setPositionFields(positions);
 
       methods.reset({
@@ -111,7 +115,7 @@ export default function StudyRecruitEditPage({
         category: data.data.category,
         tagList: tags.map((tag) => tag.slice(1)),
         imageUrlList: imageUrlList,
-        createRecruitmentPositionRequestList: positions, 
+        createRecruitmentPositionRequestList: positions,
       });
     }
   }, [data]);
@@ -150,16 +154,19 @@ export default function StudyRecruitEditPage({
         return;
       }
       const imageUrl = URL.createObjectURL(file);
-      const newImage = {
-        url: imageUrl,
-        file: file,
-        width: 200,
-        height: 200,
-        name: file.name,
-      };
-      const newImages = [...previewImages, newImage];
-      setPreviewImages(newImages);
-      methods.setValue('image', newImages);
+      setPreviewImages((prev) => [
+        ...prev,
+        {
+          url: imageUrl,
+          width: 200,
+          height: 200,
+          name: file.name,
+        },
+      ]);
+      methods.setValue('imageFiles', [
+        ...(methods.getValues('imageFiles') || []),
+        file,
+      ]);
     }
   };
 
@@ -332,52 +339,79 @@ export default function StudyRecruitEditPage({
       // console.log('생성 성공 응답:', response);
 
       setIsToast(true);
-      setMessage('스터디 생성 요청이 완료되었습니다.');
+      setMessage('스터디 수정이 완료되었습니다.');
 
-      await queryClient.invalidateQueries({ queryKey: ['study'] });
-      await queryClient.refetchQueries({ queryKey: ['study'] });
+      await queryClient.invalidateQueries({
+        queryKey: ['studyDetail', params.id],
+      });
+      await queryClient.refetchQueries({
+        queryKey: ['studyDetail', params.id],
+      });
 
       setTimeout(() => {
         router.push('/study-recruit');
       }, 500);
     },
-    onError: (error) => {
-      console.error('생성 실패:', error);
+    onError: (error: any) => {
+      console.error('상세 에러:', error.response?.data); // 서버 에러 메시지 확인
       setIsToast(true);
-      setMessage('스터디 생성 요청에 실패했습니다.');
+      setMessage(
+        error.response?.data?.message || '스터디 수정에 실패했습니다.',
+      );
     },
   });
 
   const onSubmit = methods.handleSubmit(async (data) => {
     try {
-      const uploadedUrls = await Promise.all(
-        (data.image || []).map(async (img: ImageFile) => {
-          return await uploadFileToPresignedUrl(img.file);
-        }),
+      const newImages = previewImages.filter((img) =>
+        img.url.startsWith('blob:'),
       );
+      const imageFiles = methods.getValues('imageFiles') || [];
+
+      const uploadedUrls = await Promise.all(
+        imageFiles.map(async (file: File) => {
+          try {
+            const url = await uploadFileToPresignedUrl(file);
+            return url;
+          } catch (error) {
+            console.error('이미지 업로드 실패:', error);
+            return null;
+          }
+        }),
+      ).then((urls) => urls.filter(Boolean) as string[]);
+
+      const existingUrls = previewImages
+        .map((img) => img.url)
+        .filter((url) => !url.startsWith('blob:'));
 
       const studyData = {
         title: data.title,
         content: data.content,
         openChatUrl: data.openChatUrl,
         category: data.category,
-        tagList: (data.tagList || [])
-          .filter((tag: string) => tag && typeof tag === 'string')
-          .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
-        imageUrlList: uploadedUrls,
-        createRecruitmentPositionRequestList: (data.positions || []).map(
-          (pos: PositionField) => ({
-            title: pos.position,
-            headcount: pos.capacity,
-          }),
-        ),
+        saveTagRequest: {
+          tagListToAdd: data.tagList || [],
+          tagIdListToRemove: [],
+        },
+        saveImageRequest: {
+          imageUrlListToAdd: [...existingUrls, ...uploadedUrls],
+          imageIdListToRemove: [],
+        },
+        // createRecruitmentPositionRequestList: positionFields
+        //   .filter((pos) => pos.position !== 'ALL')
+        //   .map((pos) => ({
+        //     title: pos.position,
+        //     headcount: Number(pos.capacity),
+        //   })),
       };
+
+      console.log('전송 데이터:', studyData); // 요청 데이터 확인
 
       mutate(studyData);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
       setIsToast(true);
-      setMessage('이미지 업로드에 실패했습니다.');
+      setMessage('스터디 수정에 실패했습니다.');
     }
   });
 

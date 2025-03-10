@@ -8,7 +8,7 @@ export const editStudy = async (
 ): Promise<ApiResponse> => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${API_ENDPOINTS.STUDY.PATCH(studyId)}`;
-  const res = await axios.put(url, studyData, {
+  const res = await axios.patch(url, studyData, {
     headers: {
       Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
     },

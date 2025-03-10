@@ -72,7 +72,7 @@ export default function StudyCreate() {
       // console.log('생성 성공 응답:', response);
 
       setIsToast(true);
-      setMessage('스터디 생성 요청이 완료되었습니다.');
+      setMessage('스터디 생정이 완료되었습니다.');
 
       await queryClient.invalidateQueries({ queryKey: ['study'] });
       await queryClient.refetchQueries({ queryKey: ['study'] });
@@ -84,7 +84,7 @@ export default function StudyCreate() {
     onError: (error) => {
       console.error('생성 실패:', error);
       setIsToast(true);
-      setMessage('스터디 생성 요청에 실패했습니다.');
+      setMessage('스터디 생성에 실패했습니다.');
     },
   });
 
