@@ -180,7 +180,7 @@ export default function Comment({ studyId }: { studyId: string }) {
       (c) => String(c.commentId) === commentId,
     );
     setEditingCommentId(commentId);
-    setEditContent(comment?.content || ''); // 기존 댓글 내용을 설정
+    setEditContent(comment?.content || ''); 
     setIsEditing(!isEditing);
   };
 

@@ -125,6 +125,31 @@ export default function StudyRecruitPage({
   };
 
   const [activeTab, setActiveTab] = useState('info');
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      const commentSection = document.getElementById(
+        'tab-item-content-comment',
+      );
+      const infoSection = document.getElementById('tab-item-content-info');
+
+      if (commentSection && infoSection) {
+        const commentOffset = commentSection.offsetTop;
+        const infoOffset = infoSection.offsetTop;
+
+        if (scrollPosition >= commentOffset) {
+          setActiveTab('comment');
+        } else if (scrollPosition >= infoOffset) {
+          setActiveTab('info');
+        }
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const moveActiveTab = (tab: string) => {
     setActiveTab(tab);
     const tabItemContent = document.getElementById('tab-item-content-' + tab);
