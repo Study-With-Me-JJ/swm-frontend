@@ -5,7 +5,7 @@ import {
   deleteComment,
   editComment,
   getComment,
-  getReply,
+  getReply, 
 } from '@/lib/api/study/getComment';
 import { postReply } from '@/lib/api/study/postComment';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
@@ -76,6 +76,10 @@ export default function Comment({ studyId }: { studyId: string }) {
   const handleReplyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setReplyContent(e.target.value);
   };
+
+  const [isReplyEditing, setIsReplyEditing] = useState(false);
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editReplyContent, setEditReplyContent] = useState('');
 
   const { mutate: submitReply } = useMutation({
     mutationFn: () => postReply(studyId, parentId, replyContent),
@@ -170,15 +174,78 @@ export default function Comment({ studyId }: { studyId: string }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
-
+  
   const handleEditStart = (commentId: string) => {
+    const comment = comments?.data.data.find(
+      (c) => String(c.commentId) === commentId,
+    );
     setEditingCommentId(commentId);
+    setEditContent(comment?.content || ''); // 기존 댓글 내용을 설정
     setIsEditing(!isEditing);
+  };
+
+  const handleReplyEditStart = (replyId: string) => {
+    const reply = allReplies?.pages?.[0]?.flatMap(page => page.data.data)
+      .find(r => String(r.commentId) === replyId);
+    setEditingReplyId(replyId);
+    setEditReplyContent(reply?.content || '');
+    setIsReplyEditing(!isReplyEditing);
+  };
+
+  const { mutate: editCommentMutation } = useMutation({
+    mutationFn: ({
+      commentId,
+      content,
+    }: {
+      commentId: string;
+      content: string;
+    }) => editComment(commentId, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comment'] });
+      setEditingCommentId(null);
+      setEditContent('');
+      setIsEditing(false);
+      setIsToast(true);
+      setMessage('댓글이 수정되었습니다.');
+    },
+    onError: () => {
+      setIsToast(true);
+      setMessage('댓글 수정에 실패했습니다.');
+    },
+  });
+
+  const { mutate: editReplyMutation } = useMutation({
+    mutationFn: ({
+      replyId,
+      content,
+    }: {
+      replyId: string;
+      content: string;
+    }) => editComment(replyId, content),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['replies'] });
+      setEditingReplyId(null);
+      setEditReplyContent(''); 
+      setIsReplyEditing(false);
+      setIsToast(true);
+      setMessage('답글이 수정되었습니다.');
+    },
+    onError: () => {
+      setIsToast(true);
+      setMessage('답글 수정에 실패했습니다.');
+    },
+  });
+
+  const handleReplyEditSubmit = (replyId: string) => {
+    if (editingReplyId) {
+      editReplyMutation({ replyId, content: editReplyContent });
+    }
+    setIsReplyEditing(!isReplyEditing);
   };
 
   const handleEditSubmit = (commentId: string) => {
     if (editingCommentId) {
-      editComment(commentId, editContent);
+      editCommentMutation({ commentId, content: editContent });
     }
     setIsEditing(!isEditing);
   };
@@ -259,7 +326,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                     <textarea
                       value={editContent}
                       onChange={(e) => setEditContent(e.target.value)}
-                      className="h-[120px] w-full resize-none rounded-[8px] border border-gray-disabled p-[16px] text-sm text-gray-light"
+                      className="h-[120px] w-full resize-none rounded-[8px] border border-gray-disabled p-[16px] text-sm text-black placeholder:text-gray-light"
                       placeholder="댓글을 수정해주세요."
                     />
                     <div className="flex justify-end">
@@ -354,6 +421,11 @@ export default function Comment({ studyId }: { studyId: string }) {
                       {replyItem.nickname === user?.data?.nickname && (
                         <div className="flex items-center gap-[4px]">
                           <button
+                            onClick={() =>
+                              handleReplyEditStart(
+                                String(replyItem.commentId),
+                              )
+                            }
                             type="button"
                             className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
                           >
@@ -386,9 +458,33 @@ export default function Comment({ studyId }: { studyId: string }) {
                         </div>
                       )}
                     </div>
-                    <p className="font-regular text-[14px] text-black">
-                      {replyItem.content}
-                    </p>
+                    {isReplyEditing ? (
+                      <div>
+                        <textarea
+                          value={editReplyContent}
+                          onChange={(e) => setEditReplyContent(e.target.value)}
+                          className="h-[120px] w-full resize-none rounded-[8px] border border-gray-disabled p-[16px] text-sm text-black placeholder:text-gray-light"
+                          placeholder="댓글을 수정해주세요."
+                        />
+                        <div className="flex justify-end">
+                          <button
+                            onClick={() =>
+                              handleReplyEditSubmit(
+                                String(replyItem.commentId),
+                              )
+                            }
+                            type="button"
+                            className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+                          >
+                            수정 완료
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="font-regular text-[14px] text-black">
+                        {replyItem.content}
+                      </p>
+                    )}
                     <div className="flex items-center justify-between">
                       <p className="font-regular text-[14px] text-gray-light">
                         {formatDate(replyItem.createdAt)}
