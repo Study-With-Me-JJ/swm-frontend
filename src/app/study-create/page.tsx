@@ -23,13 +23,6 @@ interface PositionField {
   position: string;
   capacity: number | undefined;
 }
-interface ImageFile {
-  url: string;
-  file: File;
-  width: number;
-  height: number;
-  name: string;
-}
 
 export default function StudyCreate() {
   const router = useRouter();
@@ -43,6 +36,7 @@ export default function StudyCreate() {
       width: number;
       height: number;
       name: string;
+      file: File;
     }[]
   >([]);
 
@@ -136,9 +130,19 @@ export default function StudyCreate() {
   };
 
   const handleOrderEdit = (
-    newOrder: { url: string; width: number; height: number; name: string }[],
+    newOrder: {
+      url: string;
+      width: number;
+      height: number;
+      name: string;
+    }[],
   ) => {
-    setPreviewImages(newOrder);
+    const updatedOrder = newOrder.map((item) => ({
+      ...item,
+      file: previewImages.find((img) => img.url === item.url)?.file as File,
+    }));
+    setPreviewImages(updatedOrder);
+    methods.setValue('image', updatedOrder);
   };
 
   const handleImageEdit = (
@@ -162,6 +166,7 @@ export default function StudyCreate() {
       const imageUrl = URL.createObjectURL(file);
       const newImage = {
         url: imageUrl,
+        file: file,
         width: 200,
         height: 200,
         name: file.name,
@@ -169,6 +174,7 @@ export default function StudyCreate() {
       setPreviewImages((prev) =>
         prev.map((img) => (img.url === oldUrl ? newImage : img)),
       );
+      methods.setValue('image', [...previewImages, newImage]);
     }
   };
 
@@ -293,8 +299,13 @@ export default function StudyCreate() {
 
   const onSubmit = methods.handleSubmit(async (data) => {
     try {
+      const imagesToUpload = previewImages.filter((img) => img && img.file);
+
       const uploadedUrls = await Promise.all(
-        (data.image || []).map(async (img: ImageFile) => {
+        imagesToUpload.map(async (img) => {
+          if (!img.file) {
+            throw new Error('파일이 존재하지 않습니다.');
+          }
           return await uploadFileToPresignedUrl(img.file);
         }),
       );
@@ -316,6 +327,7 @@ export default function StudyCreate() {
         ),
       };
 
+      console.log('create studyData', studyData);
       mutate(studyData);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);

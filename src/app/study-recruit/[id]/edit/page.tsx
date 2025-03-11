@@ -11,28 +11,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import {
-  getCategoryList,
-  getPositionOptions,
-} from '@/types/api/study-recruit/study';
+import { getCategoryList } from '@/types/api/study-recruit/study';
 import { InputField } from '@/components/InputField';
 import ImageUploader from '@/components/study-create/ui/image-uploader';
-import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
 import Toast from '@/components/ui/Toast';
-
-interface PositionField {
-  id: string;
-  position: string;
-  capacity: number | undefined;
-}
-interface ImageFile {
-  url: string;
-  file: File;
-  width: number;
-  height: number;
-  name: string;
-}
 
 export default function StudyRecruitEditPage({
   params,
@@ -43,10 +26,6 @@ export default function StudyRecruitEditPage({
   const [isToast, setIsToast] = useState(false);
   const [message, setMessage] = useState('');
   const queryClient = useQueryClient();
-
-  const positionOptions = getPositionOptions();
-
-  const [openSelects, setOpenSelects] = useState<Record<string, boolean>>({});
 
   const [tagList, setTagList] = useState<string[]>([]);
   const category = getCategoryList();
@@ -60,41 +39,30 @@ export default function StudyRecruitEditPage({
     }[]
   >([]);
 
-  const [positionFields, setPositionFields] = useState<PositionField[]>([
-    { id: '1', position: 'ALL', capacity: undefined },
-  ]);
-
   const methods = useForm();
   const { watch } = methods;
 
-  const { data } = useQuery({
+  const { data: studyDetail } = useQuery({
     queryKey: ['studyDetail', params.id],
     queryFn: () => getStudyDetail(params.id as string),
   });
 
   useEffect(() => {
-    if (data) {
-      const tags = (data.data.getTagResponseList || [])
+    if (studyDetail) {
+      const tags = (studyDetail.data.getTagResponseList || [])
         .filter((tag: { tagId: number; name: string }) => tag && tag.name)
         .map((tag: { tagId: number; name: string }) =>
           tag.name.startsWith('#') ? tag.name : `#${tag.name}`,
         );
-      const imageUrlList = (data.data.getImageResponseList || []).map(
+      const sortedImages = [...(studyDetail.data.getImageResponseList || [])]
+        .filter(
+          (image: { imageId: number; imageUrl: string | null }) =>
+            image.imageUrl,
+        )
+        .sort((a, b) => a.imageId - b.imageId);
+      const imageUrlList = sortedImages.map(
         (image: { imageId: number; imageUrl: string | null }) =>
           image.imageUrl || '',
-      );
-      const positions = (
-        data.data.getRecruitmentPositionResponseList || []
-      ).map(
-        (pos: {
-          recruitmentPositionId: number;
-          title: string;
-          headcount: number;
-        }) => ({
-          id: pos.recruitmentPositionId.toString(),
-          position: pos.title,
-          capacity: pos.headcount,
-        }),
       );
 
       setTagList(tags);
@@ -106,19 +74,20 @@ export default function StudyRecruitEditPage({
           name: 'image',
         })),
       );
-      setPositionFields(positions);
 
       methods.reset({
-        title: data.data.title,
-        content: data.data.content,
-        openChatUrl: data.data.openChatUrl,
-        category: data.data.category,
-        tagList: tags.map((tag) => tag.slice(1)),
+        title: studyDetail.data.title,
+        content: studyDetail.data.content,
+        openChatUrl: studyDetail.data.openChatUrl,
+        category: studyDetail.data.category,
+        tagList: studyDetail.data.getTagResponseList.map(
+          (tag: { name: string }) => tag.name,
+        ),
         imageUrlList: imageUrlList,
-        createRecruitmentPositionRequestList: positions,
       });
+      console.log('original studyDetail:', studyDetail);
     }
-  }, [data]);
+  }, [studyDetail]);
 
   //필수입력값 유효성검사
   const formTitle = watch('title');
@@ -127,17 +96,7 @@ export default function StudyRecruitEditPage({
   const formCategory = watch('category');
 
   const isFormValid =
-    formTitle &&
-    formContent &&
-    formOpenChatUrl &&
-    formCategory &&
-    positionFields.length > 0 &&
-    positionFields.every(
-      (field: PositionField) =>
-        field.position !== 'ALL' &&
-        field.capacity !== undefined &&
-        field.capacity > 0,
-    );
+    formTitle && formContent && formOpenChatUrl && formCategory;
 
   const handleCategoryChange = (value: string) => {
     methods.setValue('category', value);
@@ -150,6 +109,12 @@ export default function StudyRecruitEditPage({
       if (file.size > 5 * 1024 * 1024) {
         setIsToast(true);
         setMessage('이미지 크기는 5MB를 초과할 수 없습니다.');
+        e.target.value = '';
+        return;
+      }
+      if (previewImages.length >= 10) {
+        setIsToast(true);
+        setMessage('이미지는 최대 10개까지만 추가할 수 있습니다.');
         e.target.value = '';
         return;
       }
@@ -189,6 +154,12 @@ export default function StudyRecruitEditPage({
         e.target.value = '';
         return;
       }
+      if (previewImages.length >= 10) {
+        setIsToast(true);
+        setMessage('이미지는 최대 10개까지만 추가할 수 있습니다.');
+        e.target.value = '';
+        return;
+      }
       const targetImage = previewImages.find((img) => img.url === oldUrl);
       if (targetImage) {
         URL.revokeObjectURL(targetImage.url);
@@ -204,50 +175,10 @@ export default function StudyRecruitEditPage({
       setPreviewImages((prev) =>
         prev.map((img) => (img.url === oldUrl ? newImage : img)),
       );
+
+      const currentFiles = methods.getValues('imageFiles') || [];
+      methods.setValue('imageFiles', [...currentFiles, file]);
     }
-  };
-
-  const handleToggle = (fieldId: string) => {
-    setOpenSelects((prev) => ({
-      ...prev,
-      [fieldId]: !prev[fieldId],
-    }));
-  };
-
-  const handlePositionChange = (
-    id: string,
-    type: 'position' | 'capacity',
-    value: string,
-  ) => {
-    const newPositions = positionFields.map((field) =>
-      field.id === id
-        ? {
-            ...field,
-            [type]: type === 'position' ? value || 'ALL' : parseInt(value) || 0,
-          }
-        : field,
-    );
-    setPositionFields(newPositions);
-    methods.setValue('positions', newPositions);
-  };
-
-  const handleAddPosition = () => {
-    setPositionFields((prev) => [
-      ...prev,
-      {
-        id: (prev.length + 1).toString(),
-        position: 'ALL',
-        capacity: undefined,
-      },
-    ]);
-  };
-
-  const handleDeletePosition = (id: string) => {
-    setPositionFields((prev) => prev.filter((field) => field.id !== id));
-    methods.setValue(
-      'positions',
-      positionFields.filter((field) => field.id !== id),
-    );
   };
 
   const [inputValue, setInputValue] = useState('');
@@ -342,7 +273,7 @@ export default function StudyRecruitEditPage({
       setMessage('스터디 수정이 완료되었습니다.');
 
       await queryClient.invalidateQueries({
-        queryKey: ['studyDetail', params.id],
+        queryKey: ['studyDetail', params.id, 'study'],
       });
       await queryClient.refetchQueries({
         queryKey: ['studyDetail', params.id],
@@ -363,26 +294,33 @@ export default function StudyRecruitEditPage({
 
   const onSubmit = methods.handleSubmit(async (data) => {
     try {
-      const newImages = previewImages.filter((img) =>
-        img.url.startsWith('blob:'),
-      );
-      const imageFiles = methods.getValues('imageFiles') || [];
+      const originalTags = studyDetail?.data?.getTagResponseList || [];
+      const currentTags = data.tagList || [];
+      const removedTagIds = originalTags
+        .filter((tag: { tagId: number }) => !currentTags.includes(tag.tagId))
+        .map((tag: { tagId: number }) => tag.tagId);
 
-      const uploadedUrls = await Promise.all(
-        imageFiles.map(async (file: File) => {
-          try {
-            const url = await uploadFileToPresignedUrl(file);
-            return url;
-          } catch (error) {
-            console.error('이미지 업로드 실패:', error);
-            return null;
-          }
-        }),
-      ).then((urls) => urls.filter(Boolean) as string[]);
+      // 새로 업로드된 이미지 처리
+      let uploadedImageUrls: string[] = [];
+      if (data.imageFiles && data.imageFiles.length > 0) {
+        uploadedImageUrls = await Promise.all(
+          data.imageFiles.map(async (file: File) => {
+            const presignedUrl = await uploadFileToPresignedUrl(file);
+            return presignedUrl;
+          }),
+        );
+      }
 
-      const existingUrls = previewImages
-        .map((img) => img.url)
-        .filter((url) => !url.startsWith('blob:'));
+      const allImageUrls = previewImages
+        .map((img) =>
+          img.url.startsWith('blob:') ? uploadedImageUrls.shift() : img.url,
+        )
+        .filter((url) => url) as string[];
+
+      const removedImageIds =
+        studyDetail?.data?.getImageResponseList
+          ?.filter((image) => Boolean(image?.imageUrl))
+          .map((image) => image.imageId) || [];
 
       const studyData = {
         title: data.title,
@@ -391,21 +329,16 @@ export default function StudyRecruitEditPage({
         category: data.category,
         saveTagRequest: {
           tagListToAdd: data.tagList || [],
-          tagIdListToRemove: [],
+          tagIdListToRemove: removedTagIds,
         },
         saveImageRequest: {
-          imageUrlListToAdd: [...existingUrls, ...uploadedUrls],
-          imageIdListToRemove: [],
+          imageUrlListToAdd: allImageUrls,
+          imageIdListToRemove: removedImageIds,
         },
-        // createRecruitmentPositionRequestList: positionFields
-        //   .filter((pos) => pos.position !== 'ALL')
-        //   .map((pos) => ({
-        //     title: pos.position,
-        //     headcount: Number(pos.capacity),
-        //   })),
       };
 
-      console.log('전송 데이터:', studyData); // 요청 데이터 확인
+      //   console.log('전송 데이터:', studyData);
+      //   console.log('이미지 요청 데이터:', studyData.saveImageRequest);
 
       mutate(studyData);
     } catch (error) {
@@ -513,42 +446,6 @@ export default function StudyRecruitEditPage({
                   handleImageEdit={handleImageEdit}
                 />
               </div>
-              <div className="flex flex-col gap-[12px]">
-                <h3 className="font-semibold">모집 직무</h3>
-                {[...positionFields].map(
-                  (field: PositionField, index: number) => (
-                    <PositionFieldGroup
-                      key={field.id}
-                      name="positions"
-                      type="default"
-                      value={field.position}
-                      capacity={field.capacity || 0}
-                      onChange={(value) =>
-                        handlePositionChange(
-                          field.id,
-                          'position',
-                          value as string,
-                        )
-                      }
-                      onCapacityChange={(value) =>
-                        handlePositionChange(
-                          field.id,
-                          'capacity',
-                          value.toString(),
-                        )
-                      }
-                      options={positionOptions}
-                      isOpen={openSelects[field.id] || false}
-                      onToggle={() => handleToggle(field.id)}
-                      isLastField={index === 0}
-                      onAdd={handleAddPosition}
-                      onDelete={() => handleDeletePosition(field.id)}
-                      id={field.id}
-                      disabled={true}
-                    />
-                  ),
-                )}
-              </div>
               <button
                 type="submit"
                 className={`mt-[10px] h-[60px] w-full rounded-[8px] px-4 py-2 text-[16px] font-semibold text-white ${
@@ -556,7 +453,7 @@ export default function StudyRecruitEditPage({
                 }`}
                 disabled={!isFormValid}
               >
-                스터디 생성 요청하기
+                스터디 수정하기
               </button>
             </div>
           </form>

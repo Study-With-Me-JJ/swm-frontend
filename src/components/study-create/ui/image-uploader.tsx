@@ -18,7 +18,7 @@ export default function ImageUploader({
     url: string;
     width: number;
     height: number;
-    name: string;
+    name: string; 
   }[];
   msg?: string;
   handleOrderEdit: (

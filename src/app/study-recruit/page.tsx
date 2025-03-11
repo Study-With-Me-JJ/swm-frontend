@@ -56,6 +56,7 @@ export default function StudyRecruit() {
   } = useInfiniteQuery({
     queryKey: [
       'study',
+      'studyDetail',
       selectSort,
       selectCategory,
       selectPosition,

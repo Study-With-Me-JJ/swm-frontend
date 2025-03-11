@@ -287,7 +287,7 @@ export default function StudyRecruitPage({
                     key={item.tagId}
                     className="h-[30px] min-w-[30px] rounded-[4px] border border-[#eee] bg-white px-[7px] py-[5px] text-sm font-medium text-[#a5a5a5]"
                   >
-                    #{item.name}
+                    #{item.name},
                   </span>
                 ))}
               </div>
@@ -303,7 +303,7 @@ export default function StudyRecruitPage({
                   <Swiper
                     className="my-swiper"
                     modules={[Navigation]}
-                    loop={true}
+                    loop={false}
                     spaceBetween={10}
                     slidesPerView="auto"
                     observer={true}
@@ -342,18 +342,42 @@ export default function StudyRecruitPage({
                       },
                     }}
                   >
-                    {data?.data.getImageResponseList.map((item) => (
-                      <SwiperSlide key={item.imageId}>
-                        <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-gray-disabled">
-                          <Image
-                            src={item.imageUrl || '/no-image.png'}
-                            alt={item.imageUrl || 'study-recruit-image'}
-                            fill
-                            className="object-cover"
-                          />
-                        </div>
-                      </SwiperSlide>
-                    ))}
+                    {/* {[...(data?.data.getImageResponseList || [])]
+                      .sort((a, b) => a.imageId - b.imageId)
+                      .map((item) => (
+                        <SwiperSlide key={item.imageId}>
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-gray-disabled">
+                            <Image
+                              src={item.imageUrl || '/no-image.png'}
+                              alt={item.imageUrl || 'study-recruit-image'}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </SwiperSlide>
+                      ))} */}
+                    {(() => {
+                      const imageList = data?.data.getImageResponseList || [];
+                      console.log('정렬 전 이미지 리스트:', imageList);
+
+                      const sortedImageList = [...imageList].sort(
+                        (a, b) => a.imageId - b.imageId,
+                      );
+                      console.log('정렬 후 이미지 리스트:', sortedImageList);
+
+                      return sortedImageList.map((item) => (
+                        <SwiperSlide key={item.imageId}>
+                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-gray-disabled">
+                            <Image
+                              src={item.imageUrl || '/no-image.png'}
+                              alt={`study-image-${item.imageId}`}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
+                        </SwiperSlide>
+                      ));
+                    })()}
                   </Swiper>
                 )}
               </div>
