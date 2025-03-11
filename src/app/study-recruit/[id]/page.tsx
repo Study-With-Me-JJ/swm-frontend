@@ -342,28 +342,14 @@ export default function StudyRecruitPage({
                       },
                     }}
                   >
-                    {/* {[...(data?.data.getImageResponseList || [])]
-                      .sort((a, b) => a.imageId - b.imageId)
-                      .map((item) => (
-                        <SwiperSlide key={item.imageId}>
-                          <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-gray-disabled">
-                            <Image
-                              src={item.imageUrl || '/no-image.png'}
-                              alt={item.imageUrl || 'study-recruit-image'}
-                              fill
-                              className="object-cover"
-                            />
-                          </div>
-                        </SwiperSlide>
-                      ))} */}
                     {(() => {
                       const imageList = data?.data.getImageResponseList || [];
-                      console.log('정렬 전 이미지 리스트:', imageList);
+                      // console.log('정렬 전 이미지 리스트:', imageList);
 
                       const sortedImageList = [...imageList].sort(
                         (a, b) => a.imageId - b.imageId,
                       );
-                      console.log('정렬 후 이미지 리스트:', sortedImageList);
+                      // console.log('정렬 후 이미지 리스트:', sortedImageList);
 
                       return sortedImageList.map((item) => (
                         <SwiperSlide key={item.imageId}>
