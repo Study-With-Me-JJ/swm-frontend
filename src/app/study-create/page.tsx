@@ -327,7 +327,7 @@ export default function StudyCreate() {
         ),
       };
 
-      console.log('create studyData', studyData);
+      // console.log('create studyData', studyData);
       mutate(studyData);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);

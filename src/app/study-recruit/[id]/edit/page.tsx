@@ -284,7 +284,6 @@ export default function StudyRecruitEditPage({
       }, 500);
     },
     onError: (error: any) => {
-      console.error('상세 에러:', error.response?.data); // 서버 에러 메시지 확인
       setIsToast(true);
       setMessage(
         error.response?.data?.message || '스터디 수정에 실패했습니다.',
@@ -300,7 +299,6 @@ export default function StudyRecruitEditPage({
         .filter((tag: { tagId: number }) => !currentTags.includes(tag.tagId))
         .map((tag: { tagId: number }) => tag.tagId);
 
-      // 새로 업로드된 이미지 처리
       let uploadedImageUrls: string[] = [];
       if (data.imageFiles && data.imageFiles.length > 0) {
         uploadedImageUrls = await Promise.all(

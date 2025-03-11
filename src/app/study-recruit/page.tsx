@@ -148,8 +148,7 @@ export default function StudyRecruit() {
   };
 
   const handlePositionChange = (value: string | string[]) => {
-    if (Array.isArray(value)) {
-      // value가 빈 배열이거나 'ALL'만 포함된 경우
+    if (Array.isArray(value)) { 
       if (value.length === 0 || value.includes('ALL')) {
         setSelectPosition('ALL');
         return;
