@@ -5,7 +5,7 @@ import {
   deleteComment,
   editComment,
   getComment,
-  getReply, 
+  getReply,
 } from '@/lib/api/study/getComment';
 import { postReply } from '@/lib/api/study/postComment';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
@@ -16,6 +16,7 @@ import { useRouter } from 'next/navigation';
 import { Suspense, useState } from 'react';
 import CommentForm from './CommentForm';
 import { ApiReplyResponse, Reply } from '@/types/api/study-recruit/getReply';
+import LoadingBar from '@/components/ui/Loadingbar';
 import Toast from '@/components/ui/Toast';
 
 export default function Comment({ studyId }: { studyId: string }) {
@@ -132,18 +133,37 @@ export default function Comment({ studyId }: { studyId: string }) {
   };
 
   const [visibleReplyCounts, setVisibleReplyCounts] = useState<{
-    [key: string]: number;
+    [key: string]: { count: number; expanded: boolean };
   }>({});
 
   const getVisibleReplies = (commentId: string, replies: Reply[]) => {
-    const visibleCount = visibleReplyCounts[commentId] || 3;
-    return replies.slice(0, visibleCount);
+    const visibleState = visibleReplyCounts[commentId] || {
+      count: 1,
+      expanded: false,
+    };
+    return replies.slice(
+      0,
+      visibleState.expanded ? replies.length : visibleState.count,
+    );
   };
 
-  const handleLoadMore = (commentId: string) => {
+  const handleLoadMore = (commentId: string, replies: Reply[]) => {
     setVisibleReplyCounts((prev) => ({
       ...prev,
-      [commentId]: (prev[commentId] || 3) + 3,
+      [commentId]: {
+        count: replies.length,
+        expanded: true,
+      },
+    }));
+  };
+
+  const handleLoadLess = (commentId: string) => {
+    setVisibleReplyCounts((prev) => ({
+      ...prev,
+      [commentId]: {
+        count: 1,
+        expanded: false,
+      },
     }));
   };
 
@@ -174,19 +194,20 @@ export default function Comment({ studyId }: { studyId: string }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editingCommentId, setEditingCommentId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
-  
+
   const handleEditStart = (commentId: string) => {
     const comment = comments?.data.data.find(
       (c) => String(c.commentId) === commentId,
     );
     setEditingCommentId(commentId);
-    setEditContent(comment?.content || ''); 
+    setEditContent(comment?.content || '');
     setIsEditing(!isEditing);
   };
 
   const handleReplyEditStart = (replyId: string) => {
-    const reply = allReplies?.pages?.[0]?.flatMap(page => page.data.data)
-      .find(r => String(r.commentId) === replyId);
+    const reply = allReplies?.pages?.[0]
+      ?.flatMap((page) => page.data.data)
+      .find((r) => String(r.commentId) === replyId);
     setEditingReplyId(replyId);
     setEditReplyContent(reply?.content || '');
     setIsReplyEditing(!isReplyEditing);
@@ -215,17 +236,12 @@ export default function Comment({ studyId }: { studyId: string }) {
   });
 
   const { mutate: editReplyMutation } = useMutation({
-    mutationFn: ({
-      replyId,
-      content,
-    }: {
-      replyId: string;
-      content: string;
-    }) => editComment(replyId, content),
+    mutationFn: ({ replyId, content }: { replyId: string; content: string }) =>
+      editComment(replyId, content),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['replies'] });
       setEditingReplyId(null);
-      setEditReplyContent(''); 
+      setEditReplyContent('');
       setIsReplyEditing(false);
       setIsToast(true);
       setMessage('답글이 수정되었습니다.');
@@ -255,7 +271,7 @@ export default function Comment({ studyId }: { studyId: string }) {
   }
 
   return (
-    <Suspense fallback={<div>로딩중...</div>}>
+    <Suspense fallback={<LoadingBar />}>
       <div>
         {comments?.data.data.map((comment, index) => {
           const commentReplies = getRepliesForComment(
@@ -422,9 +438,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                         <div className="flex items-center gap-[4px]">
                           <button
                             onClick={() =>
-                              handleReplyEditStart(
-                                String(replyItem.commentId),
-                              )
+                              handleReplyEditStart(String(replyItem.commentId))
                             }
                             type="button"
                             className="flex h-[33px] w-[63px] cursor-pointer items-center justify-center gap-[2px] rounded-[4px] border border-gray-disabled bg-[#f9f9f9] text-[14px] font-medium text-[#6e6e6e]"
@@ -469,9 +483,7 @@ export default function Comment({ studyId }: { studyId: string }) {
                         <div className="flex justify-end">
                           <button
                             onClick={() =>
-                              handleReplyEditSubmit(
-                                String(replyItem.commentId),
-                              )
+                              handleReplyEditSubmit(String(replyItem.commentId))
                             }
                             type="button"
                             className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
@@ -507,19 +519,34 @@ export default function Comment({ studyId }: { studyId: string }) {
                   </div>
                 ))}
               </div>
-              {hasMoreReplies && (
+              {(commentReplies.length > 1 ||
+                visibleReplyCounts[String(comment.commentId)]?.expanded) && (
                 <div className="px-[16px] py-[27px]">
                   <button
-                    onClick={() => handleLoadMore(String(comment.commentId))}
+                    onClick={() =>
+                      visibleReplyCounts[String(comment.commentId)]?.expanded
+                        ? handleLoadLess(String(comment.commentId))
+                        : handleLoadMore(
+                            String(comment.commentId),
+                            commentReplies,
+                          )
+                    }
                     type="button"
                     className="flex cursor-pointer items-center gap-[4px] text-[14px] font-semibold text-[#828282]"
                   >
-                    답글 3개 더보기
+                    {visibleReplyCounts[String(comment.commentId)]?.expanded
+                      ? '답글 접기'
+                      : `답글 ${commentReplies.length - 1}개 더보기`}{' '}
                     <Image
                       src="/icons/icon_select_arrow.svg"
                       alt="arrow"
                       width={24}
                       height={24}
+                      className={
+                        visibleReplyCounts[String(comment.commentId)]?.expanded
+                          ? 'rotate-180'
+                          : ''
+                      }
                     />
                   </button>
                 </div>
