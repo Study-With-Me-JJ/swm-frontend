@@ -287,7 +287,7 @@ export default function StudyRecruitPage({
                     key={item.tagId}
                     className="h-[30px] min-w-[30px] rounded-[4px] border border-[#eee] bg-white px-[7px] py-[5px] text-sm font-medium text-[#a5a5a5]"
                   >
-                    #{item.name},
+                    #{item.name}
                   </span>
                 ))}
               </div>
