@@ -19,7 +19,13 @@ import { ApiReplyResponse, Reply } from '@/types/api/study-recruit/getReply';
 import LoadingBar from '@/components/ui/Loadingbar';
 import Toast from '@/components/ui/Toast';
 
-export default function Comment({ studyId }: { studyId: string }) {
+export default function Comment({
+  studyId,
+  postAuthorNickname,
+}: {
+  studyId: string;
+  postAuthorNickname: string | undefined;
+}) {
   const [page, setPage] = useState(0);
   const handlePageChange = (newPage: number) => {
     const currentPosition = window.scrollY;
@@ -366,6 +372,19 @@ export default function Comment({ studyId }: { studyId: string }) {
                   <p className="font-regular text-[14px] text-gray-light">
                     {formatDate(comment.createdAt)}
                   </p>
+                  {user?.data &&
+                    comment.nickname !== user?.data?.nickname &&
+                    user?.data?.nickname === postAuthorNickname && (
+                      <button
+                        onClick={() =>
+                          handleReplyClick(String(comment.commentId))
+                        }
+                        type="button"
+                        className="h-[33px] w-[57px] cursor-pointer rounded-[4px] border border-[#e0e0e0] bg-[#f9f9f9] text-[14px] font-semibold text-[#626262]"
+                      >
+                        답글
+                      </button>
+                    )}
                   {/* <button className="flex items-center gap-[4px]">
                     <Image
                       src="/icons/Favorite.svg"
@@ -378,20 +397,14 @@ export default function Comment({ studyId }: { studyId: string }) {
                     </p>  
                   </button> */}
                 </div>
-                <div className="flex justify-start">
-                  <button
-                    onClick={() => handleReplyClick(String(comment.commentId))}
-                    type="button"
-                    className="h-[33px] w-[57px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
-                  >
-                    답글
-                  </button>
-                </div>
               </div>
               {/* 답글 입력 영역 */}
               {showReplyId === String(comment.commentId) && (
-                <div className="relative flex flex-col gap-[16px] py-[24px] pl-[48px] before:absolute before:left-[18px] before:top-[24px] before:h-[10px] before:w-[10px] before:border-b before:border-l before:border-link-default">
-                  <form onSubmit={() => submitReply()}>
+                <div className="relative border-b border-gray-disabled py-[24px] pl-[48px] before:absolute before:left-[18px] before:top-[24px] before:h-[10px] before:w-[10px] before:border-b before:border-l before:border-link-default">
+                  <form
+                    onSubmit={() => submitReply()}
+                    className="flex flex-col gap-[10px]"
+                  >
                     <div>
                       <textarea
                         value={replyContent}
@@ -501,6 +514,18 @@ export default function Comment({ studyId }: { studyId: string }) {
                       <p className="font-regular text-[14px] text-gray-light">
                         {formatDate(replyItem.createdAt)}
                       </p>
+                      {user?.data &&
+                        replyItem.nickname !== user?.data?.nickname && (
+                          <button
+                            onClick={() =>
+                              handleReplyClick(String(replyItem.commentId))
+                            }
+                            type="button"
+                            className="h-[33px] w-[57px] cursor-pointer rounded-[4px] border border-[#e0e0e0] bg-[#f9f9f9] text-[14px] font-semibold text-[#626262]"
+                          >
+                            답글
+                          </button>
+                        )}
                       {/* <button
                         type="button"
                         className="flex items-center gap-[4px]"
