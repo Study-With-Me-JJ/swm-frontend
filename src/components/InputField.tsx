@@ -17,6 +17,7 @@ interface InputFieldProps {
   onButtonClick?: () => void;
   disabled?: boolean;
   onAuthCodeCheck?: () => void;
+  className?: string;
 }
 
 export function InputField({
@@ -30,6 +31,7 @@ export function InputField({
   onButtonClick,
   disabled,
   onAuthCodeCheck,
+  className = '',
 }: InputFieldProps) {
   const {
     control,
@@ -82,7 +84,7 @@ export function InputField({
 
   return (
     <div className="flex flex-col gap-2">
-      {label && <h3 className="font-medium">{label}</h3>}
+      {label && <h3 className={`${className} font-medium`}>{label}</h3>}
       <div className="flex gap-2">
         <Controller
           name={name}
@@ -111,7 +113,7 @@ export function InputField({
         {buttonText && onButtonClick && (
           <Button
             type="button"
-            className="w-36 flex-shrink-0 bg-blue-default"
+            className="bg-blue-default w-36 flex-shrink-0"
             onClick={handleButtonClick}
             disabled={disabled}
           >
@@ -130,7 +132,7 @@ export function InputField({
         </Button>
       )}
       {helperText && !errors[name] && (
-        <p className="whitespace-pre-line text-xs text-blue-default">
+        <p className="text-blue-default whitespace-pre-line text-xs">
           {helperText}
         </p>
       )}
