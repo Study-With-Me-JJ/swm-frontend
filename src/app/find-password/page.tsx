@@ -40,6 +40,7 @@ export default function FindPassword() {
     setValue,
     setError,
     formState: { errors, isValid, isSubmitting },
+    getValues,
   } = methods;
 
   const router = useRouter();
@@ -104,12 +105,9 @@ export default function FindPassword() {
   };
 
   return (
-    <div
-      className="flex items-center justify-center"
-      style={{ height: 'calc(100vh - 70px)' }}
-    >
+    <div className="flex h-[calc(100vh-70px)] items-center justify-center">
       <FormProvider {...methods}>
-        <form className="mx-5 flex w-[432px] flex-col gap-10">
+        <form className="mx-5 -mt-[70px] flex w-[432px] flex-col gap-10">
           <h1 className="text-2xl font-bold">비밀번호 찾기</h1>
 
           <section className="flex flex-col gap-5">
@@ -150,7 +148,11 @@ export default function FindPassword() {
             <Button
               className="bg-blue-default"
               type="button"
-              onClick={() => router.push('/find-password/reset')}
+              onClick={() =>
+                router.push(
+                  `/find-password/reset?email=${encodeURIComponent(getValues('joinEmail'))}`,
+                )
+              }
               disabled={!isValid || isSubmitting || !authCodeVerified}
             >
               확인
