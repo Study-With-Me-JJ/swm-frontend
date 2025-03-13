@@ -15,31 +15,32 @@ interface InputFieldProps {
   maxLength?: number;
   buttonText?: string;
   onButtonClick?: () => void;
-  disabled?: boolean;
+  buttonDisabled?: boolean;
+  inputDisabled?: boolean;
   onAuthCodeCheck?: () => void;
 }
 
-export function InputField({
-  name,
-  label,
-  type,
-  placeholder,
-  helperText,
-  maxLength,
-  buttonText,
-  onButtonClick,
-  disabled,
-  onAuthCodeCheck,
-}: InputFieldProps) {
+export function InputField({ ...props }: InputFieldProps) {
   const {
     control,
     formState: { errors },
     getValues,
   } = useFormContext();
+  const {
+    name,
+    label,
+    type,
+    placeholder,
+    helperText,
+    maxLength,
+    buttonText,
+    onButtonClick,
+    buttonDisabled,
+    inputDisabled,
+    onAuthCodeCheck,
+  } = props;
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(600);
-  const [isAuthCodeInputEnabled, setIsAuthCodeInputEnabled] =
-    useState<boolean>(false);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -64,10 +65,9 @@ export function InputField({
     if (onButtonClick) {
       onButtonClick();
     }
-    if (name === 'authCode') {
+    if (buttonText === '인증번호 받기' && !inputDisabled) {
       setIsCountdownActive(true);
       setCountdown(600);
-      setIsAuthCodeInputEnabled(true);
     }
   };
 
@@ -79,6 +79,17 @@ export function InputField({
       }
     }
   };
+
+  useEffect(() => {
+    if (name === 'findPasswordAuthCode') {
+      if (!inputDisabled) {
+        setIsCountdownActive(true);
+        setCountdown(600);
+      } else {
+        setIsCountdownActive(false);
+      }
+    }
+  }, [name, inputDisabled]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -96,7 +107,7 @@ export function InputField({
                 type={type}
                 placeholder={placeholder}
                 maxLength={maxLength}
-                disabled={name === 'authCode' && !isAuthCodeInputEnabled}
+                disabled={inputDisabled}
                 className={`flex-grow disabled:cursor-default ${
                   errors[name]
                     ? 'border-red-error'
@@ -113,9 +124,13 @@ export function InputField({
             type="button"
             className="w-36 flex-shrink-0 bg-blue-default"
             onClick={handleButtonClick}
-            disabled={disabled}
+            disabled={buttonDisabled}
           >
-            {buttonText}
+            {name === 'findPasswordAuthCode'
+              ? isCountdownActive
+                ? `${buttonText} (${formatTime(countdown)})`
+                : buttonText
+              : buttonText}
           </Button>
         )}
       </div>
