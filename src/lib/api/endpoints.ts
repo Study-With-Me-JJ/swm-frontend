@@ -20,6 +20,10 @@ export const API_ENDPOINTS = {
     CHECK_EMAIL: '/api/v1/user/login-id/validation',
     SEND_AUTH_CODE: '/api/v1/user/login-id/auth-codes',
     CHECK_AUTH_CODE: '/api/v1/user/login-id/auth-codes/verification',
+    FIND_ID: '/api/v1/user/login-id/retrieval',
+    SEND_PASSWORD_AUTH_CODE: '/api/v1/user/password/auth-codes',
+    CHECK_PASSWORD_AUTH_CODE: '/api/v1/user/password/auth-codes/verification',
+    RESET_PASSWORD: '/api/v1/user/password',
   },
   AUTH: {
     LOGIN: '/api/auth/login',
