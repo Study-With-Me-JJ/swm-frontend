@@ -9,10 +9,13 @@ export const sendPasswordAuthCode = async (loginId: string) => {
     },
   );
 
-    return response.data;
+  return response.data;
 };
 
-export const checkPasswordAuthCode = async (loginId: string, authCode: string) => {
+export const checkPasswordAuthCode = async (
+  loginId: string,
+  authCode: string,
+) => {
   const response = await axiosInstance.post(
     API_ENDPOINTS.USER.CHECK_PASSWORD_AUTH_CODE,
     {
@@ -25,7 +28,7 @@ export const checkPasswordAuthCode = async (loginId: string, authCode: string) =
 };
 
 export const resetPassword = async (loginId: string, newPassword: string) => {
-  const response = await axiosInstance.post(
+  const response = await axiosInstance.patch(
     API_ENDPOINTS.USER.RESET_PASSWORD,
     {
       loginId: loginId,
@@ -35,4 +38,3 @@ export const resetPassword = async (loginId: string, newPassword: string) => {
 
   return response.data;
 };
-
