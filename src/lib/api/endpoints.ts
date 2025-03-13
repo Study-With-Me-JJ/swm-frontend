@@ -24,6 +24,10 @@ export const API_ENDPOINTS = {
       `/api/v1/study/${studyId}/comment/${parentId}`, //답글생성
     EDIT_POSITION: (recruitmentPositionId: string) =>
       `/api/v1/study/recruitment-position/${recruitmentPositionId}`, //스터디모집 포지션수정
+    BOOKMARK: (studyId: string) => `/api/v1/study/${studyId}/bookmark`, //스터디 북마크
+    DELETE_BOOKMARK: (bookmarkId: string) =>
+      `/api/v1/study/bookmark/${bookmarkId}`, //스터디 북마크 취소
+    LIKE: (studyId: string) => `/api/v1/study/${studyId}/like`, //스터디 좋아요 추가삭제
   },
   FILES: {
     PRESIGNED_URL: '/api/v1/files/presigned-url',

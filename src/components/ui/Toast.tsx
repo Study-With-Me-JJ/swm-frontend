@@ -21,7 +21,7 @@ export default function Toast({
     <>
       <div
         className={
-          'fixed bottom-0 left-0 right-0 h-[150px] w-full min-w-[300px] animate-slide-up-fade text-center'
+          'z-100 fixed bottom-0 left-0 right-0 h-[150px] w-full min-w-[300px] animate-slide-up-fade text-center'
         }
       >
         <div className="inline-block">

@@ -3,6 +3,8 @@
 import { getUserInfo } from '@/lib/api/auth';
 import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import { deleteStudy } from '@/lib/api/study/getStudyDetail';
+import { addStudyBookmark } from '@/lib/api/study/postStudy';
+import { deleteStudyBookmark } from '@/lib/api/study/postStudy';
 import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -38,28 +40,55 @@ export default function StudyRecruitPage({
     queryFn: () => getStudyDetail(params.id),
   });
 
-  // console.log('detail data', data);
+  console.log('detail data', data);
 
   const router = useRouter();
 
-  const [isBookmark, setIsBookmark] = useState(false);
+  console.log('studyBookmarkId:', data?.data?.studyBookmarkId);
+
+  const isBookmark = data?.data?.studyBookmarkId ? true : false;
+  console.log('isBookmark status:', isBookmark);
+
   const [isToast, setIsToast] = useState(false);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
-  const handleBookmark = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
 
-    if (timerId) {
-      clearTimeout(timerId);
-    }
+  const queryClient = useQueryClient();
 
-    setIsBookmark(!isBookmark);
-    setIsToast(true);
+  const bookmarkMutation = useMutation({
+    mutationFn: async () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
 
-    const newTimerId = setTimeout(() => {
-      setIsToast(false);
-    }, 2000);
-    setTimerId(newTimerId);
+      const newTimerId = setTimeout(() => {
+        setIsToast(false);
+      }, 2000);
+      setTimerId(newTimerId);
+
+      if (isBookmark) {
+        const bookmarkId = String(data?.data?.studyBookmarkId);
+        if (!bookmarkId) throw new Error('Bookmark ID not found');
+        await deleteStudyBookmark(bookmarkId);
+        // setIsBookmark(false);
+        // setIsToast(true);
+      } else {
+        await addStudyBookmark(params.id);
+        // setIsBookmark(true);
+        // setIsToast(true);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['studyDetail', params.id] });
+      queryClient.invalidateQueries({ queryKey: ['bookmarkList'] });
+      setIsToast(true);
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+  const handleBookmarkClick = () => {
+    bookmarkMutation.mutate();
   };
 
   const positionList = getPositionOptions();
@@ -72,7 +101,6 @@ export default function StudyRecruitPage({
     setIsEditModalOpen(!isEditModalOpen);
   };
 
-  const queryClient = useQueryClient();
   const handleDeleteStudy = async () => {
     try {
       await deleteStudy(params.id);
@@ -246,9 +274,8 @@ export default function StudyRecruitPage({
               </div>
               <div className="flex items-center">
                 <button
-                  onClick={(e) => {
-                    handleBookmark(e);
-                  }}
+                  type="button"
+                  onClick={handleBookmarkClick}
                   className="relative z-10"
                 >
                   <BookMarkIcon
@@ -344,6 +371,7 @@ export default function StudyRecruitPage({
                 likeCount={data?.data.likeCount || 0}
                 commentCount={data?.data.commentCount || 0}
                 viewCount={data?.data.viewCount || 0}
+                studyId={params.id}
               />
             </div>
             <div className="w-full max-w-[860px] overflow-hidden">
@@ -429,7 +457,7 @@ export default function StudyRecruitPage({
             </div>
           </div>
           <div className="tab-container">
-            <div className="sticky top-[0px] z-10 flex h-[50px] items-center bg-white">
+            <div className="z-5 sticky top-[0px] flex h-[50px] items-center bg-white">
               <div
                 className={`tab-item-title ${activeTab === 'info' ? 'tab-item-title-active border-link-default' : 'border-gray-disabled'} h-[50px] min-w-[100px] border-b-2 px-[18px] py-[15px]`}
               >

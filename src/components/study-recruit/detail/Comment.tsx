@@ -582,74 +582,75 @@ export default function Comment({
       </div>
       <CommentForm studyId={studyId} />
       {isToast && <Toast isToast={isToast} message={message} />}
-
-      <div className="mt-[24px] flex items-center justify-center gap-[10px]">
-        <button
-          onClick={() => handlePageChange(0)}
-          disabled={page === 0}
-          className="cursor-pointer"
-        >
-          <Image
-            src="/icons/AngleLeft2.svg"
-            alt="arrow"
-            width={14}
-            height={14}
-            className="rotate-180 transform"
-          />
-        </button>
-        <button
-          onClick={() => handlePageChange(page - 1)}
-          disabled={page === 0}
-          className="cursor-pointer"
-        >
-          <Image
-            src="/icons/AngleLeft.svg"
-            alt="arrow"
-            width={14}
-            height={14}
-            className="rotate-180 transform"
-          />
-        </button>
-        {[
-          ...Array(Math.min(Math.ceil(comments?.data?.totalPages ?? 1), 5)),
-        ].map((_, i) => (
+      {comments?.data?.data && comments?.data?.data?.length > 0 && (
+        <div className="mt-[24px] flex items-center justify-center gap-[10px]">
           <button
-            key={i}
-            onClick={() => handlePageChange(i)}
-            className={`text-[14px] ${
-              page === i ? 'font-bold text-black' : 'text-[#828282]'
-            }`}
+            onClick={() => handlePageChange(0)}
+            disabled={page === 0}
+            className="cursor-pointer"
           >
-            {i + 1}
+            <Image
+              src="/icons/AngleLeft2.svg"
+              alt="arrow"
+              width={14}
+              height={14}
+              className="rotate-180 transform"
+            />
           </button>
-        ))}
-        <button
-          onClick={() => handlePageChange(page + 1)}
-          disabled={page >= Math.ceil((comments?.data?.totalPages ?? 1) - 1)}
-          className="cursor-pointer"
-        >
-          <Image
-            src="/icons/AngleLeft.svg"
-            alt="arrow"
-            width={14}
-            height={14}
-          />
-        </button>
-        <button
-          onClick={() =>
-            setPage(Math.ceil((comments?.data?.totalPages ?? 1) - 1))
-          }
-          disabled={page >= Math.ceil((comments?.data?.totalPages ?? 1) - 1)}
-          className="cursor-pointer"
-        >
-          <Image
-            src="/icons/AngleLeft2.svg"
-            alt="arrow"
-            width={14}
-            height={14}
-          />
-        </button>
-      </div>
+          <button
+            onClick={() => handlePageChange(page - 1)}
+            disabled={page === 0}
+            className="cursor-pointer"
+          >
+            <Image
+              src="/icons/AngleLeft.svg"
+              alt="arrow"
+              width={14}
+              height={14}
+              className="rotate-180 transform"
+            />
+          </button>
+          {[
+            ...Array(Math.min(Math.ceil(comments?.data?.totalPages ?? 1), 5)),
+          ].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => handlePageChange(i)}
+              className={`text-[14px] ${
+                page === i ? 'font-bold text-black' : 'text-[#828282]'
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page >= Math.ceil((comments?.data?.totalPages ?? 1) - 1)}
+            className="cursor-pointer"
+          >
+            <Image
+              src="/icons/AngleLeft.svg"
+              alt="arrow"
+              width={14}
+              height={14}
+            />
+          </button>
+          <button
+            onClick={() =>
+              setPage(Math.ceil((comments?.data?.totalPages ?? 1) - 1))
+            }
+            disabled={page >= Math.ceil((comments?.data?.totalPages ?? 1) - 1)}
+            className="cursor-pointer"
+          >
+            <Image
+              src="/icons/AngleLeft2.svg"
+              alt="arrow"
+              width={14}
+              height={14}
+            />
+          </button>
+        </div>
+      )}
     </Suspense>
   );
 }
