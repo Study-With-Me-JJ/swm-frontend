@@ -20,7 +20,8 @@ const buttonVariants = cva(
       },
       size: {
         default: 'w-full max-w-[432px] h-[60px] p-[18px] rounded-lg',
-        sm: 'w-36 h-[60px] p-[18px] rounded-lg',
+        sm: 'w-[120px] h-[40px] p-[18px] rounded-sm text-sm',
+        md: 'w-[250px] h-[40px] p-[18px] rounded-sm text-sm',
         lg: 'rounded-lg px-8',
         icon: 'h-10 w-10',
       },
