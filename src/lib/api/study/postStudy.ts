@@ -31,8 +31,8 @@ export const addStudyBookmark = async (
         },
       },
     );
-    console.log('북마크추가', res);
-    return res.data;
+    console.log('북마크추가', res.data.data, url);
+    return res.data.data;
   } catch (error) {
     console.error('북마크추가 오류:', error);
     throw error;
