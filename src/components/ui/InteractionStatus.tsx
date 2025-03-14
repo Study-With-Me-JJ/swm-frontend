@@ -77,7 +77,7 @@ export default function InteractionStatus({
   const handleLikeClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    likeMutation.mutate(); 
+    likeMutation.mutate();
   };
 
   return (
@@ -122,7 +122,7 @@ export default function InteractionStatus({
           />
           <span
             className={`text-semibold text-sm ${
-             likeStatus ? 'text-link-default' : 'text-gray-default'
+              likeStatus ? 'text-link-default' : 'text-gray-default'
             }`}
           >
             {likeCount}
