@@ -92,3 +92,21 @@ export const addStudyLike = async (studyId: string) => {
     throw error;
   }
 };
+
+//스터디 좋아요 삭제
+export const deleteStudyLike = async (studyId: string) => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const url = `${baseUrl}${API_ENDPOINTS.STUDY.LIKE(studyId)}`;
+    const res = await axios.delete(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    });
+    console.log('좋아요취소', res);
+    return res.data;
+  } catch (error) {
+    console.error('좋아요취소 오류:', error);
+    throw error;
+  }
+};

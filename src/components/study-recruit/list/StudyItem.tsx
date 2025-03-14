@@ -71,11 +71,7 @@ export default function StudyItem({ data }: { data: Study }) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['study'],
-      });
-      await queryClient.invalidateQueries({
-        queryKey: ['studyDetail', studyId],
-        refetchActive: true,
-      });
+      }); 
 
       setIsToast(true);
     },
@@ -163,6 +159,7 @@ export default function StudyItem({ data }: { data: Study }) {
               commentCount={commentCount}
               viewCount={viewCount}
               studyId={data.studyId.toString()}
+              likeStatus={data.liked}
             />
           </div>
         </div>

@@ -36,7 +36,7 @@ export default function StudyRecruitPage({
   params: { id: string };
 }) {
   const { data } = useQuery({
-    queryKey: ['studyDetail', params.id],
+    queryKey: ['study', 'studyDetail', params.id],
     queryFn: async () => {
       try {
         const response = await getStudyDetail(params.id);
@@ -54,7 +54,7 @@ export default function StudyRecruitPage({
     },
   });
 
-  // console.log('detail data', data);
+  console.log('detail data', data);
 
   const router = useRouter();
 
@@ -420,6 +420,7 @@ export default function StudyRecruitPage({
                 commentCount={data?.data?.commentCount || 0}
                 viewCount={data?.data?.viewCount || 0}
                 studyId={params.id}
+                likeStatus={data?.data?.likeStatus || false}
               />
             </div>
             <div className="w-full max-w-[860px] overflow-hidden">

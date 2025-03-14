@@ -1,9 +1,11 @@
 'use client';
 
-// import { deleteStudyLike } from '@/lib/api/study/postStudy';
+import { deleteStudyLike } from '@/lib/api/study/postStudy';
 import { addStudyLike } from '@/lib/api/study/postStudy';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useState } from 'react';
+import Toast from './Toast';
 import { InteractionStatusProps } from '@/types/api/interaction';
 
 export default function InteractionStatus({
@@ -11,21 +13,72 @@ export default function InteractionStatus({
   commentCount,
   viewCount,
   studyId,
+  likeStatus,
 }: InteractionStatusProps) {
-  const [isLike, setIsLike] = useState(false);
-  const [likeCountValue, setLikeCountValue] = useState(likeCount);
+  const isLike = likeStatus;
+  const [localLikeCount, setLocalLikeCount] = useState(likeCount);
+  const [localLikeStatus, setLocalLikeStatus] = useState(likeStatus);
+  const [isToast, setIsToast] = useState(false);
+  const [isToastMessage, setIsToastMessage] = useState('');
+  const [isToastActive, setIsToastActive] = useState(false);
+  const [isToastIcon, setIsToastIcon] = useState('');
+  const [isToastUrl, setIsToastUrl] = useState('');
+  const [isToastUrlText, setIsToastUrlText] = useState('');
+  const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
+
+  const queryClient = useQueryClient();
+
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+
+      const newTimerId = setTimeout(() => {
+        setIsToast(false);
+      }, 2000);
+      setTimerId(newTimerId);
+
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setIsToast(true);
+        setIsToastMessage('로그인 후 이용해주세요.');
+        setIsToastActive(false);
+        setIsToastIcon('');
+        setIsToastUrl('/login');
+        setIsToastUrlText('로그인하러 가기');
+        return;
+      }
+
+      setLocalLikeStatus(!localLikeStatus);
+      setLocalLikeCount((prev) => (localLikeStatus ? prev - 1 : prev + 1));
+
+      if (localLikeStatus) {
+        await deleteStudyLike(studyId);
+        setIsToast(true);
+        setIsToastMessage('좋아요 취소');
+        setIsToastActive(false);
+        setIsToastUrl('');
+      } else {
+        await addStudyLike(studyId);
+        setIsToast(true);
+        setIsToastMessage('좋아요 추가');
+        setIsToastActive(false);
+        setIsToastUrl('');
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['study'],
+      });
+    },
+  });
 
   const handleLikeClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    setIsLike(!isLike);
-    setLikeCountValue((prev) => (isLike ? prev - 1 : prev + 1));
-
-    if (isLike) {
-      //   await deleteStudyLike(studyId); 
-    } else {
-      await addStudyLike(studyId); 
-    }
+    likeMutation.mutate();
+    // setLikeCountValue((prev) => (isLike ? prev - 1 : prev + 1));
   };
 
   return (
@@ -60,7 +113,7 @@ export default function InteractionStatus({
         >
           <Image
             src={
-              isLike
+              localLikeStatus
                 ? '/icons/icon_interaction_like_fill.svg'
                 : '/icons/icon_interaction_like.svg'
             }
@@ -70,13 +123,21 @@ export default function InteractionStatus({
           />
           <span
             className={`text-semibold text-sm ${
-              isLike ? 'text-link-default' : 'text-gray-default'
+              localLikeStatus ? 'text-link-default' : 'text-gray-default'
             }`}
           >
-            {likeCount}
+            {localLikeCount}
           </span>
         </button>
       </div>
+      <Toast
+        isToast={isToast}
+        message={isToastMessage}
+        url={isToastUrl}
+        urlText={isToastUrlText}
+        active={isToastActive}
+        icon={isToastIcon}
+      />
     </>
   );
 }

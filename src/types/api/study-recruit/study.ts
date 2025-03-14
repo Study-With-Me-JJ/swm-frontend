@@ -120,6 +120,7 @@ export interface Study {
   status: string;
   viewCount: number;
   studyBookmarkId: number;
+  liked: boolean;
   getTagResponseList: getTagResponseList[];
   getRecruitmentPositionResponseList: getRecruitmentPositionResponseList[];
 }

@@ -1,5 +1,6 @@
 export interface InteractionStatusProps extends InteractionResponse {
   studyId: string;
+  likeStatus: boolean;
 }
 
 export interface InteractionResponse {
