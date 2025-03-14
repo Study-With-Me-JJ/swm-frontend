@@ -50,10 +50,10 @@ export default function InteractionStatus({
         return;
       }
 
-      setLocalLikeStatus(!localLikeStatus);
-      setLocalLikeCount((prev) => (localLikeStatus ? prev - 1 : prev + 1));
+      setLocalLikeStatus(!likeStatus);
+      setLocalLikeCount((prev) => (likeStatus ? prev - 1 : prev + 1));
 
-      if (localLikeStatus) {
+      if (likeStatus) {
         await deleteStudyLike(studyId);
         setIsToast(true);
         setIsToastMessage('좋아요 취소');
@@ -77,8 +77,7 @@ export default function InteractionStatus({
   const handleLikeClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.stopPropagation();
     e.preventDefault();
-    likeMutation.mutate();
-    // setLikeCountValue((prev) => (isLike ? prev - 1 : prev + 1));
+    likeMutation.mutate(); 
   };
 
   return (
@@ -113,7 +112,7 @@ export default function InteractionStatus({
         >
           <Image
             src={
-              localLikeStatus
+              likeStatus
                 ? '/icons/icon_interaction_like_fill.svg'
                 : '/icons/icon_interaction_like.svg'
             }
@@ -123,10 +122,10 @@ export default function InteractionStatus({
           />
           <span
             className={`text-semibold text-sm ${
-              localLikeStatus ? 'text-link-default' : 'text-gray-default'
+             likeStatus ? 'text-link-default' : 'text-gray-default'
             }`}
           >
-            {localLikeCount}
+            {likeCount}
           </span>
         </button>
       </div>
