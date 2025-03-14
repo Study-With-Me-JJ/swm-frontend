@@ -8,13 +8,17 @@ export const getStudy = async (params: SearchStudyParams) => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL;
     const url = `${baseUrl}${API_ENDPOINTS.STUDY.LIST}`;
 
+    const token = localStorage.getItem('accessToken');
+    const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
     const res = await axios.get<ApiResponse<Study>>(url, {
       params,
       paramsSerializer: {
         indexes: null,
       },
+      headers,
     });
-    // console.log('[getStudy] 응답 데이터 내용:', res.data);
+    console.log('[getStudy] 응답 데이터 내용:', res.data);
 
     if (!res.data) {
       console.warn('[getStudy] 응답 데이터가 비어있습니다');

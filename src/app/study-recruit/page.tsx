@@ -2,6 +2,7 @@
 
 import { getStudy } from '@/lib/api/study/getStudy';
 import { useInfiniteQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRef } from 'react';
@@ -64,34 +65,46 @@ export default function StudyRecruit() {
     ],
     initialPageParam: { lastStudyId: 0, lastSortValue: 0 },
     queryFn: async ({ pageParam = { lastStudyId: 0, lastSortValue: 0 } }) => {
-      const params: SearchStudyParams = {
-        sortCriteria: selectSort as SortCriteria,
-        ...(selectCategory !== 'ALL' && {
-          category: selectCategory as StudyCategory,
-        }),
-        ...(selectStatus !== 'ALL' && { status: selectStatus as StudyStatus }),
-        ...(selectPosition !== 'ALL' &&
-          Array.isArray(selectPosition) &&
-          selectPosition.length > 0 && {
-            recruitmentPositionTitleList:
-              selectPosition as RecruitmentPositionTitle[],
+      try {
+        const params: SearchStudyParams = {
+          sortCriteria: selectSort as SortCriteria,
+          ...(selectCategory !== 'ALL' && {
+            category: selectCategory as StudyCategory,
           }),
-        ...(selectPosition !== 'ALL' &&
-          !Array.isArray(selectPosition) && {
-            recruitmentPositionTitleList: [
-              selectPosition as RecruitmentPositionTitle,
-            ],
+          ...(selectStatus !== 'ALL' && {
+            status: selectStatus as StudyStatus,
           }),
-        ...(pageParam?.lastStudyId && { lastStudyId: pageParam.lastStudyId }),
-        ...(pageParam?.lastSortValue && {
-          lastSortValue: pageParam.lastSortValue,
-        }),
-      };
+          ...(selectPosition !== 'ALL' &&
+            Array.isArray(selectPosition) &&
+            selectPosition.length > 0 && {
+              recruitmentPositionTitleList:
+                selectPosition as RecruitmentPositionTitle[],
+            }),
+          ...(selectPosition !== 'ALL' &&
+            !Array.isArray(selectPosition) && {
+              recruitmentPositionTitleList: [
+                selectPosition as RecruitmentPositionTitle,
+              ],
+            }),
+          ...(pageParam?.lastStudyId && { lastStudyId: pageParam.lastStudyId }),
+          ...(pageParam?.lastSortValue && {
+            lastSortValue: pageParam.lastSortValue,
+          }),
+        };
+        const response = await getStudy(params);
+        if (response?.message === 'Expired Token') {
+          localStorage.removeItem('accessToken');
+          return { message: '정상 처리 되었습니다.', data: null };
+        }
+        return response;
 
-      return await getStudy(params);
+      } catch (error) {
+        console.error('Error fetching study:', error);
+        throw error;
+      }
     },
     getNextPageParam: (lastPage) => {
-      if (!lastPage.data.hasNext) return undefined;
+      if (!lastPage.data?.hasNext) return undefined;
 
       const lastItem = lastPage.data.data[lastPage.data.data.length - 1];
       return {
@@ -104,6 +117,8 @@ export default function StudyRecruit() {
               : lastItem.studyId,
       };
     },
+    staleTime: 0,
+    refetchOnMount: true,
   });
 
   const observerRef = useRef<HTMLDivElement>(null);
@@ -148,7 +163,7 @@ export default function StudyRecruit() {
   };
 
   const handlePositionChange = (value: string | string[]) => {
-    if (Array.isArray(value)) { 
+    if (Array.isArray(value)) {
       if (value.length === 0 || value.includes('ALL')) {
         setSelectPosition('ALL');
         return;
@@ -243,7 +258,7 @@ export default function StudyRecruit() {
           />
         </div>
       </div>
-      {!study?.pages || study.pages[0].data.data.length === 0 ? (
+      {!study?.pages || study?.pages[0]?.data?.data?.length === 0 ? (
         <div className="flex h-[300px] items-center justify-center">
           <div className="flex w-full max-w-[480px] flex-col items-center justify-center rounded-[8px] bg-[#f9f9f9] py-[40px]">
             <Image
@@ -263,7 +278,7 @@ export default function StudyRecruit() {
       ) : (
         <div className="grid w-full max-w-screen-xl grid-cols-1 gap-x-5 gap-y-[26px] md:grid-cols-2 lg:grid-cols-3">
           {study.pages.map((page) => {
-            return page.data.data.map((item) => {
+            return page.data?.data.map((item) => {
               return (
                 <StudyItem
                   key={`${item.studyId}-${item.title}`}

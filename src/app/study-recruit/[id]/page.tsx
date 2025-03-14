@@ -37,19 +37,38 @@ export default function StudyRecruitPage({
 }) {
   const { data } = useQuery({
     queryKey: ['studyDetail', params.id],
-    queryFn: () => getStudyDetail(params.id),
+    queryFn: async () => {
+      try {
+        const response = await getStudyDetail(params.id);
+
+        if (response?.message === 'Expired Token') {
+          localStorage.removeItem('accessToken');
+          return { message: '정상 처리 되었습니다.', data: null };
+        }
+
+        return response;
+      } catch (error) {
+        console.error('상세 조회 API 오류:', error);
+        throw error;
+      }
+    },
   });
 
-  console.log('detail data', data);
+  // console.log('detail data', data);
 
   const router = useRouter();
 
-  console.log('studyBookmarkId:', data?.data?.studyBookmarkId);
+  // console.log('studyBookmarkId:', data?.data?.studyBookmarkId);
 
-  const isBookmark = data?.data?.studyBookmarkId ? true : false;
-  console.log('isBookmark status:', isBookmark);
+  const isBookmark = data?.data?.studyBookmarkId !== null;
+  // console.log('isBookmark status:', isBookmark);
 
   const [isToast, setIsToast] = useState(false);
+  const [isToastMessage, setIsToastMessage] = useState('');
+  const [isToastActive, setIsToastActive] = useState(false);
+  const [isToastIcon, setIsToastIcon] = useState('');
+  const [isToastUrl, setIsToastUrl] = useState('');
+  const [isToastUrlText, setIsToastUrlText] = useState('');
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   const queryClient = useQueryClient();
@@ -65,21 +84,43 @@ export default function StudyRecruitPage({
       }, 2000);
       setTimerId(newTimerId);
 
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setIsToast(true);
+        setIsToastMessage('로그인 후 이용해주세요.');
+        setIsToastActive(false);
+        setIsToastIcon('');
+        setIsToastUrl('/login');
+        setIsToastUrlText('로그인하러 가기');
+        return;
+      }
+
       if (isBookmark) {
         const bookmarkId = String(data?.data?.studyBookmarkId);
         if (!bookmarkId) throw new Error('Bookmark ID not found');
         await deleteStudyBookmark(bookmarkId);
-        // setIsBookmark(false);
-        // setIsToast(true);
+        setIsToast(true);
+        setIsToastMessage('북마크 해제');
+        setIsToastActive(false);
+        setIsToastIcon('/icons/icon_bookmark_off.svg');
+        setIsToastUrl('/study-recruit');
+        setIsToastUrlText('내 북마크 보기');
       } else {
         await addStudyBookmark(params.id);
-        // setIsBookmark(true);
-        // setIsToast(true);
+        setIsToast(true);
+        setIsToastMessage('북마크 완료');
+        setIsToastActive(true);
+        setIsToastIcon('/icons/icon_bookmark_on.svg');
+        setIsToastUrl('/study-recruit');
+        setIsToastUrlText('내 북마크 보기');
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['studyDetail', params.id] });
-      queryClient.invalidateQueries({ queryKey: ['bookmarkList'] });
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['studyDetail', params.id],
+        refetchActive: true,
+      });
+
       setIsToast(true);
     },
     onError: (error) => {
@@ -220,7 +261,7 @@ export default function StudyRecruitPage({
   >({
     mutationFn: (positionData: EditRecruitmentPositionRequest) => {
       const positionId = String(
-        data?.data.getRecruitmentPositionResponseList[0].recruitmentPositionId,
+        data?.data?.getRecruitmentPositionResponseList[0].recruitmentPositionId,
       );
       if (!positionId) throw new Error('Position ID not found');
       return editRecruitmentPosition(positionId, positionData);
@@ -237,9 +278,9 @@ export default function StudyRecruitPage({
     const positionData: EditRecruitmentPositionRequest = {
       title: value,
       headcount:
-        data?.data.getRecruitmentPositionResponseList[0].headcount || 0,
+        data?.data?.getRecruitmentPositionResponseList[0].headcount || 0,
       acceptedCount:
-        data?.data.getRecruitmentPositionResponseList[0].acceptedCount || 0,
+        data?.data?.getRecruitmentPositionResponseList[0].acceptedCount || 0,
     };
     mutate(positionData);
   };
@@ -253,14 +294,15 @@ export default function StudyRecruitPage({
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center gap-[12px]">
                 <div
-                  className={`flex h-[30px] min-w-[60px] items-center justify-center rounded-full border border-link-default bg-white text-sm font-bold text-link-default ${data?.data.status === 'ACTIVE' ? 'border-link-default text-link-default' : 'border-gray-light text-gray-light'}`}
+                  className={`flex h-[30px] min-w-[60px] items-center justify-center rounded-full border border-link-default bg-white text-sm font-bold text-link-default ${data?.data?.status === 'ACTIVE' ? 'border-link-default text-link-default' : 'border-gray-light text-gray-light'}`}
                 >
-                  {data?.data.status === 'ACTIVE' ? '모집중' : '모집마감'}
+                  {data?.data?.status === 'ACTIVE' ? '모집중' : '모집마감'}
                 </div>
                 <div className="flex items-center gap-[4px]">
                   <Image
                     src={
-                      data?.data.profileImageUrl || '/icons/icon_no_profile.svg'
+                      data?.data?.profileImageUrl ||
+                      '/icons/icon_no_profile.svg'
                     }
                     alt="study-recruit-icon-1"
                     width={18}
@@ -268,7 +310,7 @@ export default function StudyRecruitPage({
                     className="overflow-hidden rounded-full"
                   />
                   <p className="text-sm font-bold text-link-default">
-                    {data?.data.nickname}
+                    {data?.data?.nickname}
                   </p>
                 </div>
               </div>
@@ -284,7 +326,7 @@ export default function StudyRecruitPage({
                   />
                 </button>
                 {user?.data?.userId &&
-                  data?.data.userId === user?.data.userId && (
+                  data?.data?.userId === user?.data.userId && (
                     <div className="relative h-[24px] w-[24px]">
                       <button
                         onClick={handleOptionsClick}
@@ -336,29 +378,33 @@ export default function StudyRecruitPage({
               </div>
             </div>
             <div className="font-regular text-sm text-gray-light">
-              {formatDate(data?.data.createdAt || '')}
+              {formatDate(data?.data?.createdAt || '')}
             </div>
             <div className="text-[24px] font-semibold text-black">
-              {data?.data.title}
+              {data?.data?.title}
             </div>
             <div className="flex items-center gap-[4px]">
-              {data?.data.getRecruitmentPositionResponseList.map((item) => (
-                <div
-                  key={item.recruitmentPositionId}
-                  className="rounded-[4px] bg-[#eee] px-[7px] py-[5px] text-sm font-medium text-[#565656]"
-                >
-                  {
-                    positionList.find(
-                      (position) => position.value === item.title,
-                    )?.label
-                  }{' '}
-                  <span className="text-link-default">{item.headcount}명</span>
-                </div>
-              ))}
+              {data?.data?.getRecruitmentPositionResponseList.map(
+                (item: any) => (
+                  <div
+                    key={item.recruitmentPositionId}
+                    className="rounded-[4px] bg-[#eee] px-[7px] py-[5px] text-sm font-medium text-[#565656]"
+                  >
+                    {
+                      positionList.find(
+                        (position) => position.value === item.title,
+                      )?.label
+                    }{' '}
+                    <span className="text-link-default">
+                      {item.headcount}명
+                    </span>
+                  </div>
+                ),
+              )}
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-[4px]">
-                {data?.data.getTagResponseList.map((item) => (
+                {data?.data?.getTagResponseList.map((item: any) => (
                   <span
                     key={item.tagId}
                     className="h-[30px] min-w-[30px] rounded-[4px] border border-[#eee] bg-white px-[7px] py-[5px] text-sm font-medium text-[#a5a5a5]"
@@ -368,9 +414,9 @@ export default function StudyRecruitPage({
                 ))}
               </div>
               <InteractionStatus
-                likeCount={data?.data.likeCount || 0}
-                commentCount={data?.data.commentCount || 0}
-                viewCount={data?.data.viewCount || 0}
+                likeCount={data?.data?.likeCount || 0}
+                commentCount={data?.data?.commentCount || 0}
+                viewCount={data?.data?.viewCount || 0}
                 studyId={params.id}
               />
             </div>
@@ -420,7 +466,7 @@ export default function StudyRecruitPage({
                     }}
                   >
                     {(() => {
-                      const imageList = data?.data.getImageResponseList || [];
+                      const imageList = data?.data?.getImageResponseList || [];
                       // console.log('정렬 전 이미지 리스트:', imageList);
 
                       const sortedImageList = [...imageList].sort(
@@ -477,7 +523,7 @@ export default function StudyRecruitPage({
                 >
                   댓글{' '}
                   <span className="text-link-default">
-                    {data?.data.commentCount || 0}
+                    {data?.data?.commentCount || 0}
                   </span>
                 </div>
               </div>
@@ -488,7 +534,7 @@ export default function StudyRecruitPage({
                   스터디 소개
                 </div>
                 <div className="font-regular rounded-[8px] border border-gray-disabled p-[24px] text-sm text-black">
-                  {data?.data.content}
+                  {data?.data?.content}
                 </div>
               </div>
               <div
@@ -498,13 +544,13 @@ export default function StudyRecruitPage({
                 <div className="pb-[24px] text-[20px] font-semibold text-black">
                   댓글{' '}
                   <span className="text-link-default">
-                    {data?.data.commentCount || 0}
+                    {data?.data?.commentCount || 0}
                   </span>
                 </div>
                 <div className="font-regular border-t border-gray-disabled text-sm text-gray-light">
                   <Comment
                     studyId={params.id}
-                    postAuthorNickname={data?.data.nickname || ''}
+                    postAuthorNickname={data?.data?.nickname || ''}
                   />
                 </div>
               </div>
@@ -518,62 +564,66 @@ export default function StudyRecruitPage({
               모집 현황
             </div>
             <ul>
-              {data?.data.getRecruitmentPositionResponseList.map((item) => (
-                <li
-                  key={item.recruitmentPositionId}
-                  className="flex items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]"
-                >
-                  <div className="flex items-center gap-[8px]">
-                    <div className="text-[16px] font-semibold text-black">
-                      {
-                        positionList.find(
-                          (position) => position.value === item.title,
-                        )?.label
-                      }{' '}
-                      <span className="text-link-default">
-                        {item.headcount}명
-                      </span>{' '}
-                      모집중
-                    </div>
-                    {/* <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
+              {data?.data?.getRecruitmentPositionResponseList.map(
+                (item: any) => (
+                  <li
+                    key={item.recruitmentPositionId}
+                    className="flex items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]"
+                  >
+                    <div className="flex items-center gap-[8px]">
+                      <div className="text-[16px] font-semibold text-black">
+                        {
+                          positionList.find(
+                            (position) => position.value === item.title,
+                          )?.label
+                        }{' '}
+                        <span className="text-link-default">
+                          {item.headcount}명
+                        </span>{' '}
+                        모집중
+                      </div>
+                      {/* <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
                       신청함
                     </div> */}
-                  </div>
-                  <div>
-                    <span className="box-border block h-[30px] min-w-[50px] rounded-[4px] border border-[#eee] px-[6px] py-[4px] text-[14px] font-medium text-[#a5a5a5]">
-                      {item.acceptedCount}명 신청중
-                    </span>
+                    </div>
+                    <div>
+                      <span className="box-border block h-[30px] min-w-[50px] rounded-[4px] border border-[#eee] px-[6px] py-[4px] text-[14px] font-medium text-[#a5a5a5]">
+                        {item.acceptedCount}명 신청중
+                      </span>
+                    </div>
+                  </li>
+                ),
+              )}
+            </ul>
+          </div>
+          {user?.data?.userId && (
+            <div className="flex flex-col gap-[30px]">
+              <div className="text-[24px] font-semibold text-black">
+                내 신청 현황
+              </div>
+              <ul>
+                <li className="flex w-full items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]">
+                  <div className="flex w-full items-center justify-between gap-[8px]">
+                    <div className="flex items-center gap-[8px]">
+                      <div className="text-[16px] font-semibold text-black">
+                        프론트엔드 직무
+                      </div>
+                      <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
+                        신청완료
+                      </div>
+                    </div>
+                    <button
+                      onClick={handleOpenModal}
+                      type="button"
+                      className="cursor-pointer text-sm font-medium text-[#a5a5a5] hover:text-link-default"
+                    >
+                      신청 포지션 변경
+                    </button>
                   </div>
                 </li>
-              ))}
-            </ul>
-          </div>
-          <div className="flex flex-col gap-[30px]">
-            <div className="text-[24px] font-semibold text-black">
-              내 신청 현황
+              </ul>
             </div>
-            <ul>
-              <li className="flex w-full items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]">
-                <div className="flex w-full items-center justify-between gap-[8px]">
-                  <div className="flex items-center gap-[8px]">
-                    <div className="text-[16px] font-semibold text-black">
-                      프론트엔드 직무
-                    </div>
-                    <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
-                      신청완료
-                    </div>
-                  </div>
-                  <button
-                    onClick={handleOpenModal}
-                    type="button"
-                    className="cursor-pointer text-sm font-medium text-[#a5a5a5] hover:text-link-default"
-                  >
-                    신청 포지션 변경
-                  </button>
-                </div>
-              </li>
-            </ul>
-          </div>
+          )}
           <button
             type="button"
             className="h-[60px] w-full cursor-pointer rounded-[8px] bg-link-default text-[16px] font-semibold text-white"
@@ -584,15 +634,11 @@ export default function StudyRecruitPage({
       </div>
       <Toast
         isToast={isToast}
-        message={isBookmark ? '북마크 완료!' : '북마크 해제'}
-        url={isBookmark ? '/study-recruit' : '/study-recruit'}
-        urlText="내 북마크 보기"
-        active={isBookmark}
-        icon={
-          isBookmark
-            ? '/icons/icon_bookmark_on.svg'
-            : '/icons/icon_bookmark_off.svg'
-        }
+        message={isToastMessage}
+        url={isToastUrl}
+        urlText={isToastUrlText}
+        active={isToastActive}
+        icon={isToastIcon}
       />
       {isModalOpen && (
         <StudyPositionChange
@@ -601,12 +647,12 @@ export default function StudyRecruitPage({
             positionList.find(
               (position) =>
                 position.value ===
-                data?.data.getRecruitmentPositionResponseList[0].title,
+                data?.data?.getRecruitmentPositionResponseList[0].title,
             )?.label
           }
           position={
-            data?.data.getRecruitmentPositionResponseList.map(
-              (position, index) => position.title,
+            data?.data?.getRecruitmentPositionResponseList.map(
+              (position: any, index: any) => position.title,
             ) || []
           }
           onClickOption={handleChangePosition}

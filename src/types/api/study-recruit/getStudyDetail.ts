@@ -23,7 +23,7 @@ export interface StudyDetailRequest {
   profileImageUrl: string | null;
   likeStatus: boolean;
   openChatUrl: string;
-  studyBookmarkId: number;
+  studyBookmarkId: string | null;
   getTagResponseList: {
     tagId: number;
     name: string;

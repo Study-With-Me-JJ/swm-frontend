@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  addStudyBookmark,
+  deleteStudyBookmark,
+} from '@/lib/api/study/postStudy';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Study } from '@/types/api/study-recruit/study';
@@ -8,33 +13,84 @@ import InteractionStatus from '@/components/ui/InteractionStatus';
 import Toast from '@/components/ui/Toast';
 
 export default function StudyItem({ data }: { data: Study }) {
-  const [isBookmark, setIsBookmark] = useState(false);
-  const [isToast, setIsToast] = useState(false);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const router = useRouter();
+  const queryClient = useQueryClient();
 
-  const handleBookmark = (e: React.MouseEvent<HTMLButtonElement>) => {
-    e.stopPropagation();
-    e.preventDefault();
+  const isBookmark = data.studyBookmarkId !== null;
 
-    if (timerId) {
-      clearTimeout(timerId);
-    }
+  const [isToast, setIsToast] = useState(false);
+  const [isToastMessage, setIsToastMessage] = useState('');
+  const [isToastActive, setIsToastActive] = useState(false);
+  const [isToastIcon, setIsToastIcon] = useState('');
+  const [isToastUrl, setIsToastUrl] = useState('');
+  const [isToastUrlText, setIsToastUrlText] = useState('');
 
-    setIsBookmark(!isBookmark);
-    setIsToast(true);
+  const bookmarkMutation = useMutation({
+    mutationFn: async () => {
+      if (timerId) {
+        clearTimeout(timerId);
+      }
 
-    const newTimerId = setTimeout(() => {
-      setIsToast(false);
-    }, 2000);
-    setTimerId(newTimerId);
+      const newTimerId = setTimeout(() => {
+        setIsToast(false);
+      }, 2000);
+      setTimerId(newTimerId);
+
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        setIsToast(true);
+        setIsToastMessage('로그인 후 이용해주세요.');
+        setIsToastActive(false);
+        setIsToastIcon('');
+        setIsToastUrl('/login');
+        setIsToastUrlText('로그인하러 가기');
+        return;
+      }
+
+      if (isBookmark) {
+        const bookmarkId = String(studyBookmarkId);
+        if (!bookmarkId) throw new Error('Bookmark ID not found');
+        await deleteStudyBookmark(bookmarkId);
+        setIsToast(true);
+        setIsToastMessage('북마크 해제');
+        setIsToastActive(false);
+        setIsToastIcon('/icons/icon_bookmark_off.svg');
+        setIsToastUrl('/study-recruit');
+        setIsToastUrlText('내 북마크 보기');
+      } else {
+        await addStudyBookmark(studyId.toString());
+        setIsToast(true);
+        setIsToastMessage('북마크 완료');
+        setIsToastActive(true);
+        setIsToastIcon('/icons/icon_bookmark_on.svg');
+        setIsToastUrl('/study-recruit');
+        setIsToastUrlText('내 북마크 보기');
+      }
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: ['studyDetail', studyId],
+        refetchActive: true,
+      });
+
+      setIsToast(true);
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
+
+   const handleBookmarkClick = () => {
+    bookmarkMutation.mutate();
   };
+
 
   const handleMoveDetail = () => {
     router.push(`/study-recruit/${data.studyId}`);
   };
 
-  const { likeCount, commentCount, viewCount } = data;
+  const { likeCount, commentCount, viewCount, studyBookmarkId, studyId } = data; 
 
   return (
     <>
@@ -55,13 +111,7 @@ export default function StudyItem({ data }: { data: Study }) {
                 </div>
               )}
               <div className="w-30 h-30">
-                {/* <button onClick={handleBookmark}><Image src={isBookmark ? '/icons/icon_bookmark_on.svg' : '/icons/icon_bookmark_off.svg'} alt='북마크' width={30} height={30} /></button> */}
-                <button
-                  onClick={(e) => {
-                    handleBookmark(e);
-                  }}
-                  className="relative z-10"
-                >
+                <button onClick={handleBookmarkClick} className="relative z-10">
                   <BookMarkIcon
                     color={isBookmark ? '#4998E9' : '#f9f9f9'}
                     strokeColor={isBookmark ? '#4998E9' : '#c8c8c8'}
@@ -104,6 +154,7 @@ export default function StudyItem({ data }: { data: Study }) {
               likeCount={likeCount}
               commentCount={commentCount}
               viewCount={viewCount}
+              studyId={data.studyId.toString()}
             />
           </div>
         </div>
