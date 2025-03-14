@@ -70,6 +70,9 @@ export default function StudyItem({ data }: { data: Study }) {
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
+        queryKey: ['study'],
+      });
+      await queryClient.invalidateQueries({
         queryKey: ['studyDetail', studyId],
         refetchActive: true,
       });
@@ -81,16 +84,17 @@ export default function StudyItem({ data }: { data: Study }) {
     },
   });
 
-   const handleBookmarkClick = () => {
+  const handleBookmarkClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
     bookmarkMutation.mutate();
   };
-
 
   const handleMoveDetail = () => {
     router.push(`/study-recruit/${data.studyId}`);
   };
 
-  const { likeCount, commentCount, viewCount, studyBookmarkId, studyId } = data; 
+  const { likeCount, commentCount, viewCount, studyBookmarkId, studyId } = data;
 
   return (
     <>
@@ -111,7 +115,11 @@ export default function StudyItem({ data }: { data: Study }) {
                 </div>
               )}
               <div className="w-30 h-30">
-                <button onClick={handleBookmarkClick} className="relative z-10">
+                <button
+                  type="button"
+                  onClick={handleBookmarkClick}
+                  className="relative z-10"
+                >
                   <BookMarkIcon
                     color={isBookmark ? '#4998E9' : '#f9f9f9'}
                     strokeColor={isBookmark ? '#4998E9' : '#c8c8c8'}
@@ -161,15 +169,11 @@ export default function StudyItem({ data }: { data: Study }) {
       </div>
       <Toast
         isToast={isToast}
-        message={isBookmark ? '스터디 북마크 완료!' : '스터디 북마크 해제'}
-        url={isBookmark ? '/study-recruit' : '/study-recruit'}
-        urlText="내 북마크 보기"
-        active={isBookmark}
-        icon={
-          isBookmark
-            ? '/icons/icon_bookmark_on.svg'
-            : '/icons/icon_bookmark_off.svg'
-        }
+        message={isToastMessage}
+        url={isToastUrl}
+        urlText={isToastUrlText}
+        active={isToastActive}
+        icon={isToastIcon}
       />
     </>
   );

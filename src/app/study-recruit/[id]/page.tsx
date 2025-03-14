@@ -128,7 +128,9 @@ export default function StudyRecruitPage({
     },
   });
 
-  const handleBookmarkClick = () => {
+  const handleBookmarkClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation();
+    e.preventDefault();
     bookmarkMutation.mutate();
   };
 

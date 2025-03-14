@@ -31,7 +31,7 @@ export const addStudyBookmark = async (
         },
       },
     );
-    console.log('북마크 추가 API 응답 데이터', res.data.data, url);
+    // console.log('북마크 추가 API 응답 데이터', res.data.data, url);
     return res.data;
   } catch (error) {
     console.error('북마크추가 오류:', error);
@@ -49,7 +49,7 @@ export const deleteStudyBookmark = async (bookmarkId: string) => {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
     });
-    console.log('북마크취소', res);
+    // console.log('북마크취소', res);
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
