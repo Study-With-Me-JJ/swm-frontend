@@ -7,12 +7,11 @@ import { useQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import Toast from '@/components/ui/Toast';
+import { useToastStore } from '@/store/useToastStore';
 
 export default function CommentForm({ studyId }: { studyId: string }) {
   const queryClient = useQueryClient();
-  const [isToast, setIsToast] = useState(false);
-  const [message, setMessage] = useState('');
+  const { showToast } = useToastStore();
   const router = useRouter();
 
   const { data: user } = useQuery({
@@ -29,8 +28,11 @@ export default function CommentForm({ studyId }: { studyId: string }) {
     mutationFn: () => postComment(studyId, content),
     onSuccess: (response) => {
       if (response.message === 'Expired Token') {
-        setIsToast(true);
-        setMessage('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        showToast({
+          message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+          url: '/login',
+          urlText: '로그인하러 가기',
+        });
         router.push('/login');
         return;
       }
@@ -38,10 +40,15 @@ export default function CommentForm({ studyId }: { studyId: string }) {
       //   console.log('댓글 작성 성공', response);
       setContent('');
       queryClient.invalidateQueries({ queryKey: ['comment', studyId] });
-      console.log('댓글 작성 성공');
+      showToast({
+        message: '댓글이 작성되었습니다.',
+      });
     },
     onError: (error) => {
       console.error('API Error:', error);
+      showToast({
+        message: '댓글 작성에 실패했습니다. 다시 시도해주세요.',
+      });
     },
   });
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -91,7 +98,6 @@ export default function CommentForm({ studyId }: { studyId: string }) {
           </button>
         </div>
       </form>
-      {isToast && <Toast isToast={isToast} message={message} />}
     </div>
   );
 }

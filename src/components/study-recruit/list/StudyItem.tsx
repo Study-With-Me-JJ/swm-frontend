@@ -4,13 +4,13 @@ import {
   addStudyBookmark,
   deleteStudyBookmark,
 } from '@/lib/api/study/postStudy';
+import { useToastStore } from '@/store/useToastStore';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Study } from '@/types/api/study-recruit/study';
 import BookMarkIcon from '@/components/ui/BookMarkIcon';
 import InteractionStatus from '@/components/ui/InteractionStatus';
-import Toast from '@/components/ui/Toast';
 
 export default function StudyItem({ data }: { data: Study }) {
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
@@ -19,12 +19,7 @@ export default function StudyItem({ data }: { data: Study }) {
 
   const isBookmark = data.studyBookmarkId !== null;
 
-  const [isToast, setIsToast] = useState(false);
-  const [isToastMessage, setIsToastMessage] = useState('');
-  const [isToastActive, setIsToastActive] = useState(false);
-  const [isToastIcon, setIsToastIcon] = useState('');
-  const [isToastUrl, setIsToastUrl] = useState('');
-  const [isToastUrlText, setIsToastUrlText] = useState('');
+  const { showToast, hideToast } = useToastStore();
 
   const bookmarkMutation = useMutation({
     mutationFn: async () => {
@@ -33,18 +28,17 @@ export default function StudyItem({ data }: { data: Study }) {
       }
 
       const newTimerId = setTimeout(() => {
-        setIsToast(false);
+        hideToast();
       }, 2000);
       setTimerId(newTimerId);
 
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setIsToast(true);
-        setIsToastMessage('로그인 후 이용해주세요.');
-        setIsToastActive(false);
-        setIsToastIcon('');
-        setIsToastUrl('/login');
-        setIsToastUrlText('로그인하러 가기');
+        showToast({
+          message: '로그인 후 이용해주세요.',
+          url: '/login',
+          urlText: '로그인하러 가기',
+        });
         return;
       }
 
@@ -52,28 +46,28 @@ export default function StudyItem({ data }: { data: Study }) {
         const bookmarkId = String(studyBookmarkId);
         if (!bookmarkId) throw new Error('Bookmark ID not found');
         await deleteStudyBookmark(bookmarkId);
-        setIsToast(true);
-        setIsToastMessage('북마크 해제');
-        setIsToastActive(false);
-        setIsToastIcon('/icons/icon_bookmark_off.svg');
-        setIsToastUrl('/study-recruit');
-        setIsToastUrlText('내 북마크 보기');
+        showToast({
+          message: '북마크 해제',
+          icon: '/icons/icon_bookmark_off.svg',
+          url: '/study-recruit',
+          active: false,
+          urlText: '내 북마크 보기',
+        });
       } else {
         await addStudyBookmark(studyId.toString());
-        setIsToast(true);
-        setIsToastMessage('북마크 완료');
-        setIsToastActive(true);
-        setIsToastIcon('/icons/icon_bookmark_on.svg');
-        setIsToastUrl('/study-recruit');
-        setIsToastUrlText('내 북마크 보기');
+        showToast({
+          message: '북마크 완료',
+          icon: '/icons/icon_bookmark_on.svg',
+          url: '/study-recruit',
+          active: true,
+          urlText: '내 북마크 보기',
+        });
       }
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
         queryKey: ['study'],
-      }); 
-
-      setIsToast(true);
+      });
     },
     onError: (error) => {
       console.error(error);
@@ -164,14 +158,6 @@ export default function StudyItem({ data }: { data: Study }) {
           </div>
         </div>
       </div>
-      <Toast
-        isToast={isToast}
-        message={isToastMessage}
-        url={isToastUrl}
-        urlText={isToastUrlText}
-        active={isToastActive}
-        icon={isToastIcon}
-      />
     </>
   );
 }

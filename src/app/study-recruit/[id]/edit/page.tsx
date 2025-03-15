@@ -3,6 +3,7 @@
 import { editStudy } from '@/lib/api/study/editStudy';
 import { uploadFileToPresignedUrl } from '@/lib/api/study/getPresignedUrl';
 import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
+import { useToastStore } from '@/store/useToastStore';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
 import { useQuery } from '@tanstack/react-query';
@@ -15,7 +16,6 @@ import { getCategoryList } from '@/types/api/study-recruit/study';
 import { InputField } from '@/components/InputField';
 import ImageUploader from '@/components/study-create/ui/image-uploader';
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
-import Toast from '@/components/ui/Toast';
 
 export default function StudyRecruitEditPage({
   params,
@@ -23,8 +23,7 @@ export default function StudyRecruitEditPage({
   params: { id: string };
 }) {
   const router = useRouter();
-  const [isToast, setIsToast] = useState(false);
-  const [message, setMessage] = useState('');
+  const { showToast } = useToastStore();
   const queryClient = useQueryClient();
 
   const [tagList, setTagList] = useState<string[]>([]);
@@ -85,7 +84,7 @@ export default function StudyRecruitEditPage({
         ),
         imageUrlList: imageUrlList,
       });
-      console.log('original studyDetail:', studyDetail);
+      //   console.log('original studyDetail:', studyDetail);
     }
   }, [studyDetail]);
 
@@ -107,14 +106,16 @@ export default function StudyRecruitEditPage({
 
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setIsToast(true);
-        setMessage('이미지 크기는 5MB를 초과할 수 없습니다.');
+        showToast({
+          message: '이미지 크기는 5MB를 초과할 수 없습니다.',
+        });
         e.target.value = '';
         return;
       }
       if (previewImages.length >= 10) {
-        setIsToast(true);
-        setMessage('이미지는 최대 10개까지만 추가할 수 있습니다.');
+        showToast({
+          message: '이미지는 최대 10개까지만 추가할 수 있습니다.',
+        });
         e.target.value = '';
         return;
       }
@@ -149,14 +150,16 @@ export default function StudyRecruitEditPage({
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setIsToast(true);
-        setMessage('이미지 크기는 5MB를 초과할 수 없습니다.');
+        showToast({
+          message: '이미지 크기는 5MB를 초과할 수 없습니다.',
+        });
         e.target.value = '';
         return;
       }
       if (previewImages.length >= 10) {
-        setIsToast(true);
-        setMessage('이미지는 최대 10개까지만 추가할 수 있습니다.');
+        showToast({
+          message: '이미지는 최대 10개까지만 추가할 수 있습니다.',
+        });
         e.target.value = '';
         return;
       }
@@ -189,8 +192,9 @@ export default function StudyRecruitEditPage({
       const tagValue = value.replace(',', '').trim();
       if (tagValue) {
         if (tagList.length >= 10) {
-          setIsToast(true);
-          setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+          showToast({
+            message: '태그는 최대 10개까지만 입력할 수 있습니다.',
+          });
           setInputValue('');
           return;
         }
@@ -217,8 +221,9 @@ export default function StudyRecruitEditPage({
       if (!value) return;
 
       if (tagList.length >= 10) {
-        setIsToast(true);
-        setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+        showToast({
+          message: '태그는 최대 10개까지만 입력할 수 있습니다.',
+        });
         return;
       }
 
@@ -261,33 +266,31 @@ export default function StudyRecruitEditPage({
     mutationFn: (studyData: any) => editStudy(params.id as string, studyData),
     onSuccess: async (response) => {
       if (response.message === 'Expired Token') {
-        setIsToast(true);
-        setMessage('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        showToast({
+          message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+        });
         router.push('/login');
         return;
       }
 
       // console.log('생성 성공 응답:', response);
 
-      setIsToast(true);
-      setMessage('스터디 수정이 완료되었습니다.');
-
       await queryClient.invalidateQueries({
-        queryKey: ['studyDetail', params.id, 'study'],
+        queryKey: ['study', 'studyDetail', params.id],
       });
-      await queryClient.refetchQueries({
-        queryKey: ['studyDetail', params.id],
+
+      showToast({
+        message: '스터디 수정이 완료되었습니다.',
       });
 
       setTimeout(() => {
-        router.push('/study-recruit');
+        router.push(`/study-recruit/${params.id}`);
       }, 500);
     },
     onError: (error: any) => {
-      setIsToast(true);
-      setMessage(
-        error.response?.data?.message || '스터디 수정에 실패했습니다.',
-      );
+      showToast({
+        message: error.response?.data?.message || '스터디 수정에 실패했습니다.',
+      });
     },
   });
 
@@ -341,8 +344,9 @@ export default function StudyRecruitEditPage({
       mutate(studyData);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
-      setIsToast(true);
-      setMessage('스터디 수정에 실패했습니다.');
+      showToast({
+        message: '스터디 수정에 실패했습니다.',
+      });
     }
   });
 
@@ -457,7 +461,6 @@ export default function StudyRecruitEditPage({
           </form>
         </FormProvider>
       </section>
-      {isToast && <Toast isToast={isToast} message={message} />}
     </>
   );
 }

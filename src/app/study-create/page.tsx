@@ -15,9 +15,8 @@ import {
 import { InputField } from '@/components/InputField';
 import ImageUploader from '@/components/study-create/ui/image-uploader';
 import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
-import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
-import Toast from '@/components/ui/Toast';
-
+import RadioSelectGroup from '@/components/study-create/ui/radio-select-group'; 
+import { useToastStore } from '@/store/useToastStore';
 interface PositionField {
   id: string;
   position: string;
@@ -43,9 +42,8 @@ export default function StudyCreate() {
   const [positionFields, setPositionFields] = useState<PositionField[]>([
     { id: '1', position: 'ALL', capacity: undefined },
   ]);
-
-  const [isToast, setIsToast] = useState(false);
-  const [message, setMessage] = useState('');
+ 
+  const { showToast } = useToastStore(); 
 
   const positionOptions = getPositionOptions();
 
@@ -57,16 +55,18 @@ export default function StudyCreate() {
     mutationFn: (studyData: any) => postStudy(studyData),
     onSuccess: async (response) => {
       if (response.message === 'Expired Token') {
-        setIsToast(true);
-        setMessage('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        showToast({
+          message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+        });
         router.push('/login');
         return;
       }
 
       // console.log('생성 성공 응답:', response);
 
-      setIsToast(true);
-      setMessage('스터디 생정이 완료되었습니다.');
+      showToast({
+        message: '스터디 생정이 완료되었습니다.',
+      });
 
       await queryClient.invalidateQueries({ queryKey: ['study'] });
       await queryClient.refetchQueries({ queryKey: ['study'] });
@@ -77,8 +77,9 @@ export default function StudyCreate() {
     },
     onError: (error) => {
       console.error('생성 실패:', error);
-      setIsToast(true);
-      setMessage('스터디 생성에 실패했습니다.');
+      showToast({
+        message: '스터디 생성에 실패했습니다.',
+      });
     },
   });
 
@@ -110,8 +111,9 @@ export default function StudyCreate() {
 
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setIsToast(true);
-        setMessage('이미지 크기는 5MB를 초과할 수 없습니다.');
+        showToast({
+          message: '이미지 크기는 5MB를 초과할 수 없습니다.',
+        });
         e.target.value = '';
         return;
       }
@@ -153,8 +155,9 @@ export default function StudyCreate() {
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setIsToast(true);
-        setMessage('이미지 크기는 5MB를 초과할 수 없습니다.');
+        showToast({
+          message: '이미지 크기는 5MB를 초과할 수 없습니다.',
+        });
         e.target.value = '';
         return;
       }
@@ -229,8 +232,9 @@ export default function StudyCreate() {
       const tagValue = value.replace(',', '').trim();
       if (tagValue) {
         if (tagList.length >= 10) {
-          setIsToast(true);
-          setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+          showToast({
+            message: '태그는 최대 10개까지만 입력할 수 있습니다.',
+          });
           setInputValue('');
           return;
         }
@@ -257,8 +261,9 @@ export default function StudyCreate() {
       if (!value) return;
 
       if (tagList.length >= 10) {
-        setIsToast(true);
-        setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+        showToast({
+          message: '태그는 최대 10개까지만 입력할 수 있습니다.',
+        });
         return;
       }
 
@@ -331,8 +336,9 @@ export default function StudyCreate() {
       mutate(studyData);
     } catch (error) {
       console.error('이미지 업로드 실패:', error);
-      setIsToast(true);
-      setMessage('이미지 업로드에 실패했습니다.');
+      showToast({
+        message: '이미지 업로드에 실패했습니다.',
+      });
     }
   });
 
@@ -483,7 +489,6 @@ export default function StudyCreate() {
           </form>
         </FormProvider>
       </section>
-      {isToast && <Toast isToast={isToast} message={message} />}
     </>
   );
 }

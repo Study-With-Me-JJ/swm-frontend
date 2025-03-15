@@ -5,7 +5,8 @@ import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import { deleteStudy } from '@/lib/api/study/getStudyDetail';
 import { addStudyBookmark } from '@/lib/api/study/postStudy';
 import { deleteStudyBookmark } from '@/lib/api/study/postStudy';
-import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition';
+import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition'; 
+import { useToastStore } from '@/store/useToastStore';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
@@ -28,7 +29,6 @@ import StudyPositionChange from '@/components/modal/study-position-change';
 import Comment from '@/components/study-recruit/detail/Comment';
 import BookMarkIcon from '@/components/ui/BookMarkIcon';
 import InteractionStatus from '@/components/ui/InteractionStatus';
-import Toast from '@/components/ui/Toast';
 
 export default function StudyRecruitPage({
   params,
@@ -61,15 +61,10 @@ export default function StudyRecruitPage({
   // console.log('studyBookmarkId:', data?.data?.studyBookmarkId);
 
   const isBookmark = data?.data?.studyBookmarkId !== null;
-  // console.log('isBookmark status:', isBookmark);
 
-  const [isToast, setIsToast] = useState(false);
-  const [isToastMessage, setIsToastMessage] = useState('');
-  const [isToastActive, setIsToastActive] = useState(false);
-  const [isToastIcon, setIsToastIcon] = useState('');
-  const [isToastUrl, setIsToastUrl] = useState('');
-  const [isToastUrlText, setIsToastUrlText] = useState('');
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
+
+  const { showToast, hideToast } = useToastStore();
 
   const queryClient = useQueryClient();
 
@@ -79,19 +74,13 @@ export default function StudyRecruitPage({
         clearTimeout(timerId);
       }
 
-      const newTimerId = setTimeout(() => {
-        setIsToast(false);
-      }, 2000);
-      setTimerId(newTimerId);
-
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setIsToast(true);
-        setIsToastMessage('로그인 후 이용해주세요.');
-        setIsToastActive(false);
-        setIsToastIcon('');
-        setIsToastUrl('/login');
-        setIsToastUrlText('로그인하러 가기');
+        showToast({
+          message: '로그인 후 이용해주세요.',
+          url: '/login',
+          urlText: '로그인하러 가기',
+        });
         return;
       }
 
@@ -99,29 +88,33 @@ export default function StudyRecruitPage({
         const bookmarkId = String(data?.data?.studyBookmarkId);
         if (!bookmarkId) throw new Error('Bookmark ID not found');
         await deleteStudyBookmark(bookmarkId);
-        setIsToast(true);
-        setIsToastMessage('북마크 해제');
-        setIsToastActive(false);
-        setIsToastIcon('/icons/icon_bookmark_off.svg');
-        setIsToastUrl('/study-recruit');
-        setIsToastUrlText('내 북마크 보기');
+        showToast({
+          message: '북마크 해제',
+          icon: '/icons/icon_bookmark_off.svg',
+          url: '/study-recruit',
+          urlText: '내 북마크 보기',
+        });
       } else {
         await addStudyBookmark(params.id);
-        setIsToast(true);
-        setIsToastMessage('북마크 완료');
-        setIsToastActive(true);
-        setIsToastIcon('/icons/icon_bookmark_on.svg');
-        setIsToastUrl('/study-recruit');
-        setIsToastUrlText('내 북마크 보기');
+        showToast({
+          message: '북마크 완료',
+          active: true,
+          icon: '/icons/icon_bookmark_on.svg',
+          url: '/study-recruit',
+          urlText: '내 북마크 보기',
+        });
       }
+
+      const newTimerId = setTimeout(() => {
+        hideToast();
+      }, 2000);
+      setTimerId(newTimerId);
     },
     onSuccess: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ['studyDetail', params.id],
+        queryKey: ['study', 'studyDetail', params.id],
         refetchActive: true,
       });
-
-      setIsToast(true);
     },
     onError: (error) => {
       console.error(error);
@@ -635,14 +628,6 @@ export default function StudyRecruitPage({
           </button>
         </div>
       </div>
-      <Toast
-        isToast={isToast}
-        message={isToastMessage}
-        url={isToastUrl}
-        urlText={isToastUrlText}
-        active={isToastActive}
-        icon={isToastIcon}
-      />
       {isModalOpen && (
         <StudyPositionChange
           handleCloseModal={handleCloseModal}

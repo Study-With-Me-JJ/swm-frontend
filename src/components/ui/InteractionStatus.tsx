@@ -2,10 +2,10 @@
 
 import { deleteStudyLike } from '@/lib/api/study/postStudy';
 import { addStudyLike } from '@/lib/api/study/postStudy';
+import { useToastStore } from '@/store/useToastStore';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import { useState } from 'react';
-import Toast from './Toast';
 import { InteractionStatusProps } from '@/types/api/interaction';
 
 export default function InteractionStatus({
@@ -15,15 +15,9 @@ export default function InteractionStatus({
   studyId,
   likeStatus,
 }: InteractionStatusProps) {
-  const isLike = likeStatus;
+  const { showToast, hideToast } = useToastStore();
   const [localLikeCount, setLocalLikeCount] = useState(likeCount);
   const [localLikeStatus, setLocalLikeStatus] = useState(likeStatus);
-  const [isToast, setIsToast] = useState(false);
-  const [isToastMessage, setIsToastMessage] = useState('');
-  const [isToastActive, setIsToastActive] = useState(false);
-  const [isToastIcon, setIsToastIcon] = useState('');
-  const [isToastUrl, setIsToastUrl] = useState('');
-  const [isToastUrlText, setIsToastUrlText] = useState('');
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   const queryClient = useQueryClient();
@@ -35,18 +29,17 @@ export default function InteractionStatus({
       }
 
       const newTimerId = setTimeout(() => {
-        setIsToast(false);
+        hideToast();
       }, 2000);
       setTimerId(newTimerId);
 
       const token = localStorage.getItem('accessToken');
       if (!token) {
-        setIsToast(true);
-        setIsToastMessage('로그인 후 이용해주세요.');
-        setIsToastActive(false);
-        setIsToastIcon('');
-        setIsToastUrl('/login');
-        setIsToastUrlText('로그인하러 가기');
+        showToast({
+          message: '로그인 후 이용해주세요.',
+          url: '/login',
+          urlText: '로그인하러 가기',
+        });
         return;
       }
 
@@ -55,16 +48,16 @@ export default function InteractionStatus({
 
       if (likeStatus) {
         await deleteStudyLike(studyId);
-        setIsToast(true);
-        setIsToastMessage('좋아요 취소');
-        setIsToastActive(false);
-        setIsToastUrl('');
+        showToast({
+          message: '좋아요 취소',
+          url: '/study-recruit', 
+        });
       } else {
         await addStudyLike(studyId);
-        setIsToast(true);
-        setIsToastMessage('좋아요 추가');
-        setIsToastActive(false);
-        setIsToastUrl('');
+        showToast({
+          message: '좋아요 추가', 
+          url: '/study-recruit', 
+        });
       }
     },
     onSuccess: async () => {
@@ -129,14 +122,6 @@ export default function InteractionStatus({
           </span>
         </button>
       </div>
-      <Toast
-        isToast={isToast}
-        message={isToastMessage}
-        url={isToastUrl}
-        urlText={isToastUrlText}
-        active={isToastActive}
-        icon={isToastIcon}
-      />
     </>
   );
 }

@@ -8,6 +8,7 @@ import {
   getReply,
 } from '@/lib/api/study/getComment';
 import { postReply } from '@/lib/api/study/postComment';
+import { useToastStore } from '@/store/useToastStore';
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -17,7 +18,6 @@ import { Suspense, useState } from 'react';
 import CommentForm from './CommentForm';
 import { ApiReplyResponse, Reply } from '@/types/api/study-recruit/getReply';
 import LoadingBar from '@/components/ui/Loadingbar';
-import Toast from '@/components/ui/Toast';
 
 export default function Comment({
   studyId,
@@ -76,8 +76,7 @@ export default function Comment({
 
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [isToast, setIsToast] = useState(false);
-  const [message, setMessage] = useState('');
+  const { showToast } = useToastStore();
 
   const [replyContent, setReplyContent] = useState('');
   const handleReplyChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -92,8 +91,11 @@ export default function Comment({
     mutationFn: () => postReply(studyId, parentId, replyContent),
     onSuccess: (response) => {
       if (response.message === 'Expired Token') {
-        setIsToast(true);
-        setMessage('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        showToast({
+          message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+          url: '/login',
+          urlText: '로그인하러 가기',
+        });
         router.push('/login');
         return;
       }
@@ -104,13 +106,15 @@ export default function Comment({
       setShowReplyId(null);
       queryClient.invalidateQueries({ queryKey: ['replies'] });
       //   console.log('답글 작성 성공');
-      setIsToast(true);
-      setMessage('답글이 작성되었습니다.');
+      showToast({
+        message: '답글이 작성되었습니다.',
+      });
     },
     onError: (error) => {
       console.error('API Error:', error);
-      setIsToast(true);
-      setMessage('답글 작성에 실패했습니다. 다시 시도해주세요.');
+      showToast({
+        message: '답글 작성에 실패했습니다. 다시 시도해주세요.',
+      });
     },
   });
 
@@ -182,14 +186,16 @@ export default function Comment({
       commentId: string;
     }) => deleteComment(studyId, commentId),
     onSuccess: () => {
-      setIsToast(true);
-      setMessage('댓글이 삭제되었습니다.');
+      showToast({
+        message: '댓글이 삭제되었습니다.',
+      });
       queryClient.invalidateQueries({ queryKey: ['comment'] });
       queryClient.invalidateQueries({ queryKey: ['replies'] });
     },
     onError: () => {
-      setIsToast(true);
-      setMessage('댓글 삭제에 실패했습니다.');
+      showToast({
+        message: '댓글 삭제에 실패했습니다.',
+      });
     },
   });
 
@@ -232,12 +238,14 @@ export default function Comment({
       setEditingCommentId(null);
       setEditContent('');
       setIsEditing(false);
-      setIsToast(true);
-      setMessage('댓글이 수정되었습니다.');
+      showToast({
+        message: '댓글이 수정되었습니다.',
+      });
     },
     onError: () => {
-      setIsToast(true);
-      setMessage('댓글 수정에 실패했습니다.');
+      showToast({
+        message: '댓글 수정에 실패했습니다.',
+      });
     },
   });
 
@@ -249,12 +257,14 @@ export default function Comment({
       setEditingReplyId(null);
       setEditReplyContent('');
       setIsReplyEditing(false);
-      setIsToast(true);
-      setMessage('답글이 수정되었습니다.');
+      showToast({
+        message: '답글이 수정되었습니다.',
+      });
     },
     onError: () => {
-      setIsToast(true);
-      setMessage('답글 수정에 실패했습니다.');
+      showToast({
+        message: '답글 수정에 실패했습니다.',
+      });
     },
   });
 
@@ -288,7 +298,6 @@ export default function Comment({
             String(comment.commentId),
             commentReplies,
           );
-          const hasMoreReplies = commentReplies.length > visibleReplies.length;
 
           return (
             <div key={comment.commentId}>
@@ -357,7 +366,7 @@ export default function Comment({
                           handleEditSubmit(String(comment.commentId))
                         }
                         type="button"
-                        className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+                        className="h-[40px] w-[160px] cursor-pointer rounded-[4px] border border-[#e0e0e0] bg-[#f9f9f9] text-[14px] font-semibold text-[#626262]"
                       >
                         수정 완료
                       </button>
@@ -416,7 +425,7 @@ export default function Comment({
                     <div className="flex justify-end">
                       <button
                         type="submit"
-                        className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+                        className="h-[40px] w-[160px] cursor-pointer rounded-[4px] border border-[#e0e0e0] bg-[#f9f9f9] text-[14px] font-semibold text-[#626262]"
                       >
                         답글 등록
                       </button>
@@ -499,7 +508,7 @@ export default function Comment({
                               handleReplyEditSubmit(String(replyItem.commentId))
                             }
                             type="button"
-                            className="h-[40px] w-[160px] cursor-pointer rounded-[4px] bg-link-default text-[14px] font-semibold text-white"
+                            className="h-[40px] w-[160px] cursor-pointer rounded-[4px] border border-[#e0e0e0] bg-[#f9f9f9] text-[14px] font-semibold text-[#626262]"
                           >
                             수정 완료
                           </button>
@@ -514,7 +523,7 @@ export default function Comment({
                       <p className="font-regular text-[14px] text-gray-light">
                         {formatDate(replyItem.createdAt)}
                       </p>
-                      {user?.data &&
+                      {/* {user?.data &&
                         replyItem.nickname !== user?.data?.nickname && (
                           <button
                             onClick={() =>
@@ -525,7 +534,7 @@ export default function Comment({
                           >
                             답글
                           </button>
-                        )}
+                        )} */}
                       {/* <button
                         type="button"
                         className="flex items-center gap-[4px]"
@@ -581,7 +590,6 @@ export default function Comment({
         })}
       </div>
       <CommentForm studyId={studyId} />
-      {isToast && <Toast isToast={isToast} message={message} />}
       {comments?.data?.data && comments?.data?.data?.length > 0 && (
         <div className="mt-[24px] flex items-center justify-center gap-[10px]">
           <button
