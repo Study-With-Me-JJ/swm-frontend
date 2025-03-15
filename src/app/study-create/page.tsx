@@ -65,7 +65,7 @@ export default function StudyCreate() {
       // console.log('생성 성공 응답:', response);
 
       showToast({
-        message: '스터디 생성이 완료되었습니다.'성
+        message: '스터디 생성이 완료되었습니다.',
       });
 
       await queryClient.invalidateQueries({ queryKey: ['study'] });
