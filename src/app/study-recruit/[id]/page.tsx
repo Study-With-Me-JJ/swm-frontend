@@ -256,7 +256,7 @@ export default function StudyRecruitPage({
   >({
     mutationFn: (positionData: EditRecruitmentPositionRequest) => {
       const positionId = String(
-        data?.data?.getRecruitmentPositionResponseList[0].recruitmentPositionId,
+        data?.data?.getRecruitmentPositionResponses[0].recruitmentPositionId,
       );
       if (!positionId) throw new Error('Position ID not found');
       return editRecruitmentPosition(positionId, positionData);
@@ -273,9 +273,9 @@ export default function StudyRecruitPage({
     const positionData: EditRecruitmentPositionRequest = {
       title: value,
       headcount:
-        data?.data?.getRecruitmentPositionResponseList[0].headcount || 0,
+        data?.data?.getRecruitmentPositionResponses[0].headcount || 0,
       acceptedCount:
-        data?.data?.getRecruitmentPositionResponseList[0].acceptedCount || 0,
+        data?.data?.getRecruitmentPositionResponses[0].acceptedCount || 0,
     };
     mutate(positionData);
   };
@@ -379,7 +379,7 @@ export default function StudyRecruitPage({
               {data?.data?.title}
             </div>
             <div className="flex items-center gap-[4px]">
-              {data?.data?.getRecruitmentPositionResponseList.map(
+              {data?.data?.getRecruitmentPositionResponses.map(
                 (item: any) => (
                   <div
                     key={item.recruitmentPositionId}
@@ -399,7 +399,7 @@ export default function StudyRecruitPage({
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-[4px]">
-                {data?.data?.getTagResponseList.map((item: any) => (
+                {data?.data?.getTagResponses.map((item: any) => (
                   <span
                     key={item.tagId}
                     className="h-[30px] min-w-[30px] rounded-[4px] border border-[#eee] bg-white px-[7px] py-[5px] text-sm font-medium text-[#a5a5a5]"
@@ -462,7 +462,7 @@ export default function StudyRecruitPage({
                     }}
                   >
                     {(() => {
-                      const imageList = data?.data?.getImageResponseList || [];
+                      const imageList = data?.data?.getImageResponses || [];
                       // console.log('정렬 전 이미지 리스트:', imageList);
 
                       const sortedImageList = [...imageList].sort(
@@ -560,7 +560,7 @@ export default function StudyRecruitPage({
               모집 현황
             </div>
             <ul>
-              {data?.data?.getRecruitmentPositionResponseList.map(
+              {data?.data?.getRecruitmentPositionResponses.map(
                 (item: any) => (
                   <li
                     key={item.recruitmentPositionId}
@@ -635,11 +635,11 @@ export default function StudyRecruitPage({
             positionList.find(
               (position) =>
                 position.value ===
-                data?.data?.getRecruitmentPositionResponseList[0].title,
+                data?.data?.getRecruitmentPositionResponses[0].title,
             )?.label
           }
           position={
-            data?.data?.getRecruitmentPositionResponseList.map(
+            data?.data?.getRecruitmentPositionResponses.map(
               (position: any, index: any) => position.title,
             ) || []
           }

@@ -10,12 +10,12 @@ export interface EditStudyRequest {
   content: string;
   openChatUrl: string;
   category: StudyCategory;
-  saveTagRequest?: {
-    tagListToAdd: string[];
-    tagIdListToRemove: number[];
+  modifyTagRequest?: {
+    tagsToAdd: string[];
+    tagIdsToRemove: number[];
   };
-  saveImageRequest?: {
-    imageUrlListToAdd: string[];
-    imageIdListToRemove: number[];
+  modifyImageRequest?: {
+    imageUrlsToAdd: string[];
+    imageIdsToRemove: number[];
   }; 
 }

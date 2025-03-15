@@ -24,15 +24,15 @@ export interface StudyDetailRequest {
   likeStatus: boolean;
   openChatUrl: string;
   studyBookmarkId: string | null;
-  getTagResponseList: {
+  getTagResponses: {
     tagId: number;
     name: string;
   }[];
-  getImageResponseList: {
+  getImageResponses: {
     imageId: number;
     imageUrl: string | null;
   }[];
-  getRecruitmentPositionResponseList: {
+  getRecruitmentPositionResponses: {
     recruitmentPositionId: number;
     title: RecruitmentPositionTitle;
     headcount: number;

@@ -87,7 +87,7 @@ export interface SearchStudyParams {
   title?: string;
   category?: StudyCategory | '';
   status?: StudyStatus | '';
-  recruitmentPositionTitleList?: RecruitmentPositionTitle[];
+  recruitmentPositionTitles?: RecruitmentPositionTitle[];
   lastStudyId?: number;
   sortCriteria?: SortCriteria | '';
   lastSortValue?: number;
@@ -121,8 +121,8 @@ export interface Study {
   viewCount: number;
   studyBookmarkId: number;
   liked: boolean;
-  getTagResponseList: getTagResponseList[];
-  getRecruitmentPositionResponseList: getRecruitmentPositionResponseList[];
+  getTagResponses: getTagResponseList[];
+  getRecruitmentPositionResponses: getRecruitmentPositionResponseList[];
 }
 
 export type StudyResponse = ApiResponse<Study>;

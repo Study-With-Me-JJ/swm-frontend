@@ -65,7 +65,7 @@ export default function StudyCreate() {
       // console.log('생성 성공 응답:', response);
 
       showToast({
-        message: '스터디 생정이 완료되었습니다.',
+        message: '스터디 생성이 완료되었습니다.'성
       });
 
       await queryClient.invalidateQueries({ queryKey: ['study'] });
@@ -320,11 +320,11 @@ export default function StudyCreate() {
         content: data.content,
         openChatUrl: data.openChatUrl,
         category: data.category,
-        tagList: (data.tagList || [])
+        tags: (data.tagList || [])
           .filter((tag: string) => tag && typeof tag === 'string')
           .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
-        imageUrlList: uploadedUrls,
-        createRecruitmentPositionRequestList: (data.positions || []).map(
+        imageUrls: uploadedUrls,
+        createRecruitmentPositionRequests: (data.positions || []).map(
           (pos: PositionField) => ({
             title: pos.position,
             headcount: pos.capacity,

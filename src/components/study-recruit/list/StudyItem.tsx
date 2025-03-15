@@ -121,7 +121,7 @@ export default function StudyItem({ data }: { data: Study }) {
               {data.title}
             </h3>
             <div className="flex flex-wrap items-center justify-start gap-2">
-              {data.getRecruitmentPositionResponseList.map((tag) => (
+              {data.getRecruitmentPositionResponses.map((tag) => (
                 <span
                   key={`${data.studyId}-${tag.recruitmentPositionId}`}
                   className="flex h-[28px] min-w-[30px] items-center justify-center rounded-[4px] bg-[#eee] px-[7px] text-xs font-[500] text-gray-default"
@@ -139,7 +139,7 @@ export default function StudyItem({ data }: { data: Study }) {
           </div>
           <div className="flex items-end justify-between gap-[16px]">
             <div className="flex flex-wrap items-center gap-1">
-              {data.getTagResponseList.map((item) => (
+              {data.getTagResponses.map((item) => (
                 <span
                   key={`${item.tagId}-${item.name}`}
                   className="flex h-[26px] min-w-[30px] items-center justify-center rounded-[4px] border border-[#eee] bg-white px-[7px] text-[10px] font-[500] text-[#a5a5a5]"

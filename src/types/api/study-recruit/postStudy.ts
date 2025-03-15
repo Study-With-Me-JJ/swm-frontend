@@ -13,9 +13,9 @@ export interface CreateStudyRequest {
   content: string;
   openChatUrl: string;
   category: StudyCategory;
-  tagList?: string[];
-  imageUrlList?: string[];
-  createRecruitmentPositionRequestList: {
+  tags?: string[];
+  imageUrls?: string[];
+  createRecruitmentPositionRequests: {
     title: RecruitmentPositionTitle;
     headcount: number;
   }[];

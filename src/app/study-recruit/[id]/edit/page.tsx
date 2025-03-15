@@ -48,12 +48,12 @@ export default function StudyRecruitEditPage({
 
   useEffect(() => {
     if (studyDetail) {
-      const tags = (studyDetail.data.getTagResponseList || [])
+      const tags = (studyDetail.data.getTagResponses || [])
         .filter((tag: { tagId: number; name: string }) => tag && tag.name)
         .map((tag: { tagId: number; name: string }) =>
           tag.name.startsWith('#') ? tag.name : `#${tag.name}`,
         );
-      const sortedImages = [...(studyDetail.data.getImageResponseList || [])]
+      const sortedImages = [...(studyDetail.data.getImageResponses || [])]
         .filter(
           (image: { imageId: number; imageUrl: string | null }) =>
             image.imageUrl,
@@ -79,10 +79,10 @@ export default function StudyRecruitEditPage({
         content: studyDetail.data.content,
         openChatUrl: studyDetail.data.openChatUrl,
         category: studyDetail.data.category,
-        tagList: studyDetail.data.getTagResponseList.map(
+        tags: studyDetail.data.getTagResponses.map(
           (tag: { name: string }) => tag.name,
         ),
-        imageUrlList: imageUrlList,
+        imageUrls: imageUrlList,
       });
       //   console.log('original studyDetail:', studyDetail);
     }
@@ -296,7 +296,7 @@ export default function StudyRecruitEditPage({
 
   const onSubmit = methods.handleSubmit(async (data) => {
     try {
-      const originalTags = studyDetail?.data?.getTagResponseList || [];
+      const originalTags = studyDetail?.data?.getTagResponses || [];
       const currentTags = data.tagList || [];
       const removedTagIds = originalTags
         .filter((tag: { tagId: number }) => !currentTags.includes(tag.tagId))
@@ -319,7 +319,7 @@ export default function StudyRecruitEditPage({
         .filter((url) => url) as string[];
 
       const removedImageIds =
-        studyDetail?.data?.getImageResponseList
+        studyDetail?.data?.getImageResponses
           ?.filter((image) => Boolean(image?.imageUrl))
           .map((image) => image.imageId) || [];
 
@@ -328,13 +328,13 @@ export default function StudyRecruitEditPage({
         content: data.content,
         openChatUrl: data.openChatUrl,
         category: data.category,
-        saveTagRequest: {
-          tagListToAdd: data.tagList || [],
-          tagIdListToRemove: removedTagIds,
+        modifyTagRequest: {
+          tagsToAdd: data.tagList || [],
+          tagIdsToRemove: removedTagIds,
         },
-        saveImageRequest: {
-          imageUrlListToAdd: allImageUrls,
-          imageIdListToRemove: removedImageIds,
+        modifyImageRequest: {
+          imageUrlsToAdd: allImageUrls,
+          imageIdsToRemove: removedImageIds,
         },
       };
 

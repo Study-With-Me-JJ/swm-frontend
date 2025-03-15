@@ -8,8 +8,8 @@ export default function ToastContainer() {
   return (
     <>
       <div
-        className={`fixed bottom-0 left-0 right-0 z-[100] h-[120px] w-full min-w-[300px] text-center ${
-          isToast ? 'animate-slide-up-fade' : ''
+        className={`fixed bottom-0 left-0 right-0 h-[120px] w-full min-w-[300px] text-center ${
+          isToast ? 'z-[100] animate-slide-up-fade' : 'z-[-10000]'
         }`}
       >
         <Toast
