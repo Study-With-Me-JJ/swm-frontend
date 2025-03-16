@@ -2,8 +2,9 @@ import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import axios from 'axios';
 import { ApiResponse } from '@/types/api/study-recruit/postStudy';
 import { PostBookmarkResponse } from '@/types/api/study-recruit/postStudy';
+import type { CreateStudyRequest } from '@/types/api/study-recruit/postStudy';
 
-export const postStudy = async (studyData: any): Promise<ApiResponse> => {
+export const postStudy = async (studyData: CreateStudyRequest): Promise<ApiResponse> => {
   const baseUrl = process.env.NEXT_PUBLIC_API_URL;
   const url = `${baseUrl}${API_ENDPOINTS.STUDY.CREATE}`;
 

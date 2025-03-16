@@ -29,6 +29,10 @@ import StudyPositionChange from '@/components/modal/study-position-change';
 import Comment from '@/components/study-recruit/detail/Comment';
 import BookMarkIcon from '@/components/ui/BookMarkIcon';
 import InteractionStatus from '@/components/ui/InteractionStatus';
+import {
+  GetRecruitmentPositionResponse,
+  GetTagResponse,
+} from '@/types/api/study-recruit/getStudyDetail';
 
 export default function StudyRecruitPage({
   params,
@@ -54,7 +58,7 @@ export default function StudyRecruitPage({
     },
   });
 
-  console.log('detail data', data);
+  // console.log('detail data', data);
 
   const router = useRouter();
 
@@ -130,8 +134,7 @@ export default function StudyRecruitPage({
   const positionList = getPositionOptions();
 
   const [pageLoaded, setPageLoaded] = useState(false);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false); 
 
   const handleOptionsClick = () => {
     setIsEditModalOpen(!isEditModalOpen);
@@ -171,8 +174,7 @@ export default function StudyRecruitPage({
 
   const { data: user } = useQuery({
     queryKey: ['userInfo'],
-    queryFn: () => getUserInfo(),
-    enabled: isLogin,
+    queryFn: () => getUserInfo(), 
   });
 
   const formatDate = (dateInput: number[] | string) => {
@@ -380,7 +382,7 @@ export default function StudyRecruitPage({
             </div>
             <div className="flex items-center gap-[4px]">
               {data?.data?.getRecruitmentPositionResponses.map(
-                (item: any) => (
+                (item: GetRecruitmentPositionResponse) => (
                   <div
                     key={item.recruitmentPositionId}
                     className="rounded-[4px] bg-[#eee] px-[7px] py-[5px] text-sm font-medium text-[#565656]"
@@ -399,7 +401,7 @@ export default function StudyRecruitPage({
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-[4px]">
-                {data?.data?.getTagResponses.map((item: any) => (
+                {data?.data?.getTagResponses.map((item: GetTagResponse) => (
                   <span
                     key={item.tagId}
                     className="h-[30px] min-w-[30px] rounded-[4px] border border-[#eee] bg-white px-[7px] py-[5px] text-sm font-medium text-[#a5a5a5]"
@@ -561,7 +563,7 @@ export default function StudyRecruitPage({
             </div>
             <ul>
               {data?.data?.getRecruitmentPositionResponses.map(
-                (item: any) => (
+                (item: GetRecruitmentPositionResponse) => (
                   <li
                     key={item.recruitmentPositionId}
                     className="flex items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]"
@@ -640,7 +642,8 @@ export default function StudyRecruitPage({
           }
           position={
             data?.data?.getRecruitmentPositionResponses.map(
-              (position: any, index: any) => position.title,
+              (position: GetRecruitmentPositionResponse) =>
+                position.title,
             ) || []
           }
           onClickOption={handleChangePosition}

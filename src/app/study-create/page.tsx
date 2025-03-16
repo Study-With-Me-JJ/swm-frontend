@@ -17,6 +17,7 @@ import ImageUploader from '@/components/study-create/ui/image-uploader';
 import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
 import RadioSelectGroup from '@/components/study-create/ui/radio-select-group'; 
 import { useToastStore } from '@/store/useToastStore';
+import type { CreateStudyRequest } from '@/types/api/study-recruit/postStudy';
 interface PositionField {
   id: string;
   position: string;
@@ -52,7 +53,7 @@ export default function StudyCreate() {
   const [tagList, setTagList] = useState<string[]>([]);
 
   const { mutate } = useMutation({
-    mutationFn: (studyData: any) => postStudy(studyData),
+    mutationFn: (studyData: CreateStudyRequest) => postStudy(studyData),
     onSuccess: async (response) => {
       if (response.message === 'Expired Token') {
         showToast({

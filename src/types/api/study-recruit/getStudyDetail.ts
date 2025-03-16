@@ -9,6 +9,23 @@ export interface ApiResponse {
   data: StudyDetailRequest;
 }
 
+export interface GetTagResponse {
+  tagId: number;
+  name: string;
+}
+
+export interface GetImageResponse {
+  imageId: number;
+  imageUrl: string | null;
+}
+
+export interface GetRecruitmentPositionResponse {
+  recruitmentPositionId: number;
+  title: RecruitmentPositionTitle;
+  headcount: number;
+  acceptedCount: number;
+}
+
 export interface StudyDetailRequest {
   studyId: number;
   title: string;
@@ -24,20 +41,10 @@ export interface StudyDetailRequest {
   likeStatus: boolean;
   openChatUrl: string;
   studyBookmarkId: string | null;
-  getTagResponses: {
-    tagId: number;
-    name: string;
-  }[];
-  getImageResponses: {
-    imageId: number;
-    imageUrl: string | null;
-  }[];
-  getRecruitmentPositionResponses: {
-    recruitmentPositionId: number;
-    title: RecruitmentPositionTitle;
-    headcount: number;
-    acceptedCount: number;
-  }[];
+  getTagResponses: GetTagResponse[];
+  getImageResponses: GetImageResponse[];
+  getRecruitmentPositionResponses: GetRecruitmentPositionResponse[];
+ 
   pageCommentResponse: {
     numberOfElements: number;
     totalPages: number;
