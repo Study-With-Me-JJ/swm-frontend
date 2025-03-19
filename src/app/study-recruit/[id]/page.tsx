@@ -252,7 +252,7 @@ export default function StudyRecruitPage({
   };
   const handleOpenStatusChangeModal = () => {
     setIsStatusChangeModalOpen(true);
-    console.log('data', data);
+    // console.log('data', data);
   };
 
   const handleCloseModal = () => {
@@ -272,17 +272,32 @@ export default function StudyRecruitPage({
       if (!positionId) throw new Error('Position ID not found');
       return editRecruitmentPosition(positionId, positionData);
     },
-    onSuccess: (response) => {
+    onSuccess: async (response) => {
       console.log(response);
+      await queryClient.invalidateQueries({
+        queryKey: ['study', 'studyDetail', params.id],
+        refetchActive: true,
+      });
     },
     onError: (error) => {
       console.error(error);
     },
   });
 
-  const handleChangePosition = (value: string | string[]) => {
+  // 신청포지션 수정으로 변경해야함
+  const handleChangePosition = (value: string) => {
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      showToast({
+        message: '로그인 후 이용해주세요.',
+        url: '/login',
+        urlText: '로그인하러 가기',
+      });
+      return;
+    }
+
     const positionData: EditRecruitmentPositionRequest = {
-      title: Array.isArray(value) ? value[0] : value,
+      title: value,
       headcount:
         data?.data?.getRecruitmentPositionResponses[0].headcount || 0,
       acceptedCount:
@@ -313,7 +328,17 @@ export default function StudyRecruitPage({
     },
   }); 
 
-  const handleChangeStatus = (value: string) => {
+  const handleChangeStatus = (value: string) => { 
+    const token = localStorage.getItem('accessToken');
+    if (!token) {
+      showToast({
+        message: '로그인 후 이용해주세요.',
+        url: '/login',
+        urlText: '로그인하러 가기',
+      }); 
+      return;
+    }
+
     const statusData: UpdateStudyStatusRequest = {
       status: value,
     };
@@ -654,7 +679,11 @@ export default function StudyRecruitPage({
                   <div className="flex w-full items-center justify-between gap-[8px]">
                     <div className="flex items-center gap-[8px]">
                       <div className="text-[16px] font-semibold text-black">
-                        프론트엔드 직무
+                        {
+                          positionList.find(
+                            (position) => position.value === data?.data?.getRecruitmentPositionResponses[0].title,
+                          )?.label || ''
+                        }
                       </div>
                       <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
                         신청완료

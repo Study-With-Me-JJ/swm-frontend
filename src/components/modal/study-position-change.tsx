@@ -32,7 +32,7 @@ export default function StudyPositionChange({
     ?.filter((option) => option !== 'ALL')
     .map((pos) => ({
       value: pos,
-      label: POSITION_LABELS[pos as keyof typeof RecruitmentPositionTitle],
+      label: POSITION_LABELS[pos as keyof typeof RecruitmentPositionTitle] + ' 직무',
     }));
 //   console.log(positionList);
 
