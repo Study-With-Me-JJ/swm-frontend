@@ -300,8 +300,8 @@ export default function StudyRecruitPage({
       title: value,
       headcount:
         data?.data?.getRecruitmentPositionResponses[0].headcount || 0,
-      acceptedCount:
-        data?.data?.getRecruitmentPositionResponses[0].acceptedCount || 0,
+      // acceptedCount:
+      //   data?.data?.getRecruitmentPositionResponses[0].acceptedCount || 0,
     };
     changePosition(positionData);
   };

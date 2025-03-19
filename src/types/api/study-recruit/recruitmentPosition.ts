@@ -7,5 +7,5 @@ export interface ApiResponse {
 export interface EditRecruitmentPositionRequest {
   title: string;
   headcount: number;
-  acceptedCount: number;
+  // acceptedCount: number;
 }
