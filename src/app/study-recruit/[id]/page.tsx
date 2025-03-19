@@ -33,6 +33,9 @@ import {
   GetRecruitmentPositionResponse,
   GetTagResponse,
 } from '@/types/api/study-recruit/getStudyDetail';
+import { UpdateStudyStatusRequest } from '@/types/api/study-recruit/studyStatus';
+import { updateStudyStatus } from '@/lib/api/study/editStudy'; 
+import StudyStatusChange from '@/components/modal/study-status-change';
 
 export default function StudyRecruitPage({
   params,
@@ -240,18 +243,24 @@ export default function StudyRecruitPage({
     router.push(`/study-recruit/${params.id}/edit`);
   };
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPositionChangeModalOpen, setIsPositionChangeModalOpen] = useState(false);
+  const [isStatusChangeModalOpen, setIsStatusChangeModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
+  const handleOpenPositionChangeModal = () => {
+    setIsPositionChangeModalOpen(true);
+    console.log('data', data);
+  };
+  const handleOpenStatusChangeModal = () => {
+    setIsStatusChangeModalOpen(true);
     console.log('data', data);
   };
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
+    setIsPositionChangeModalOpen(false);
+    setIsStatusChangeModalOpen(false);
   };
 
-  const { mutate } = useMutation<
+  const { mutate: changePosition } = useMutation<
     ApiResponse,
     Error,
     EditRecruitmentPositionRequest
@@ -271,15 +280,44 @@ export default function StudyRecruitPage({
     },
   });
 
-  const handleChangePosition = (value: string) => {
+  const handleChangePosition = (value: string | string[]) => {
     const positionData: EditRecruitmentPositionRequest = {
-      title: value,
+      title: Array.isArray(value) ? value[0] : value,
       headcount:
         data?.data?.getRecruitmentPositionResponses[0].headcount || 0,
       acceptedCount:
         data?.data?.getRecruitmentPositionResponses[0].acceptedCount || 0,
     };
-    mutate(positionData);
+    changePosition(positionData);
+  };
+
+  const {mutate: updateStudyStatusMutation} = useMutation<
+    ApiResponse,
+    Error,
+    UpdateStudyStatusRequest
+  >({
+    mutationFn: (statusData : UpdateStudyStatusRequest) => {
+      const studyId = String(data?.data?.studyId);
+      if (!studyId) throw new Error('Study ID not found');
+      return updateStudyStatus(studyId, statusData.status);
+    },
+    onSuccess: async (response) => {
+      console.log(response);
+      await queryClient.invalidateQueries({
+        queryKey: ['study', 'studyDetail', params.id],
+        refetchActive: true,
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  }); 
+
+  const handleChangeStatus = (value: string) => {
+    const statusData: UpdateStudyStatusRequest = {
+      status: value,
+    };
+    updateStudyStatusMutation(statusData);
   };
 
   return (
@@ -290,11 +328,23 @@ export default function StudyRecruitPage({
           <div className="flex flex-col gap-[16px]">
             <div className="flex w-full items-center justify-between">
               <div className="flex items-center gap-[12px]">
-                <div
-                  className={`flex h-[30px] min-w-[60px] items-center justify-center rounded-full border border-link-default bg-white text-sm font-bold text-link-default ${data?.data?.status === 'ACTIVE' ? 'border-link-default text-link-default' : 'border-gray-light text-gray-light'}`}
+                <button
+                  onClick={handleOpenStatusChangeModal}
+                  type="button"
+                  className={`flex min-w-[60px] items-center justify-center gap-[2px] rounded-full border   bg-white px-[12px] py-[5px] text-sm font-bold   ${data?.data?.nickname === user?.data?.nickname ? 'cursor-pointer' : 'cursor-default'} ${data?.data?.status === 'ACTIVE' ? 'border-link-default text-link-default' : 'border-gray-light text-gray-light'}`}
                 >
                   {data?.data?.status === 'ACTIVE' ? '모집중' : '모집마감'}
-                </div>
+                  {data?.data?.nickname === user?.data?.nickname && (
+                    <i className="relative top-[1px] flex h-[17px] w-[17px] items-center justify-center rounded-full bg-[#eee]">
+                      <Image
+                        src="/icons/Edit.svg"
+                      alt="edit"
+                      width={11}
+                      height={11}
+                      />
+                    </i>
+                  )}
+                </button>
                 <div className="flex items-center gap-[4px]">
                   <Image
                     src={
@@ -611,7 +661,7 @@ export default function StudyRecruitPage({
                       </div>
                     </div>
                     <button
-                      onClick={handleOpenModal}
+                      onClick={handleOpenPositionChangeModal}
                       type="button"
                       className="cursor-pointer text-sm font-medium text-[#a5a5a5] hover:text-link-default"
                     >
@@ -630,23 +680,29 @@ export default function StudyRecruitPage({
           </button>
         </div>
       </div>
-      {isModalOpen && (
+      {isPositionChangeModalOpen && ( 
         <StudyPositionChange
           handleCloseModal={handleCloseModal}
           defaultValue={
             positionList.find(
               (position) =>
-                position.value ===
-                data?.data?.getRecruitmentPositionResponses[0].title,
-            )?.label
+                position.value === data?.data?.getRecruitmentPositionResponses[0].title,
+            )?.label || ''
           }
           position={
             data?.data?.getRecruitmentPositionResponses.map(
-              (position: GetRecruitmentPositionResponse) =>
-                position.title,
+              (position: GetRecruitmentPositionResponse) => position.title,
             ) || []
           }
           onClickOption={handleChangePosition}
+        />
+      )}
+      {isStatusChangeModalOpen && (
+        <StudyStatusChange
+          handleCloseModal={handleCloseModal}
+          defaultValue={data?.data?.status || ''}
+          options={['ACTIVE', 'INACTIVE']}
+          onClickOption={handleChangeStatus}
         />
       )}
     </>

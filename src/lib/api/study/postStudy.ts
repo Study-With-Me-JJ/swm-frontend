@@ -111,3 +111,4 @@ export const deleteStudyLike = async (studyId: string) => {
     throw error;
   }
 };
+
