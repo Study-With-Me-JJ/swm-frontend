@@ -353,7 +353,7 @@ export default function StudyRecruitEditPage({
   return (
     <>
       <section className="mx-auto max-w-screen-xl px-5 pb-[110px] pt-10 xl:px-0">
-        <h2 className="mb-[40px] text-2xl font-semibold">스터디 생성하기</h2>
+        <h2 className="mb-[40px] text-2xl font-semibold">스터디 수정하기</h2>
         <FormProvider {...methods}>
           <form onSubmit={onSubmit}>
             <div className="flex flex-col gap-[30px]">
