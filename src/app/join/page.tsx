@@ -21,9 +21,9 @@ import { Button } from '@/components/ui/button';
 const signupSchema = z
   .object({
     name: z
-      .string({ required_error: INPUT_ERROR_MESSAGE.NAME })
-      .min(2, INPUT_ERROR_MESSAGE.NAME)
-      .regex(/^[가-힣a-zA-Z\s]+$/, INPUT_ERROR_MESSAGE.NAME),
+      .string({ required_error: INPUT_ERROR_MESSAGE.NAME.REQUIRED })
+      .min(2, INPUT_ERROR_MESSAGE.NAME.HELPER_TEXT)
+      .regex(/^[가-힣a-zA-Z\s]+$/, INPUT_ERROR_MESSAGE.NAME.HELPER_TEXT),
     nickName: z
       .string({ required_error: INPUT_ERROR_MESSAGE.NICKNAME.REQUIRED })
       .regex(/^[a-zA-Z0-9]+$/, INPUT_ERROR_MESSAGE.NICKNAME.HELPER_TEXT),
@@ -225,7 +225,7 @@ export default function Join() {
               label="이름"
               type="text"
               placeholder="이름을 입력해 주세요."
-              helperText={INPUT_ERROR_MESSAGE.NAME}
+              helperText={INPUT_ERROR_MESSAGE.NAME.HELPER_TEXT}
             />
             <InputField
               name="nickName"
