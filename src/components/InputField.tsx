@@ -145,12 +145,12 @@ export function InputField({ ...props }: InputFieldProps) {
         </Button>
       )}
       {helperText && !errors[name] && (
-        <p className="whitespace-pre-line text-xs text-blue-default">
+        <p className="whitespace-pre-line text-[11px] text-blue-default">
           {helperText}
         </p>
       )}
       {errors[name] && (
-        <p className="whitespace-pre-line text-xs text-red-error">
+        <p className="whitespace-pre-line text-[11px] text-red-error">
           {errors[name]?.message?.toString()}
         </p>
       )}
