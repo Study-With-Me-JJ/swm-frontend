@@ -12,6 +12,10 @@ import {
   Study,
   StudyCategory,
   StudyStatus,
+  getCategoryOptions,
+  getPositionOptions,
+  getSortOptions,
+  getStatusOptions,
 } from '@/types/api/study';
 import CategoryFilter from '@/components/study-recruit/filter/CategoryFilter';
 import PositionFilter from '@/components/study-recruit/filter/PositionFilter';
@@ -19,6 +23,13 @@ import SortFilter from '@/components/study-recruit/filter/SortFilter';
 import StatusFilter from '@/components/study-recruit/filter/StatusFilter';
 import StudyItem from '@/components/study-recruit/list/StudyItem';
 import Loadingbar from '@/components/ui/Loadingbar';
+
+const SELECT_IDS = {
+  CATEGORY: 'CATEGORY',
+  POSITION: 'POSITION',
+  STATUS: 'STATUS',
+  SORT: 'SORT'
+} as const;
 
 export default function StudyRecruit() {
   const [selectCategory, setSelectCategory] = useState<string | string[]>(
@@ -32,7 +43,7 @@ export default function StudyRecruit() {
     SortCriteria.NEWEST,
   );
 
-  const [openSelectId, setOpenSelectId] = useState<string | null>(null);
+  const [openSelectId, setOpenSelectId] = useState<keyof typeof SELECT_IDS | null>(null);
 
   const {
     data: study,
@@ -158,62 +169,10 @@ export default function StudyRecruit() {
     setSelectSort(value || SortCriteria.NEWEST);
   };
 
-  const categoryLabels: Record<StudyCategory, string> = {
-    [StudyCategory.ALGORITHM]: '알고리즘',
-    [StudyCategory.DEVELOPMENT]: '개발',
-  };
-
-  const categoryOptions = [
-    { id: 0, value: 'ALL', label: '카테고리 전체' },
-    ...Object.entries(StudyCategory).map(([, value], index) => ({
-      id: index + 1,
-      value,
-      label: categoryLabels[value as StudyCategory],
-    })),
-  ];
-
-  const positionLabels: Record<RecruitmentPositionTitle, string> = {
-    [RecruitmentPositionTitle.BACKEND]: '백엔드',
-    [RecruitmentPositionTitle.FRONTEND]: '프론트엔드',
-    [RecruitmentPositionTitle.ETC]: '기타',
-  };
-
-  const positionOptions = [
-    { id: 0, value: 'ALL', label: '직무 전체' },
-    ...Object.entries(RecruitmentPositionTitle).map(([, value], index) => ({
-      id: index + 1,
-      value,
-      label: positionLabels[value as RecruitmentPositionTitle],
-    })),
-  ];
-
-  const SORT_OPTIONS = {
-    [SortCriteria.NEWEST]: '최신순',
-    [SortCriteria.LIKE]: '좋아요순',
-    [SortCriteria.COMMENT]: '댓글순',
-  } as const;
-
-  const sortOptions = Object.entries(SORT_OPTIONS).map(
-    ([value, label], index) => ({
-      id: index,
-      value,
-      label,
-    }),
-  );
-
-  const STATUS_OPTIONS = {
-    [StudyStatus.ACTIVE]: '모집중',
-    [StudyStatus.INACTIVE]: '모집마감',
-  } as const;
-
-  const statusOptions = [
-    { id: 0, value: 'ALL', label: '상태 전체' },
-    ...Object.entries(STATUS_OPTIONS).map(([value, label], index) => ({
-      id: index + 1,
-      value,
-      label,
-    })),
-  ];
+  const categoryOptions = getCategoryOptions();
+  const positionOptions = getPositionOptions();
+  const statusOptions = getStatusOptions();
+  const sortOptions = getSortOptions();
 
   return (
     <section className="mx-auto max-w-screen-xl px-5 pb-[110px] pt-10 xl:px-0">
@@ -225,9 +184,9 @@ export default function StudyRecruit() {
             onChange={handleCategoryChange}
             defaultValue={selectCategory}
             options={categoryOptions}
-            isOpen={openSelectId === 'select1'}
+            isOpen={openSelectId === SELECT_IDS.CATEGORY}
             onToggle={() =>
-              setOpenSelectId(openSelectId === 'select1' ? null : 'select1')
+              setOpenSelectId(openSelectId === SELECT_IDS.CATEGORY ? null : SELECT_IDS.CATEGORY)
             }
           />
           <PositionFilter
@@ -235,9 +194,9 @@ export default function StudyRecruit() {
             onChange={handlePositionChange}
             defaultValue={selectPosition}
             options={positionOptions}
-            isOpen={openSelectId === 'select2'}
+            isOpen={openSelectId === SELECT_IDS.POSITION}
             onToggle={() =>
-              setOpenSelectId(openSelectId === 'select2' ? null : 'select2')
+              setOpenSelectId(openSelectId === SELECT_IDS.POSITION ? null : SELECT_IDS.POSITION)
             }
           />
           <StatusFilter
@@ -245,9 +204,9 @@ export default function StudyRecruit() {
             onChange={handleStatusChange}
             defaultValue={selectStatus}
             options={statusOptions}
-            isOpen={openSelectId === 'select3'}
+            isOpen={openSelectId === SELECT_IDS.STATUS}
             onToggle={() =>
-              setOpenSelectId(openSelectId === 'select3' ? null : 'select3')
+              setOpenSelectId(openSelectId === SELECT_IDS.STATUS ? null : SELECT_IDS.STATUS)
             }
           />
         </div>
@@ -262,9 +221,9 @@ export default function StudyRecruit() {
               value: sort.value,
               label: sort.label,
             }))}
-            isOpen={openSelectId === 'select4'}
+            isOpen={openSelectId === SELECT_IDS.SORT}
             onToggle={() =>
-              setOpenSelectId(openSelectId === 'select4' ? null : 'select4')
+              setOpenSelectId(openSelectId === SELECT_IDS.SORT ? null : SELECT_IDS.SORT)
             }
             filterName="최신순"
           />

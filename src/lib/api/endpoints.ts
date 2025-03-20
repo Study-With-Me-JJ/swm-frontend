@@ -11,6 +11,7 @@ export const API_ENDPOINTS = {
   },
   STUDY: {
     LIST: '/api/v1/study',
+    CREATE: '/api/v1/study',
   },
   USER: {
     INFO: '/api/v1/user',
