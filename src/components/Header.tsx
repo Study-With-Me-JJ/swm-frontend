@@ -15,9 +15,9 @@ export default function Header() {
     const checkLoginStatus = () => {
       const token = localStorage.getItem('accessToken');
       setIsLoggedIn(!!token);
-    }; 
-    checkLoginStatus(); 
-    window.addEventListener('storage', checkLoginStatus); 
+    };
+    checkLoginStatus();
+    window.addEventListener('storage', checkLoginStatus);
     window.addEventListener('login', checkLoginStatus);
     window.addEventListener('logout', checkLoginStatus);
 
@@ -34,15 +34,11 @@ export default function Header() {
     { name: '외부 스터디 룸', href: '/external-studyrooms' },
     { name: '외부 스터디', href: '/external-studies' },
     ...(isLoggedIn ? [{ name: '스터디 생성', href: '/study-create' }] : []),
+    // TODO: 사업자 검수 조회 state 필요. 현재는 로그인 후 보이도록 설정 by EJ
+    ...(isLoggedIn ? [{ name: '스터디 룸 생성', href: '/studyroom/new' }] : []),
   ];
 
-  const logoOnlyPaths = [
-    '/login/',
-    '/join/',
-    '/join/complete/',
-    '/find-id/',
-    '/find-password/',
-  ];
+  const logoOnlyPaths = ['/login/', '/join/', '/join/complete/'];
 
   if (logoOnlyPaths.includes(path)) {
     return (
@@ -82,7 +78,9 @@ export default function Header() {
               <li key={index} className="px-4">
                 <Link
                   href={nav.href}
-                  className={`text-base font-medium text-gray-default ${path?.startsWith(nav.href) ? 'text-primary-default' : ''}`}
+                  className={`text-base font-medium text-gray-default ${
+                    path === nav.href ? 'text-primary-default' : ''
+                  }`}
                 >
                   {nav.name}
                 </Link>
