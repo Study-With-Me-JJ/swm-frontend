@@ -4,6 +4,7 @@ import { resetPassword } from '@/lib/api/user-management/password-recovery';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { INPUT_ERROR_MESSAGE } from '@/utils/input-error-message';
@@ -31,6 +32,19 @@ const resetPasswordSchema = z
     path: ['passwordCheck'],
   });
 
+function EmailFetcher({
+  onEmailFetched,
+}: {
+  onEmailFetched: (email: string) => void;
+}) {
+  const searchParams = useSearchParams();
+  const email = searchParams.get('email');
+  if (email) {
+    onEmailFetched(email);
+  }
+  return null;
+}
+
 export default function ResetPassword() {
   const methods = useForm<z.infer<typeof resetPasswordSchema>>({
     resolver: zodResolver(resetPasswordSchema),
@@ -40,14 +54,13 @@ export default function ResetPassword() {
 
   const {
     handleSubmit,
-    formState: { isValid, isSubmitting },
+    formState: { isValid, isSubmitting, isSubmitted },
   } = methods;
 
+  const [email, setEmail] = useState<string | null>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const onSubmit = async () => {
-    const email = searchParams.get('email');
     const password = methods.getValues('password');
 
     if (!email) {
@@ -90,7 +103,7 @@ export default function ResetPassword() {
           <section className="flex flex-col gap-5">
             <Button
               className="bg-blue-default"
-              disabled={!isValid || isSubmitting}
+              disabled={!isValid || isSubmitting || isSubmitted}
             >
               비밀번호 재설정하기
             </Button>
@@ -104,6 +117,9 @@ export default function ResetPassword() {
           </section>
         </form>
       </FormProvider>
+      <Suspense fallback={<div>Loading...</div>}>
+        <EmailFetcher onEmailFetched={setEmail} />
+      </Suspense>
     </div>
   );
 }

@@ -39,7 +39,7 @@ export default function FindPassword() {
     watch,
     setValue,
     setError,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isValid, isSubmitting, isSubmitted },
     getValues,
   } = methods;
 
@@ -153,7 +153,9 @@ export default function FindPassword() {
                   `/find-password/reset?email=${encodeURIComponent(getValues('joinEmail'))}`,
                 )
               }
-              disabled={!isValid || isSubmitting || !authCodeVerified}
+              disabled={
+                !isValid || isSubmitting || !authCodeVerified || isSubmitted
+              }
             >
               확인
             </Button>
