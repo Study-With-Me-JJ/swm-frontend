@@ -123,7 +123,7 @@ export function InputField({ ...props }: InputFieldProps) {
         {buttonText && onButtonClick && (
           <Button
             type="button"
-            className="bg-blue-default w-36 flex-shrink-0"
+            className="w-36 flex-shrink-0 bg-blue-default"
             onClick={handleButtonClick}
             disabled={buttonDisabled}
           >
@@ -146,12 +146,12 @@ export function InputField({ ...props }: InputFieldProps) {
         </Button>
       )}
       {helperText && !errors[name] && (
-        <p className="text-blue-default whitespace-pre-line text-xs">
+        <p className="whitespace-pre-line text-[11px] text-blue-default">
           {helperText}
         </p>
       )}
       {errors[name] && (
-        <p className="whitespace-pre-line text-xs text-red-error">
+        <p className="whitespace-pre-line text-[11px] text-red-error">
           {errors[name]?.message?.toString()}
         </p>
       )}

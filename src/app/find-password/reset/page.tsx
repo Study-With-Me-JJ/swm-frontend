@@ -77,12 +77,13 @@ export default function ResetPassword() {
               name="password"
               label="새로운 비밀번호를 입력해 주세요."
               type="password"
-              placeholder="영문, 숫자, 특수문자를 포함한 8~20자리 비밀번호"
+              placeholder="신규 비밀번호"
+              helperText={INPUT_ERROR_MESSAGE.PASSWORD.HELPER_TEXT}
             />
             <InputField
               name="passwordCheck"
               type="password"
-              placeholder="비밀번호 확인"
+              placeholder="신규 비밀번호 확인"
             />
           </section>
 
