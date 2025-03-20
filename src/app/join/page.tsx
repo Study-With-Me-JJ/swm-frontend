@@ -6,7 +6,7 @@ import {
   checkNickname,
   createUser,
   sendAuthCode,
-} from '@/lib/api/signup';
+} from '@/lib/api/user-management/signup';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -74,6 +74,8 @@ export default function Join() {
     useState<string>('인증번호 받기');
   const [isNicknameChecked, setIsNicknameChecked] = useState<boolean>(false);
   const [isEmailChecked, setIsEmailChecked] = useState<boolean>(false);
+  const [isAuthCodeInputEnabled, setIsAuthCodeInputEnabled] =
+    useState<boolean>(false);
 
   const nickname = watch('nickName');
   const email = watch('email');
@@ -132,6 +134,7 @@ export default function Join() {
       await sendAuthCode(email);
       setAuthCodeHelperText('이메일로 인증번호를 발송했습니다.');
       setAuthCodeButtonText('인증번호 재전송');
+      setIsAuthCodeInputEnabled(true);
     } catch (error) {
       console.error('Auth code send error:', error);
       toast.error('인증번호 전송 중 오류가 발생했습니다. 다시 시도해 주세요.', {
@@ -235,7 +238,9 @@ export default function Join() {
               helperText={nicknameHelperText}
               buttonText="중복 확인"
               onButtonClick={handleCheckNickname}
-              disabled={!nickname || !!errors.nickName || isNicknameChecked}
+              buttonDisabled={
+                !nickname || !!errors.nickName || isNicknameChecked
+              }
             />
             <InputField
               name="email"
@@ -245,7 +250,7 @@ export default function Join() {
               helperText={emailHelperText}
               buttonText="중복 확인"
               onButtonClick={handleCheckEmail}
-              disabled={!email || !!errors.email || isEmailChecked}
+              buttonDisabled={!email || !!errors.email || isEmailChecked}
             />
             <InputField
               name="authCode"
@@ -256,7 +261,8 @@ export default function Join() {
               maxLength={6}
               buttonText={authCodeButtonText}
               onButtonClick={handleSendAuthCode}
-              disabled={!isEmailChecked}
+              buttonDisabled={!isEmailChecked}
+              inputDisabled={!isAuthCodeInputEnabled}
               onAuthCodeCheck={handleAuthCodeCheck}
             />
             <InputField
