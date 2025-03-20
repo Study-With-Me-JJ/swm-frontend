@@ -35,12 +35,12 @@ export default function Modal({
       <div className="flex gap-[10px]">
         <Button
           onClick={
-            pathname === '/find-id/' ? () => router.push('/login') : onClose
+            pathname === '/find-id' ? () => router.push('/login') : onClose
           }
           size="sm"
           className="bg-blue-light text-blue-default"
         >
-          {pathname === '/find-id/' ? '로그인' : '닫기'}
+          {pathname === '/find-id' ? '로그인' : '닫기'}
         </Button>
         <Button onClick={handleClick} size="md" className="bg-blue-default">
           {buttonText}
