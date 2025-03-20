@@ -47,8 +47,8 @@ export default function FindId() {
     <>
       {isModalOpen && (
         <Modal
-          mainText="이메일을 확인해 주세요."
-          subText="이메일을 받지 못했다면?"
+          mainText="이메일이 전송되었습니다."
+          subText="이메일을 받지 못했다면 회원가입을 진행해 주세요."
           onClose={() => setIsModalOpen(false)}
           buttonText="회원가입 하러가기"
           path="/join"

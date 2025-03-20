@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Button } from './ui/button';
 
 interface ModalProps {
@@ -19,6 +19,7 @@ export default function Modal({
   path,
 }: ModalProps) {
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleClick = () => {
     router.push(path);
@@ -33,11 +34,13 @@ export default function Modal({
       </div>
       <div className="flex gap-[10px]">
         <Button
-          onClick={onClose}
+          onClick={
+            pathname === '/find-id/' ? () => router.push('/login') : onClose
+          }
           size="sm"
           className="bg-blue-light text-blue-default"
         >
-          닫기
+          {pathname === '/find-id/' ? '로그인' : '닫기'}
         </Button>
         <Button onClick={handleClick} size="md" className="bg-blue-default">
           {buttonText}
