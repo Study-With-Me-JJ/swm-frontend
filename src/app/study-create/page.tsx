@@ -37,6 +37,8 @@ export default function StudyCreate() {
       height: number;
       name: string;
       file: File;
+      size: number;
+      imageId?: number;
     }[]
   >([]);
 
@@ -63,20 +65,23 @@ export default function StudyCreate() {
         return;
       }
 
-      // console.log('생성 성공 응답:', response);
-
       showToast({
         message: '스터디 생성이 완료되었습니다.',
       });
 
-      await queryClient.invalidateQueries({ queryKey: ['study'] });
-      await queryClient.refetchQueries({ queryKey: ['study'] });
+      // 캐시 무효화 전에 지연 추가
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      setTimeout(() => {
-        router.push('/study-recruit');
-      }, 500);
+      // 스터디 목록 데이터만 갱신
+      await queryClient.invalidateQueries({ 
+        queryKey: ['study'],
+        refetchType: 'none' // 자동 리패치 비활성화
+      });
+
+      // 목록 페이지로 즉시 이동
+      router.push('/study-recruit');
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       console.error('생성 실패:', error);
       showToast({
         message: '스터디 생성에 실패했습니다.',
@@ -107,10 +112,13 @@ export default function StudyCreate() {
     methods.setValue('category', value);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
 
-    if (file) {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    
+    if (files) {
+      const file = files[0];
+
       if (file.size > 5 * 1024 * 1024) {
         showToast({
           message: '이미지 크기는 5MB를 초과할 수 없습니다.',
@@ -118,17 +126,52 @@ export default function StudyCreate() {
         e.target.value = '';
         return;
       }
+
+      if (previewImages.length >= 10) {
+        showToast({
+          message: '이미지는 최대 10개까지만 추가할 수 있습니다.',
+        });
+        e.target.value = '';
+        return;
+      }
+
       const imageUrl = URL.createObjectURL(file);
-      const newImage = {
-        url: imageUrl,
-        file: file,
-        width: 200,
-        height: 200,
-        name: file.name,
-      };
-      const newImages = [...previewImages, newImage];
-      setPreviewImages(newImages);
-      methods.setValue('image', newImages);
+      
+      // 상태 업데이트 전 현재 상태 로깅
+      console.log('이미지 추가 전 상태:', {
+        currentPreviewImages: previewImages,
+        currentLength: previewImages.length
+      });
+
+      // 기존 이미지 배열을 복사하고 새 이미지 추가
+      const updatedPreviewImages = [
+        ...previewImages,
+        {
+          url: imageUrl,
+          width: 200,
+          height: 200,
+          name: file.name,
+          size: file.size,
+          file: file
+        }
+      ];
+
+      // 상태 업데이트
+      setPreviewImages(updatedPreviewImages);
+
+      // 상태 업데이트 후 로깅
+      console.log('이미지 추가 후 상태:', {
+        updatedPreviewImages,
+        newLength: updatedPreviewImages.length,
+        addedImage: {
+          url: imageUrl,
+          name: file.name
+        }
+      });
+
+      // imageFiles 업데이트
+      const currentImageFiles = methods.getValues('imageFiles') || [];
+      methods.setValue('imageFiles', [...currentImageFiles, file]);
     }
   };
 
@@ -138,6 +181,8 @@ export default function StudyCreate() {
       width: number;
       height: number;
       name: string;
+      size: number;
+      imageId?: number;
     }[],
   ) => {
     const updatedOrder = newOrder.map((item) => ({
@@ -174,7 +219,8 @@ export default function StudyCreate() {
         width: 200,
         height: 200,
         name: file.name,
-      };
+        size: file.size,
+      }; 
       setPreviewImages((prev) =>
         prev.map((img) => (img.url === oldUrl ? newImage : img)),
       );
@@ -312,7 +358,20 @@ export default function StudyCreate() {
           if (!img.file) {
             throw new Error('파일이 존재하지 않습니다.');
           }
-          return await uploadFileToPresignedUrl(img.file);
+          try {
+            return await uploadFileToPresignedUrl(img.file);
+          } catch (error) {
+            if (error instanceof Error && error.message === 'TOKEN_EXPIRED') {
+              showToast({
+                message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+                url: '/login',
+                urlText: '로그인하러 가기',
+              });
+              router.push('/login');
+              throw error;
+            }
+            throw error;
+          }
         }),
       );
 
@@ -325,7 +384,7 @@ export default function StudyCreate() {
           .filter((tag: string) => tag && typeof tag === 'string')
           .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
         imageUrls: uploadedUrls,
-        createRecruitmentPositionRequests: (data.positions || []).map(
+        upsertRecruitmentPositionRequests: (data.positions || []).map(
           (pos: PositionField) => ({
             title: pos.position,
             headcount: pos.capacity,
@@ -333,13 +392,23 @@ export default function StudyCreate() {
         ),
       };
 
-      // console.log('create studyData', studyData);
+      console.log('create studyData', studyData);
       mutate(studyData);
     } catch (error) {
-      console.error('이미지 업로드 실패:', error);
-      showToast({
-        message: '이미지 업로드에 실패했습니다.',
-      });
+      if (error instanceof Error && error.message !== 'TOKEN_EXPIRED') {
+        console.error('이미지 업로드 실패:', error);
+        showToast({
+          message: '이미지 업로드에 실패했습니다.',
+        });
+      }
+
+      if (error instanceof Error && error.message.includes('지원하지 않는 파일 형식')) {
+        showToast({
+          message: '지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif, bmp, webp, pdf만 가능)',
+        });
+        return;
+      }
+      throw error;
     }
   });
 
@@ -435,6 +504,8 @@ export default function StudyCreate() {
                     width: image.width,
                     height: image.height,
                     name: image.name,
+                    size: image.size,
+                      imageId: image.imageId
                   }))}
                   msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
                   handleOrderEdit={handleOrderEdit}

@@ -19,10 +19,11 @@ export default function ImageUploader({
     width: number;
     height: number;
     name: string; 
+    size: number;
   }[];
   msg?: string;
   handleOrderEdit: (
-    newOrder: { url: string; width: number; height: number; name: string }[],
+    newOrder: { url: string; width: number; height: number; name: string; size: number; }[],
   ) => void;
   handleImageEdit: (
     oldUrl: string,

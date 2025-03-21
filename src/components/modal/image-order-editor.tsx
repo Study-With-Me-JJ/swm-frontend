@@ -82,9 +82,21 @@ export default function ImageOrderEditor({
   handleOrderEdit,
   handleCloseModal, 
 }: {
-  images: { url: string; width: number; height: number; name: string }[];
+  images: { 
+    url: string; 
+    width: number; 
+    height: number; 
+    name: string; 
+    size: number;
+  }[];
   handleOrderEdit: (
-    newOrder: { url: string; width: number; height: number; name: string }[],
+    newOrder: { 
+      url: string; 
+      width: number; 
+      height: number; 
+      name: string; 
+      size: number;
+    }[],
   ) => void;
   handleCloseModal: () => void;
   handleChangeImage: (oldUrl: string) => void;
@@ -109,6 +121,7 @@ export default function ImageOrderEditor({
       orderedImages.filter((image) => image.url !== urlToDelete),
     );
   };
+
   const handleModalImageChange = (oldUrl: string) => {
     const fileInput = document.createElement('input');
     fileInput.type = 'file';

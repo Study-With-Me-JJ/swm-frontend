@@ -15,7 +15,8 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { getCategoryList } from '@/types/api/study-recruit/study';
 import { InputField } from '@/components/InputField';
 import ImageUploader from '@/components/study-create/ui/image-uploader';
-import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
+import RadioSelectGroup from '@/components/study-create/ui/radio-select-group'; 
+import { EditStudyRequest } from '@/types/api/study-recruit/editStudy';
 
 export default function StudyRecruitEditPage({
   params,
@@ -35,6 +36,7 @@ export default function StudyRecruitEditPage({
       width: number;
       height: number;
       name: string;
+      size: number; 
     }[]
   >([]);
 
@@ -42,12 +44,12 @@ export default function StudyRecruitEditPage({
   const { watch } = methods;
 
   const { data: studyDetail } = useQuery({
-    queryKey: ['studyDetail', params.id],
+    queryKey: ['study', 'studyDetail', params.id],
     queryFn: () => getStudyDetail(params.id as string),
   });
 
   useEffect(() => {
-    if (studyDetail) {
+    if (studyDetail?.data) {
       const tags = (studyDetail.data.getTagResponses || [])
         .filter((tag: { tagId: number; name: string }) => tag && tag.name)
         .map((tag: { tagId: number; name: string }) =>
@@ -71,6 +73,7 @@ export default function StudyRecruitEditPage({
           width: 200,
           height: 200,
           name: 'image',
+          size: 0,
         })),
       );
 
@@ -84,7 +87,6 @@ export default function StudyRecruitEditPage({
         ),
         imageUrls: imageUrlList,
       });
-      //   console.log('original studyDetail:', studyDetail);
     }
   }, [studyDetail]);
 
@@ -127,6 +129,7 @@ export default function StudyRecruitEditPage({
           width: 200,
           height: 200,
           name: file.name,
+          size: file.size,
         },
       ]);
       methods.setValue('imageFiles', [
@@ -137,7 +140,7 @@ export default function StudyRecruitEditPage({
   };
 
   const handleOrderEdit = (
-    newOrder: { url: string; width: number; height: number; name: string }[],
+    newOrder: { url: string; width: number; height: number; name: string; size: number }[],
   ) => {
     setPreviewImages(newOrder);
   };
@@ -174,6 +177,7 @@ export default function StudyRecruitEditPage({
         width: 200,
         height: 200,
         name: file.name,
+        size: file.size,
       };
       setPreviewImages((prev) =>
         prev.map((img) => (img.url === oldUrl ? newImage : img)),
@@ -263,7 +267,7 @@ export default function StudyRecruitEditPage({
   };
 
   const { mutate } = useMutation({
-    mutationFn: (studyData: any) => editStudy(params.id as string, studyData),
+    mutationFn: (studyData: EditStudyRequest ) => editStudy(params.id as string, studyData),
     onSuccess: async (response) => {
       if (response.message === 'Expired Token') {
         showToast({
@@ -287,9 +291,9 @@ export default function StudyRecruitEditPage({
         router.push(`/study-recruit/${params.id}`);
       }, 500);
     },
-    onError: (error: any) => {
+    onError: ( ) => {
       showToast({
-        message: error.response?.data?.message || '스터디 수정에 실패했습니다.',
+        message:  '스터디 수정에 실패했습니다.',
       });
     },
   });
@@ -302,26 +306,37 @@ export default function StudyRecruitEditPage({
         .filter((tag: { tagId: number }) => !currentTags.includes(tag.tagId))
         .map((tag: { tagId: number }) => tag.tagId);
 
-      let uploadedImageUrls: string[] = [];
-      if (data.imageFiles && data.imageFiles.length > 0) {
-        uploadedImageUrls = await Promise.all(
-          data.imageFiles.map(async (file: File) => {
-            const presignedUrl = await uploadFileToPresignedUrl(file);
-            return presignedUrl;
-          }),
-        );
-      }
+        let uploadedImageUrls: string[] = [];
+        if (data.imageFiles && data.imageFiles.length > 0) {
+          uploadedImageUrls = await Promise.all(
+            data.imageFiles.map(async (file: File) => {
+              const presignedUrl = await uploadFileToPresignedUrl(file);
+              return presignedUrl;
+            }),
+          );
+        }
 
-      const allImageUrls = previewImages
-        .map((img) =>
-          img.url.startsWith('blob:') ? uploadedImageUrls.shift() : img.url,
-        )
-        .filter((url) => url) as string[];
+        const currentImageUrls = previewImages
+        .map((img) => {
+          if (img.url.startsWith('blob:')) {
+            return uploadedImageUrls.shift();
+          }
+          return img.url;
+        })
+        .filter((url): url is string => url !== null);
 
-      const removedImageIds =
-        studyDetail?.data?.getImageResponses
-          ?.filter((image) => Boolean(image?.imageUrl))
-          .map((image) => image.imageId) || [];
+      // 삭제된 이미지 ID 찾기
+      const currentImageIds = new Set(
+        previewImages
+          .filter(img => !img.url.startsWith('blob:'))
+          .map(img => img.url)
+      );
+
+      const removedImageIds = studyDetail?.data?.getImageResponses
+        ?.filter(image => image?.imageUrl && !currentImageIds.has(image.imageUrl))
+        .map(image => image.imageId) || [];
+
+
 
       const studyData = {
         title: data.title,
@@ -333,13 +348,13 @@ export default function StudyRecruitEditPage({
           tagIdsToRemove: removedTagIds,
         },
         modifyImageRequest: {
-          imageUrlsToAdd: allImageUrls,
+          imageUrlsToAdd: currentImageUrls,
           imageIdsToRemove: removedImageIds,
         },
       };
 
-      //   console.log('전송 데이터:', studyData);
-      //   console.log('이미지 요청 데이터:', studyData.saveImageRequest);
+        console.log('전송 데이터:', studyData);
+        console.log('이미지 요청 데이터:', studyData.modifyImageRequest);
 
       mutate(studyData);
     } catch (error) {
@@ -442,6 +457,7 @@ export default function StudyRecruitEditPage({
                     width: image.width,
                     height: image.height,
                     name: image.name,
+                    size: image.size,  
                   }))}
                   msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
                   handleOrderEdit={handleOrderEdit}

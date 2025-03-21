@@ -15,7 +15,7 @@ export interface CreateStudyRequest {
   category: StudyCategory;
   tags?: string[];
   imageUrls?: string[];
-  createRecruitmentPositionRequests: {
+  upsertRecruitmentPositionRequests: {
     title: RecruitmentPositionTitle;
     headcount: number;
   }[];

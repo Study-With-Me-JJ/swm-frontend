@@ -2,18 +2,41 @@ import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import axios from 'axios';
 import { ApiResponse } from '@/types/api/study-recruit/postStudy';
 import { PostBookmarkResponse } from '@/types/api/study-recruit/postStudy';
-import type { CreateStudyRequest } from '@/types/api/study-recruit/postStudy';
+import type { CreateStudyRequest } from '@/types/api/study-recruit/postStudy'; 
+
+
 
 export const postStudy = async (studyData: CreateStudyRequest): Promise<ApiResponse> => {
-  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
-  const url = `${baseUrl}${API_ENDPOINTS.STUDY.CREATE}`;
+  
 
-  const res = await axios.post(url, studyData, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-    },
-  });
-  return res.data;
+  const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+  const url = `${baseUrl}${API_ENDPOINTS.STUDY.CREATE}`; 
+
+  // console.log('스터디 생성 요청 데이터(raw):', studyData);
+  // console.log('스터디 생성 요청 데이터(JSON):', JSON.stringify(studyData));
+
+  try {
+    const res = await axios.post(url, studyData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        'Content-Type': 'application/json'
+      },
+    });
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      console.error('스터디 생성 실패 상세:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.response?.data?.message,
+        details: error.response?.data?.data,
+        headers: error.response?.headers
+      });
+      console.error('전체 에러 객체:', error);
+    }
+    throw error;
+  }
 };
 
 //스터디 북마크 추가

@@ -59,9 +59,11 @@ export default function StudyRecruitPage({
         throw error;
       }
     },
+    staleTime: 0, // 항상 최신 데이터 fetch
+    gcTime: 0,
   });
 
-  // console.log('detail data', data);
+  console.log('detail data', data);
 
   const router = useRouter();
 
@@ -146,13 +148,23 @@ export default function StudyRecruitPage({
   const handleDeleteStudy = async () => {
     try {
       await deleteStudy(params.id);
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['study'] }),
-      ]);
+      
+      showToast({
+        message: '스터디가 삭제되었습니다.',
+      });
 
+      // 삭제 후 바로 리다이렉트
       router.push('/study-recruit');
+      
+      // 리다이렉트 후 캐시 무효화
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['study'] });
+      }, 0);
     } catch (error) {
-      console.error(error);
+      console.error('스터디 삭제 중 오류 발생:', error);
+      showToast({
+        message: error instanceof Error ? error.message : '스터디 삭제에 실패했습니다.',
+      });
     }
   };
 
@@ -539,15 +551,14 @@ export default function StudyRecruitPage({
                     }}
                   >
                     {(() => {
-                      const imageList = data?.data?.getImageResponses || [];
-                      // console.log('정렬 전 이미지 리스트:', imageList);
+                      const imageList = data?.data?.getImageResponses
+                        .filter(image => image && image.imageUrl)
+                        .map(image => ({
+                          imageUrl: image.imageUrl,
+                          imageId: image.imageId
+                        })) || [];
 
-                      const sortedImageList = [...imageList].sort(
-                        (a, b) => a.imageId - b.imageId,
-                      );
-                      // console.log('정렬 후 이미지 리스트:', sortedImageList);
-
-                      return sortedImageList.map((item) => (
+                      return imageList.map((item) => (
                         <SwiperSlide key={item.imageId}>
                           <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-gray-disabled">
                             <Image
