@@ -116,7 +116,7 @@ export default function ImageUploader({
           images={
             previewImages?.map((image) => ({
               ...image,
-              name: image.name.split('/').pop() || '',
+              name: image.url.split('/').pop() || '',
             })) || []
           }
           handleOrderEdit={handleOrderEdit}

@@ -207,6 +207,13 @@ export default function StudyCreate() {
         e.target.value = '';
         return;
       }
+      if (previewImages.length >= 10) {
+        showToast({
+          message: '이미지는 최대 10개까지만 추가할 수 있습니다.',
+        });
+        e.target.value = '';
+        return;
+      }
       const targetImage = previewImages.find((img) => img.url === oldUrl);
       if (targetImage) {
         URL.revokeObjectURL(targetImage.url);

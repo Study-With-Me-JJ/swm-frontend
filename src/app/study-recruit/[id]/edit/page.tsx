@@ -142,6 +142,7 @@ export default function StudyRecruitEditPage({
   const handleOrderEdit = (
     newOrder: { url: string; width: number; height: number; name: string; size: number }[],
   ) => {
+    console.log('이미지 순서 변경:', newOrder.map(img => img.url));
     setPreviewImages(newOrder);
   };
 
@@ -306,37 +307,28 @@ export default function StudyRecruitEditPage({
         .filter((tag: { tagId: number }) => !currentTags.includes(tag.tagId))
         .map((tag: { tagId: number }) => tag.tagId);
 
-        let uploadedImageUrls: string[] = [];
-        if (data.imageFiles && data.imageFiles.length > 0) {
-          uploadedImageUrls = await Promise.all(
-            data.imageFiles.map(async (file: File) => {
-              const presignedUrl = await uploadFileToPresignedUrl(file);
-              return presignedUrl;
-            }),
-          );
-        }
+      let uploadedImageUrls: string[] = [];
+      if (data.imageFiles && data.imageFiles.length > 0) {
+        uploadedImageUrls = await Promise.all(
+          data.imageFiles.map(async (file: File) => {
+            const presignedUrl = await uploadFileToPresignedUrl(file);
+            return presignedUrl;
+          }),
+        );
+      }
 
-        const currentImageUrls = previewImages
-        .map((img) => {
-          if (img.url.startsWith('blob:')) {
-            return uploadedImageUrls.shift();
-          }
-          return img.url;
-        })
-        .filter((url): url is string => url !== null);
+      console.log('현재 previewImages 순서:', previewImages.map(img => img.url));
+      
+      const allImageUrls = previewImages
+        .map((img) =>
+          img.url.startsWith('blob:') ? uploadedImageUrls.shift() : img.url,
+        )
+        .filter((url) => url) as string[];
 
-      // 삭제된 이미지 ID 찾기
-      const currentImageIds = new Set(
-        previewImages
-          .filter(img => !img.url.startsWith('blob:'))
-          .map(img => img.url)
-      );
-
-      const removedImageIds = studyDetail?.data?.getImageResponses
-        ?.filter(image => image?.imageUrl && !currentImageIds.has(image.imageUrl))
-        .map(image => image.imageId) || [];
-
-
+        const removedImageIds =
+        studyDetail?.data?.getImageResponses
+          ?.filter((image) => Boolean(image?.imageUrl))
+          .map((image) => image.imageId) || [];
 
       const studyData = {
         title: data.title,
@@ -348,20 +340,32 @@ export default function StudyRecruitEditPage({
           tagIdsToRemove: removedTagIds,
         },
         modifyImageRequest: {
-          imageUrlsToAdd: currentImageUrls,
+          imageUrlsToAdd: allImageUrls,
           imageIdsToRemove: removedImageIds,
         },
       };
 
-        console.log('전송 데이터:', studyData);
-        console.log('이미지 요청 데이터:', studyData.modifyImageRequest);
+      console.log('전송 데이터:', studyData);
+      console.log('이미지 요청 데이터:', JSON.stringify(studyData.modifyImageRequest, null, 2));
+      console.log('현재 이미지 URLs:', allImageUrls);
+      console.log('삭제할 이미지 IDs:', removedImageIds);
 
       mutate(studyData);
     } catch (error) {
-      console.error('이미지 업로드 실패:', error);
-      showToast({
-        message: '스터디 수정에 실패했습니다.',
-      });
+      if (error instanceof Error && error.message !== 'TOKEN_EXPIRED') {
+        console.error('이미지 업로드 실패:', error);
+        showToast({
+          message: '이미지 업로드에 실패했습니다.',
+        });
+      }
+
+      if (error instanceof Error && error.message.includes('지원하지 않는 파일 형식')) {
+        showToast({
+          message: '지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif, bmp, webp, pdf만 가능)',
+        });
+        return;
+      }
+      throw error;
     }
   });
 

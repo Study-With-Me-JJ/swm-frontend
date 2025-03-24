@@ -551,14 +551,21 @@ export default function StudyRecruitPage({
                     }}
                   >
                     {(() => {
-                      const imageList = data?.data?.getImageResponses
-                        .filter(image => image && image.imageUrl)
-                        .map(image => ({
-                          imageUrl: image.imageUrl,
-                          imageId: image.imageId
-                        })) || [];
+                      // const imageList = data?.data?.getImageResponses
+                      //   .filter(image => image && image.imageUrl)
+                      //   .map(image => ({
+                      //     imageUrl: image.imageUrl,
+                      //     imageId: image.imageId
+                      //   })) || [];
+                      const imageList = data?.data?.getImageResponses || [];
+                      console.log('정렬 전 이미지 리스트:', imageList);
 
-                      return imageList.map((item) => (
+                      const sortedImageList = [...imageList].sort(
+                        (a, b) => a.imageId - b.imageId,
+                      );
+                      console.log('정렬 후 이미지 리스트:', sortedImageList);
+
+                      return sortedImageList.map((item) => (
                         <SwiperSlide key={item.imageId}>
                           <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[8px] border border-gray-disabled">
                             <Image
