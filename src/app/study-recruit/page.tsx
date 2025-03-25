@@ -1,8 +1,7 @@
 'use client';
 
 import { getStudy } from '@/lib/api/study/getStudy';
-import { useInfiniteQuery } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query'; 
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useRef } from 'react';
