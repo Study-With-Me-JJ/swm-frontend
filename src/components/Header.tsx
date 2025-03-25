@@ -38,7 +38,7 @@ export default function Header() {
     ...(isLoggedIn ? [{ name: '스터디 룸 생성', href: '/studyroom/new' }] : []),
   ];
 
-  const logoOnlyPaths = ['/login/', '/join/', '/join/complete/'];
+  const logoOnlyPaths = ['/login', '/join', '/join/complete'];
 
   if (logoOnlyPaths.includes(path)) {
     return (
