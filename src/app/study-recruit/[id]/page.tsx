@@ -36,7 +36,7 @@ import {
 import { UpdateStudyStatusRequest } from '@/types/api/study-recruit/studyStatus';
 import { updateStudyStatus } from '@/lib/api/study/editStudy'; 
 import StudyStatusChange from '@/components/modal/study-status-change';
-
+import ApplyStudyModal from '@/components/modal/apply-study-modal';
 export default function StudyRecruitPage({
   params,
 }: {
@@ -253,23 +253,31 @@ export default function StudyRecruitPage({
 
   const moveEditPage = () => {
     router.push(`/study-recruit/${params.id}/edit`);
-  };
+  }; 
 
-  const [isPositionChangeModalOpen, setIsPositionChangeModalOpen] = useState(false);
-  const [isStatusChangeModalOpen, setIsStatusChangeModalOpen] = useState(false);
+  type ModalType = 'position' | 'status' | 'apply-study' | null;
+  const [activeModal, setActiveModal] = useState<ModalType>(null);
 
+  // 직무변경 팝업
   const handleOpenPositionChangeModal = () => {
-    setIsPositionChangeModalOpen(true);
+    setActiveModal('position');
     console.log('data', data);
   };
+
+  // 스터디 상태 변경 팝업
   const handleOpenStatusChangeModal = () => {
-    setIsStatusChangeModalOpen(true);
+    setActiveModal('status');
+    // console.log('data', data);
+  };
+
+  // 스터디 참여 팝업
+  const handleOpenApplyStudyModal = () => {
+    setActiveModal('apply-study'); 
     // console.log('data', data);
   };
 
   const handleCloseModal = () => {
-    setIsPositionChangeModalOpen(false);
-    setIsStatusChangeModalOpen(false);
+    setActiveModal(null);
   };
 
   const { mutate: changePosition } = useMutation<
@@ -720,6 +728,7 @@ export default function StudyRecruitPage({
             </div>
           )}
           <button
+            onClick={handleOpenApplyStudyModal}
             type="button"
             className="h-[60px] w-full cursor-pointer rounded-[8px] bg-link-default text-[16px] font-semibold text-white"
           >
@@ -727,7 +736,7 @@ export default function StudyRecruitPage({
           </button>
         </div>
       </div>
-      {isPositionChangeModalOpen && ( 
+      {activeModal === 'position' && ( 
         <StudyPositionChange
           handleCloseModal={handleCloseModal}
           defaultValue={
@@ -744,12 +753,18 @@ export default function StudyRecruitPage({
           onClickOption={handleChangePosition}
         />
       )}
-      {isStatusChangeModalOpen && (
+      {activeModal === 'status' && (
         <StudyStatusChange
           handleCloseModal={handleCloseModal}
           defaultValue={data?.data?.status || ''}
           options={['ACTIVE', 'INACTIVE']}
           onClickOption={handleChangeStatus}
+        />
+      )}
+      {activeModal === 'apply-study' && (
+        <ApplyStudyModal
+          handleCloseModal={handleCloseModal}  
+          studyData={data?.data || null}
         />
       )}
     </>

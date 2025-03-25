@@ -18,7 +18,7 @@ export default function StudyStatusChange({
   const handleConfirm = () => {
     handleCloseModal();
     onClickOption(selectedStatus || defaultValue);
-    console.log('selectedStatus', selectedStatus);
+    // console.log('selectedStatus', selectedStatus);
   };
 
   const [selectedStatus, setSelectedStatus] = useState(defaultValue || '');
