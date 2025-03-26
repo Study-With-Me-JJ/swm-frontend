@@ -65,12 +65,56 @@ export interface StudyRoomListRes {
   tags: TagRes[];
 }
 
+export interface CreateStudyRoomReq {
+  title: string;
+  subtitle?: string;
+  introduce: string;
+  notice: string;
+  guideline: string;
+  openingTime: string;
+  closingTime: string;
+  address: {
+    address: string;
+    detailAddress: string;
+    region: string;
+    locality: string;
+  };
+  coordinates: {
+    latitude: number;
+    longitude: number;
+  };
+  thumbnail: string;
+  referenceUrl?: string;
+  phoneNumber: string;
+  tags?: string[];
+  dayOffs?: string[];
+  imageUrls: string[];
+  types: string[];
+  options: string[];
+  reservationTypes: [
+    {
+      maxHeadcount: number;
+      reservationOption: string;
+      pricePerHour: number;
+    },
+  ];
+  minReserveTime: number;
+  entireMinHeadcount: number;
+  entireMaxHeadcount: number;
+  entireMinPricePerHour: number;
+  entireMaxPricePerHour: number;
+}
+
 export interface TagRes {
   studyRoomTagId: number;
   tag: string;
 }
 
 export type StudyRoomListResponse = ApiResponse<
+  CursorPageData<StudyRoomListRes>
+>;
+
+export type CreateStudyRoomResponse = ApiResponse<
   CursorPageData<StudyRoomListRes>
 >;
 

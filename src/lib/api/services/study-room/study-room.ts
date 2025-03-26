@@ -1,6 +1,7 @@
-import { publicAxiosInstance } from '@/lib/api/axios';
+import axiosInstance, { publicAxiosInstance } from '@/lib/api/axios';
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import {
+  CreateStudyRoomReq,
   LikeResponse,
   StudyRoomListParams,
   StudyRoomListResponse,
@@ -53,6 +54,14 @@ export const StudyRoomService = {
       String(studyRoomId),
     );
     const response = await publicAxiosInstance.delete<UnlikeResponse>(url);
+    return response.data;
+  },
+
+  createStudyRoom: async (createStudyRoomReq: CreateStudyRoomReq) => {
+    const response = await axiosInstance.post<CreateStudyRoomReq>(
+      API_ENDPOINTS.STUDY_ROOM.CREATE,
+      createStudyRoomReq,
+    );
     return response.data;
   },
 };

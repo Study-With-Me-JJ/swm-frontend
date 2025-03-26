@@ -18,6 +18,7 @@ interface InputFieldProps {
   buttonDisabled?: boolean;
   inputDisabled?: boolean;
   onAuthCodeCheck?: () => void;
+  className?: string;
 }
 
 export function InputField({ ...props }: InputFieldProps) {
@@ -38,6 +39,7 @@ export function InputField({ ...props }: InputFieldProps) {
     buttonDisabled,
     inputDisabled,
     onAuthCodeCheck,
+    className,
   } = props;
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(600);
@@ -93,7 +95,7 @@ export function InputField({ ...props }: InputFieldProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      {label && <h3 className="font-medium">{label}</h3>}
+      {label && <h3 className={`${className} font-medium`}>{label}</h3>}
       <div className="flex gap-2">
         <Controller
           name={name}
