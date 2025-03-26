@@ -7,10 +7,12 @@ export interface StudyRoomCreateProps {
   isPending: boolean;
 }
 
-export const StudyRoomCreate = ({
-  mutate,
-  isPending,
-}: StudyRoomCreateProps) => {
+export const StudyRoomCreate = (
+  {
+    // mutate,
+    // isPending,
+  }: StudyRoomCreateProps,
+) => {
   const methods = useForm();
 
   return (

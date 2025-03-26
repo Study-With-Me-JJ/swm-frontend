@@ -39,6 +39,7 @@ export function InputField({ ...props }: InputFieldProps) {
     buttonDisabled,
     inputDisabled,
     onAuthCodeCheck,
+    className,
   } = props;
   const [isCountdownActive, setIsCountdownActive] = useState<boolean>(false);
   const [countdown, setCountdown] = useState<number>(600);
