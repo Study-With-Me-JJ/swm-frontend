@@ -142,7 +142,7 @@ export default function StudyRecruitEditPage({
   const handleOrderEdit = (
     newOrder: { url: string; width: number; height: number; name: string; size: number }[],
   ) => {
-    console.log('이미지 순서 변경:', newOrder.map(img => img.url));
+        // console.log('이미지 순서 변경:', newOrder.map(img => img.url));
     setPreviewImages(newOrder);
   };
 
@@ -322,18 +322,13 @@ export default function StudyRecruitEditPage({
           img.url.startsWith('blob:') ? uploadedImageUrls.shift() : img.url,
         )
         .filter((url) => url) as string[];
-      console.log('화면에 있는 이미지 urls:', allImageUrls);
+      // console.log('화면에 있는 이미지 urls:', allImageUrls);
 
       const addedImageUrls = allImageUrls.filter(
         (url) => !studyDetail?.data?.getImageResponses.some((image) => image.imageUrl === url),
       );
-      console.log('추가할 이미지 urls:', addedImageUrls);
-
-        const currentImageIds =
-        studyDetail?.data?.getImageResponses
-          ?.filter((image) => Boolean(image?.imageUrl))
-          .map((image) => image.imageId) || [];
-      console.log('현재 서버에 있는 이미지 ids:', currentImageIds);
+      // console.log('추가할 이미지 urls:', addedImageUrls);
+ 
 
       const serverImages = studyDetail?.data?.getImageResponses || [];
       const serverImageMap = new Map();
@@ -354,9 +349,9 @@ export default function StudyRecruitEditPage({
         }
       });
       
-      console.log('현재 화면 이미지 URLs:', Array.from(currentImageUrlSet));
-      console.log('서버 이미지:', serverImages);
-      console.log('삭제할 이미지 ids:', removedImageIds);
+      // console.log('현재 화면 이미지 URLs:', Array.from(currentImageUrlSet));
+      // console.log('서버 이미지:', serverImages);
+      // console.log('삭제할 이미지 ids:', removedImageIds);
 
       const studyData = {
         title: data.title,
@@ -373,10 +368,10 @@ export default function StudyRecruitEditPage({
         },
       };
 
-      console.log('전송 데이터:', studyData);
-      console.log('이미지 요청 데이터:', JSON.stringify(studyData.modifyImageRequest, null, 2));
-      console.log('현재 이미지 URLs:', allImageUrls);
-      console.log('삭제할 이미지 IDs:', removedImageIds);
+      // console.log('전송 데이터:', studyData);
+      // console.log('이미지 요청 데이터:', JSON.stringify(studyData.modifyImageRequest, null, 2));
+      // console.log('현재 이미지 URLs:', allImageUrls);
+      // console.log('삭제할 이미지 IDs:', removedImageIds);
 
       mutate(studyData);
     } catch (error) {

@@ -62,7 +62,7 @@ export default function StudyRecruitPage({
     gcTime: 0,
   });
 
-  console.log('detail data', data);
+  // console.log('detail data', data);
 
   const router = useRouter();
 
@@ -260,7 +260,7 @@ export default function StudyRecruitPage({
   // 직무변경 팝업
   const handleOpenPositionChangeModal = () => {
     setActiveModal('position');
-    console.log('data', data);
+    // console.log('data', data);
   };
 
   // 스터디 상태 변경 팝업
@@ -565,12 +565,10 @@ export default function StudyRecruitPage({
                       //     imageId: image.imageId
                       //   })) || [];
                       const imageList = data?.data?.getImageResponses || [];
-                      console.log('정렬 전 이미지 리스트:', imageList);
 
                       const sortedImageList = [...imageList].sort(
                         (a, b) => a.imageId - b.imageId,
                       );
-                      console.log('정렬 후 이미지 리스트:', sortedImageList);
 
                       return sortedImageList.map((item) => (
                         <SwiperSlide key={item.imageId}>

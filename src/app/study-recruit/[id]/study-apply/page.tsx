@@ -1,6 +1,6 @@
 'use client';
 
-import { useParams,useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useQuery } from '@tanstack/react-query';
 import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
@@ -10,10 +10,20 @@ import {
   } from '@/types/api/study-recruit/getStudyDetail';
   import { getPositionOptions } from '@/types/api/study-recruit/study';
 import Image from 'next/image'; 
+import { FormProvider, useForm } from 'react-hook-form';
+import { InputField } from '@/components/InputField'; 
+import { useState } from 'react';
+import { POSITION_LABELS, RecruitmentPositionTitle } from '@/types/api/study';
+import FilterSelect from '@/components/ui/FilterSelect';
+import { useToastStore } from '@/store/useToastStore';
 
-export default function StudyApplyPage() {
-    const router = useRouter();
+const SELECT_IDS = { 
+    POSITION: 'POSITION', 
+  } as const;
+
+export default function StudyApplyPage() { 
     const params = useParams();
+    const { showToast } = useToastStore();
 
     const positionList = getPositionOptions();
 
@@ -23,15 +33,171 @@ export default function StudyApplyPage() {
         queryFn: () => getStudyDetail(params.id as string),
     });
     console.log('data', data);
+
+    const methods = useForm();
+    const { watch } = methods;
+
+    const onSubmit = methods.handleSubmit(async (data) => {
+        console.log('data', data);
+    });
+ 
+
+    const [selectPosition, setSelectPosition] = useState<string | string[]>([]);
+    const [openSelectId, setOpenSelectId] = useState<keyof typeof SELECT_IDS | null>(null);
+    const positionOptions = data?.data?.getRecruitmentPositionResponses.map((item: GetRecruitmentPositionResponse) => ({
+        id: item.recruitmentPositionId,
+        value: item.title,
+        label: POSITION_LABELS[item.title as RecruitmentPositionTitle],
+    }));
+
+    const handlePositionChange = (value: string | string[]) => {
+         
+    };
+
+    // URL 필드 개수를 관리하는 상태 추가
+    const [urlFields, setUrlFields] = useState([{ id: 1 }]);
     
+    // URL 필드 추가 함수 수정
+    const addUrlField = () => {
+        if (urlFields.length < 3) {
+            setUrlFields([...urlFields, { id: Date.now() }]);
+        } else {
+            // 3개 이상일 때 토스트 메시지 표시
+            showToast({
+                message: '최대 3개까지만 추가할 수 있습니다.',
+            });
+        }
+    };
+    
+    // URL 필드 삭제 함수
+    const removeUrlField = (id: number) => {
+        if (urlFields.length > 1) {
+            setUrlFields(urlFields.filter(field => field.id !== id));
+        }
+    };
+
+    const [fileName, setFileName] = useState('');
+
+    const onChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+          const file = files[0]; 
+          setFileName(file.name);
+          const fileSize = file.size;
+          const fileType = file.type;
+          if (fileSize > 15 * 1024 * 1024) {
+            showToast({
+                message: '최대 용량 : 15MB',
+            });
+          }
+          if (fileType !== 'application/pdf' && fileType !== 'image/jpeg' && fileType !== 'image/png' && fileType !== 'image/gif' && fileType !== 'image/bmp' && fileType !== 'image/webp') {
+            showToast({
+                message: 'jpg, jpeg, png, gif, bmp, webp, pdf만 가능합니다.',
+            });
+          }
+          methods.setValue('file', file);
+        }
+      };
 
     return (
         <>
           <div className="mx-auto flex max-w-screen-xl items-start justify-between gap-[40px] px-5 pb-[100px] pt-[40px] xl:px-0">
             {/* 왼쪽 영역 */}
             <div className="flex flex-auto flex-col gap-[40px] pt-[20px]">
-              <div className="text-[24px] font-semibold text-black">스터디 참여하기</div>
-              
+                <div className="text-[24px] font-semibold text-black text-center">스터디 참여하기</div>
+                <FormProvider {...methods}>
+                    <form onSubmit={onSubmit} className='flex flex-col gap-[20px]'>
+                        <div className='flex w-full gap-[8px] items-center'>
+                            <div className='flex-1 flex gap-2 flex-col'> 
+                                <div className='text-[16px] font-medium text-black'>신청 직무</div>
+                                <div className='h-[60px]'>
+                                    <FilterSelect
+                                        type="default"
+                                        onChange={handlePositionChange}
+                                        defaultValue={'필수 선택'}
+                                        options={positionOptions || []} 
+                                        isOpen={openSelectId === SELECT_IDS.POSITION}
+                                        onToggle={() =>
+                                            setOpenSelectId(
+                                            openSelectId === SELECT_IDS.POSITION
+                                                ? null
+                                                : SELECT_IDS.POSITION,
+                                            )
+                                        }
+                                    />
+                                </div>
+                            </div>
+                            <div className='flex-1'>
+                                <InputField
+                                    name="kakaoId"
+                                    type="text"
+                                    label="카카오톡 아이디"
+                                    placeholder="오픈채팅 개설을 위해 사용됩니다."
+                                />
+                            </div>
+                        </div>
+                        <div className='flex flex-col w-full gap-[12px]'>
+                            <div className='text-[16px] font-medium text-black'>URL</div>
+                            {urlFields.map((field, index) => (
+                                <div key={field.id} className='flex w-full gap-[12px] items-center'> 
+                                    <div className='flex-auto'>
+                                        <InputField
+                                        name={`url_${field.id}`}
+                                        type="text" 
+                                        placeholder="깃허브, 비핸스 등"  
+                                    />
+                                </div> 
+                                {index === 0 ? (
+                                    <button 
+                                    type="button"
+                                    onClick={addUrlField}
+                                    className='bg-link-default rounded-[8px] flex-shrink-0 w-[48px] h-[48px] flex items-center justify-center'
+                                    >
+                                    <Image src="/icons/Add.svg" alt="+" width={18} height={18} />
+                                    </button>
+                                ) : (
+                                    <button 
+                                    type="button"
+                                    onClick={() => removeUrlField(field.id)}
+                                    className='bg-[#f9f9f9] rounded-[8px] flex-shrink-0 w-[48px] h-[48px] flex items-center justify-center border border-[#e0e0e0]'
+                                    >
+                                    <Image src="/icons/Clear.svg" alt="-" width={18} height={18} />
+                                    </button>
+                                )}
+                            </div>
+                            ))}
+                            <div className='text-[14px] text-link-default'>최대 3개까지 추가할 수 있습니다.</div>
+                        </div> 
+                        <div className='flex flex-col w-full gap-[12px]'>
+                            <div className='text-[16px] font-medium text-black'>파일 업로드</div>
+                            <div className='flex w-full gap-[12px] items-center'> 
+                                <div className='flex-auto relative'>
+                                    <input 
+                                        type="text" 
+                                        className='w-full h-[60px] rounded-[8px] border border-[#e0e0e0] px-[12px] text-[16px] text-medium text-[#a5a5a5] focus:outline-none cursor-default' 
+                                        placeholder='pdf, jpg, jpeg, png 등' 
+                                        value={fileName}
+                                        readOnly 
+                                        />
+                                    <input 
+                                        type="file" 
+                                        id="fileInput"  
+                                        onChange={onChangeFile}
+                                        className="opacity-0 absolute inset-0 w-full h-full cursor-pointer"
+                                        />
+                                </div> 
+                                <label htmlFor="fileInput" className='bg-link-default rounded-[8px] flex-shrink-0 w-[48px] h-[48px] flex items-center justify-center text-[14px] text-white cursor-pointer'><Image src="/icons/File-Upload.svg" alt="파일 업로드" width={24} height={24} /></label>
+                            </div>
+                            <div className='text-[14px] text-red-500'>최대 용량 : 15MB</div>
+                        </div>
+                        <div className='flex flex-col w-full gap-[12px]'>
+                            <div className='text-[16px] font-medium text-black'>자기소개</div>
+                            <div className='relative'>
+                                <textarea className='w-full h-[120px] rounded-[8px] border border-[#e0e0e0] px-[12px] text-[16px] text-medium text-[#a5a5a5] focus:outline-none cursor-default' placeholder='자기소개를 입력해주세요.' />
+                            </div>
+                        </div>
+                    </form>
+                </FormProvider>
             </div>
             {/* 오른쪽 영역 */}
             <div className="sticky top-[0px] flex w-[380px] flex-shrink-0 flex-col gap-[40px] bg-white pt-[20px]">

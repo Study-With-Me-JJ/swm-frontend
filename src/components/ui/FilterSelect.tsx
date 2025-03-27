@@ -90,12 +90,14 @@ export default function FilterSelect({
             ? defaultValue
                 .map(
                   (value) =>
-                    options.find((option) => option.value === value)?.label,
+                    options?.find((option) => option.value === value)?.label,
                 )
                 .join(', ')
             : typeof defaultValue === 'string' && defaultValue.includes('전체')
               ? defaultValue
-              : options.find((option) => option.value === defaultValue)?.label}
+              : typeof defaultValue === 'string' && options && !options.some(option => option.value === defaultValue)
+                ? defaultValue
+                : options?.find((option) => option.value === defaultValue)?.label || defaultValue}
         </span>
         <Image
           src={

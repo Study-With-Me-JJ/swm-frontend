@@ -136,12 +136,7 @@ export default function StudyCreate() {
       }
 
       const imageUrl = URL.createObjectURL(file);
-      
-      // 상태 업데이트 전 현재 상태 로깅
-      console.log('이미지 추가 전 상태:', {
-        currentPreviewImages: previewImages,
-        currentLength: previewImages.length
-      });
+       
 
       // 기존 이미지 배열을 복사하고 새 이미지 추가
       const updatedPreviewImages = [
@@ -158,16 +153,7 @@ export default function StudyCreate() {
 
       // 상태 업데이트
       setPreviewImages(updatedPreviewImages);
-
-      // 상태 업데이트 후 로깅
-      console.log('이미지 추가 후 상태:', {
-        updatedPreviewImages,
-        newLength: updatedPreviewImages.length,
-        addedImage: {
-          url: imageUrl,
-          name: file.name
-        }
-      });
+ 
 
       // imageFiles 업데이트
       const currentImageFiles = methods.getValues('imageFiles') || [];
@@ -197,7 +183,6 @@ export default function StudyCreate() {
     oldUrl: string,
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    // console.log('handleImageEdit 호출됨');
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
@@ -399,7 +384,7 @@ export default function StudyCreate() {
         ),
       };
 
-      console.log('create studyData', studyData);
+      // console.log('create studyData', studyData);
       mutate(studyData);
     } catch (error) {
       if (error instanceof Error && error.message !== 'TOKEN_EXPIRED') {
