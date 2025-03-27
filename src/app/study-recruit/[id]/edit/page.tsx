@@ -315,20 +315,48 @@ export default function StudyRecruitEditPage({
             return presignedUrl;
           }),
         );
-      }
-
-      console.log('현재 previewImages 순서:', previewImages.map(img => img.url));
+      } 
       
       const allImageUrls = previewImages
         .map((img) =>
           img.url.startsWith('blob:') ? uploadedImageUrls.shift() : img.url,
         )
         .filter((url) => url) as string[];
+      console.log('화면에 있는 이미지 urls:', allImageUrls);
 
-        const removedImageIds =
+      const addedImageUrls = allImageUrls.filter(
+        (url) => !studyDetail?.data?.getImageResponses.some((image) => image.imageUrl === url),
+      );
+      console.log('추가할 이미지 urls:', addedImageUrls);
+
+        const currentImageIds =
         studyDetail?.data?.getImageResponses
           ?.filter((image) => Boolean(image?.imageUrl))
           .map((image) => image.imageId) || [];
+      console.log('현재 서버에 있는 이미지 ids:', currentImageIds);
+
+      const serverImages = studyDetail?.data?.getImageResponses || [];
+      const serverImageMap = new Map();
+      serverImages.forEach(image => {
+        if (image.imageUrl && image.imageId) {
+          serverImageMap.set(image.imageUrl, image.imageId);
+        }
+      });
+      
+      // 2. 화면에 현재 표시된 이미지 URL 집합 생성
+      const currentImageUrlSet = new Set(allImageUrls);
+      
+      // 3. 서버에 있지만 현재 화면에 없는 이미지만 삭제 목록에 추가
+      const removedImageIds: number[] = [];
+      serverImages.forEach(image => {
+        if (image.imageUrl && image.imageId && !currentImageUrlSet.has(image.imageUrl)) {
+          removedImageIds.push(image.imageId);
+        }
+      });
+      
+      console.log('현재 화면 이미지 URLs:', Array.from(currentImageUrlSet));
+      console.log('서버 이미지:', serverImages);
+      console.log('삭제할 이미지 ids:', removedImageIds);
 
       const studyData = {
         title: data.title,
@@ -340,7 +368,7 @@ export default function StudyRecruitEditPage({
           tagIdsToRemove: removedTagIds,
         },
         modifyImageRequest: {
-          imageUrlsToAdd: allImageUrls,
+          imageUrlsToAdd: addedImageUrls,
           imageIdsToRemove: removedImageIds,
         },
       };
@@ -372,7 +400,7 @@ export default function StudyRecruitEditPage({
   return (
     <>
       <section className="mx-auto max-w-screen-xl px-5 pb-[110px] pt-10 xl:px-0">
-        <h2 className="mb-[40px] text-2xl font-semibold">스터디 수정하기</h2>
+        <h2 className="mb-[40px] text-center text-2xl font-semibold">스터디 수정하기</h2>
         <FormProvider {...methods}>
           <form onSubmit={onSubmit}>
             <div className="flex flex-col gap-[30px]">

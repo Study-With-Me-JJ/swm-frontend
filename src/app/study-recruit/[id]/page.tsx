@@ -35,8 +35,7 @@ import {
 } from '@/types/api/study-recruit/getStudyDetail';
 import { UpdateStudyStatusRequest } from '@/types/api/study-recruit/studyStatus';
 import { updateStudyStatus } from '@/lib/api/study/editStudy'; 
-import StudyStatusChange from '@/components/modal/study-status-change';
-import ApplyStudyModal from '@/components/modal/apply-study-modal';
+import StudyStatusChange from '@/components/modal/study-status-change'; 
 export default function StudyRecruitPage({
   params,
 }: {
@@ -255,7 +254,7 @@ export default function StudyRecruitPage({
     router.push(`/study-recruit/${params.id}/edit`);
   }; 
 
-  type ModalType = 'position' | 'status' | 'apply-study' | null;
+  type ModalType = 'position' | 'status'  | null;
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
   // 직무변경 팝업
@@ -269,12 +268,7 @@ export default function StudyRecruitPage({
     setActiveModal('status');
     // console.log('data', data);
   };
-
-  // 스터디 참여 팝업
-  const handleOpenApplyStudyModal = () => {
-    setActiveModal('apply-study'); 
-    // console.log('data', data);
-  };
+ 
 
   const handleCloseModal = () => {
     setActiveModal(null);
@@ -364,6 +358,11 @@ export default function StudyRecruitPage({
     };
     updateStudyStatusMutation(statusData);
   };
+
+  //스터디 참여하기
+  const handleStudyApply = () => { 
+    router.push(`/study-recruit/${params.id}/study-apply`); 
+  };  
 
   return (
     <>
@@ -728,7 +727,7 @@ export default function StudyRecruitPage({
             </div>
           )}
           <button
-            onClick={handleOpenApplyStudyModal}
+            onClick={handleStudyApply}
             type="button"
             className="h-[60px] w-full cursor-pointer rounded-[8px] bg-link-default text-[16px] font-semibold text-white"
           >
@@ -760,13 +759,7 @@ export default function StudyRecruitPage({
           options={['ACTIVE', 'INACTIVE']}
           onClickOption={handleChangeStatus}
         />
-      )}
-      {activeModal === 'apply-study' && (
-        <ApplyStudyModal
-          handleCloseModal={handleCloseModal}  
-          studyData={data?.data || null}
-        />
-      )}
+      )} 
     </>
   );
 }

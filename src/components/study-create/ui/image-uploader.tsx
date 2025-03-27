@@ -100,7 +100,7 @@ export default function ImageUploader({
                     }}
                     className="h-[60px] w-[116px] rounded-[8px] border border-[#E0E0E0] bg-[#F9F9F9] text-center text-[16px] font-semibold text-[#6e6e6e]"
                   >
-                    순서 편집
+                    이미지 편집
                   </button>
                 )}
               </div>

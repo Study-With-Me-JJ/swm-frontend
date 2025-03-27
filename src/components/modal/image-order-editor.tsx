@@ -27,7 +27,7 @@ function SortableItem({
   return (
     <div
       ref={setNodeRef}
-      className="flex w-full cursor-move items-center justify-between gap-[5px] border-t border-[#e0e0e0] bg-white py-[20px]"
+      className="flex w-full cursor-default items-center justify-between gap-[5px] border-t border-[#e0e0e0] bg-white py-[20px]"
       role="listitem"
     >
       <div className="flex w-full items-center justify-start gap-[16px]">
@@ -41,8 +41,9 @@ function SortableItem({
         </div>
         <span className="max-w-[150px] truncate text-[14px] text-gray-600">
           {image.name}
-        </span>
-        <div className="flex items-center justify-center gap-[10px]">
+        </span> 
+      </div>
+      <div className="flex items-center justify-center gap-[10px]">
           <button
             type="button"
             className="flex h-[24px] w-[24px] items-center justify-center"
@@ -63,9 +64,9 @@ function SortableItem({
           >
             <Image src="/icons/Delete.svg" alt="삭제" width={24} height={24} />
           </button>
-        </div>
-      </div>
+        </div>  
       <Image
+        className="hidden"
         src="/icons/Menu.svg"
         alt="메뉴"
         width={24}
@@ -155,10 +156,10 @@ export default function ImageOrderEditor({
         <div className="flex h-full flex-col items-center justify-center gap-[30px]">
           <div className="flex flex-col items-center justify-center gap-[8px]">
             <h2 className="text-[20px] font-semibold text-black">
-              이미지 순서 편집
+              이미지 편집
             </h2>
             <p className="font-regular text-[14px] text-gray-default">
-              이미지나 ☰ 부분을 끌어 순서를 변경해 주세요.
+              이미지를 편집 또는 삭제할 수 있습니다.
             </p>
           </div>
           <div className="w-full flex-1 overflow-y-auto">
