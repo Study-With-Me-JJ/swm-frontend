@@ -5,7 +5,7 @@ import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import { deleteStudy } from '@/lib/api/study/getStudyDetail';
 import { addStudyBookmark } from '@/lib/api/study/postStudy';
 import { deleteStudyBookmark } from '@/lib/api/study/postStudy';
-import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition'; 
+import { editRecruitmentPosition, addRecruitmentPosition } from '@/lib/api/study/recruitmentPosition'; 
 import { useToastStore } from '@/store/useToastStore';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -64,7 +64,7 @@ export default function StudyRecruitPage({
     gcTime: 0,
   });
 
-  // console.log('detail data', data);
+  console.log('detail data', data);
 
   const router = useRouter();
 
@@ -769,6 +769,7 @@ export default function StudyRecruitPage({
       )} 
       {activeModal === 'positionSetting' && (
         <StudyPositionSetting
+          studyId={params.id}
           positionOptions={data?.data?.getRecruitmentPositionResponses || []}
           handleCloseModal={handleCloseModal}
         />
