@@ -665,7 +665,13 @@ export default function StudyRecruitPage({
             <div className='flex items-center justify-between'>
               <div className="text-[24px] font-semibold text-black">모집 현황</div>
               {data?.data?.nickname === user?.data?.nickname && (
-                <button onClick={handleOpenPositionSettingModal} type='button' className='flex gap-[4px] text-[14px] font-medium text-[#a5a5a5] hover:text-link-default'><Image src='/icons/Settings.svg' alt='setting' width={14} height={14} />모집 직무 설정</button>
+                <button onClick={handleOpenPositionSettingModal} type='button' className='group flex items-center gap-[4px] text-[14px] font-medium text-[#a5a5a5] hover:text-link-default'>
+                  <div className='relative w-[14px] h-[14px]'>
+                    <Image src='/icons/Settings.svg' alt='' width={14} height={14} className="transition-opacity group-hover:opacity-0" />
+                    <Image src='/icons/Settings-blue.svg' alt='' width={14} height={14} className="opacity-0 transition-opacity group-hover:opacity-100 absolute top-0 left-0" />
+                  </div>
+                  모집 직무 설정 
+                </button>
               )}
             </div> 
             <ul>
