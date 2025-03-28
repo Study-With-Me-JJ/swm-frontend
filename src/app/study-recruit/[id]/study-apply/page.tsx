@@ -112,6 +112,16 @@ export default function StudyApplyPage() {
         setIntroduction(value);
     };
 
+    // 최종 신청완료 팝업
+    const [isOpenPopup, setIsOpenPopup] = useState(false);
+    const onSubmitPopup = () => {
+        setIsOpenPopup(true);
+    };
+
+    const onSubmitDone = () => {
+        router.push(`/study-recruit/${params.id}/study-apply/complete`);
+    };
+
     return (
         <>
           <div className="mx-auto flex max-w-screen-xl items-start justify-between gap-[40px] px-5 pb-[100px] pt-[40px] xl:px-0">
@@ -213,11 +223,10 @@ export default function StudyApplyPage() {
                             </div> 
                         </div>
                         <div className='flex flex-col gap-[20px]'>
-                            <div className='w-[380px] mx-auto flex gap-[10px] items-center justify-center'>
-                                <button type='button' className='w-[120px] h-[60px] flex-shrink-0 rounded-[4px] bg-[#E7F3FF] text-[16px] font-semibold text-link-default'>취소</button>
-                                <button type='submit' className='flex-auto h-[60px] rounded-[4px] bg-link-default text-[16px] font-semibold text-white'>스터디 참여 신청하기</button>
+                            <div className='w-[360px] mx-auto flex gap-[10px] items-center justify-center'>
+                                <button onClick={onSubmitPopup} type='button' className='flex-auto h-[60px] rounded-[4px] bg-link-default text-[16px] font-semibold text-white'>스터디 참여 신청하기</button>
                             </div>
-                            <div className='text-[14px] text-[#a2a2a2] text-center'>스터디 참여 신청 완료 시 신청 내용은 수정할 수 없습니다.</div>
+                            <div className='text-[14px] text-[#a2a2a2] text-center'>[신청대기] 상태에서는 수정 및 삭제가 가능하지만, [신청승인] 상태에서는 수정 및 삭제가 불가능합니다.</div>
                         </div>  
                     </form>
                 </FormProvider>
@@ -306,6 +315,17 @@ export default function StudyApplyPage() {
                 </div> 
             </div>
           </div> 
+          {isOpenPopup && (
+            <div className='fixed inset-0 flex items-center justify-center bg-black bg-opacity-50'>
+                <div className='w-[480px] px-[50px] py-[40px] bg-white rounded-[8px] flex flex-col gap-[30px] justify-center items-center'>
+                    <div className='text-[20px] font-semibold text-black'>스터디 참여를 신청하시겠습니까?</div>
+                    <div className='flex gap-[10px] w-full'>
+                        <button onClick={() => setIsOpenPopup(false)} type='button' className='w-[120px] h-[40px] flex-shrink-0 rounded-[4px] bg-[#E7F3FF] text-[14px] font-semibold text-link-default'>취소</button>
+                        <button onClick={onSubmitDone} type='button' className='flex-auto h-[40px] rounded-[4px] bg-link-default text-[14px] font-semibold text-white'>신청하기</button>
+                    </div>
+                </div>
+            </div>
+          )}
         </>
     );
 }
