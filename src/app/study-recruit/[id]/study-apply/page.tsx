@@ -26,8 +26,7 @@ export default function StudyApplyPage() {
     const router = useRouter();
     const { showToast } = useToastStore();
 
-    const positionList = getPositionOptions();
-
+    const positionList = getPositionOptions(); 
 
     const { data} = useQuery({
         queryKey: ['study','studyDetail', params.id],
@@ -41,10 +40,9 @@ export default function StudyApplyPage() {
     const onSubmit = methods.handleSubmit(async (data) => {
         // console.log('data', data);
         router.push(`/study-recruit/${params.id}/study-apply/complete`);
-    });
- 
+    }); 
 
-    const [selectPosition, setSelectPosition] = useState<string | string[]>([]);
+    const [selectPosition, setSelectPosition] = useState<string | string[]>('필수 선택');
     const [openSelectId, setOpenSelectId] = useState<keyof typeof SELECT_IDS | null>(null);
     const positionOptions = data?.data?.getRecruitmentPositionResponses.map((item: GetRecruitmentPositionResponse) => ({
         id: item.recruitmentPositionId,
@@ -52,8 +50,9 @@ export default function StudyApplyPage() {
         label: POSITION_LABELS[item.title as RecruitmentPositionTitle],
     }));
 
+    // 신청 직무 선택
     const handlePositionChange = (value: string | string[]) => {
-         
+        setSelectPosition(value);
     };
 
     // URL 필드 개수를 관리하는 상태 추가
@@ -63,8 +62,7 @@ export default function StudyApplyPage() {
     const addUrlField = () => {
         if (urlFields.length < 3) {
             setUrlFields([...urlFields, { id: Date.now() }]);
-        } else {
-            // 3개 이상일 때 토스트 메시지 표시
+        } else { 
             showToast({
                 message: '최대 3개까지만 추가할 수 있습니다.',
             });
@@ -136,9 +134,10 @@ export default function StudyApplyPage() {
                                     <div className='text-[16px] font-medium text-black'>신청 직무</div>
                                     <div className='h-[60px]'>
                                         <FilterSelect
+                                            className='text-[#bbb]'
                                             type="default"
                                             onChange={handlePositionChange}
-                                            defaultValue={'필수 선택'}
+                                            defaultValue={selectPosition}
                                             options={positionOptions || []} 
                                             isOpen={openSelectId === SELECT_IDS.POSITION}
                                             onToggle={() =>

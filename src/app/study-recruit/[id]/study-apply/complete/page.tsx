@@ -4,8 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import Loadingbar from '@/components/ui/Loadingbar';
-
+import { useRouter } from "next/navigation";
 export default function StudyApplyCompletePage() {
+    const router = useRouter();
     const params = useParams();
     const { data,isLoading} = useQuery({
         queryKey: ['study','studyDetail', params.id],
@@ -43,8 +44,8 @@ export default function StudyApplyCompletePage() {
                 </div>
                 <div className='flex gap-[24px] flex-col'>
                     <div className='flex gap-[10px] justify-center w-[440px] mx-auto'>
-                        <button type='button' className='w-[120px] h-[60px] flex-shrink-0 rounded-[4px] bg-[#E7F3FF] text-[16px] font-semibold text-link-default'>홈 화면</button>
-                        <button type='button' className='flex-auto h-[60px] rounded-[4px] bg-link-default text-[16px] font-semibold text-white'>스터디 상세페이지로 돌아가기</button>
+                        <button onClick={() => router.push('/')} type='button' className='w-[120px] h-[60px] flex-shrink-0 rounded-[4px] bg-[#E7F3FF] text-[16px] font-semibold text-link-default'>홈 화면</button>
+                        <button onClick={() => router.push(`/study-recruit/${params.id}`)} type='button' className='flex-auto h-[60px] rounded-[4px] bg-link-default text-[16px] font-semibold text-white'>스터디 상세페이지로 돌아가기</button>
                     </div>
                     <div className='text-[14px] font-regular text-[#a2a2a2] text-center'>스터디 신청 내역은 <span className='text-[#565656]'>[마이페이지 &gt; 내 활동 &gt; 내 스터디]</span>에서 확인할 수 있습니다.</div>
                 </div> 

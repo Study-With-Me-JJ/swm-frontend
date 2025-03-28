@@ -36,6 +36,8 @@ import {
 import { UpdateStudyStatusRequest } from '@/types/api/study-recruit/studyStatus';
 import { updateStudyStatus } from '@/lib/api/study/editStudy'; 
 import StudyStatusChange from '@/components/modal/study-status-change'; 
+import StudyPositionSetting from '@/components/modal/study-position-setting';
+
 export default function StudyRecruitPage({
   params,
 }: {
@@ -254,10 +256,10 @@ export default function StudyRecruitPage({
     router.push(`/study-recruit/${params.id}/edit`);
   }; 
 
-  type ModalType = 'position' | 'status'  | null;
+  type ModalType = 'position' | 'status' | 'positionSetting' | null;
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
-  // 직무변경 팝업
+  // 신청 포지션변경 팝업
   const handleOpenPositionChangeModal = () => {
     setActiveModal('position');
     // console.log('data', data);
@@ -265,8 +267,7 @@ export default function StudyRecruitPage({
 
   // 스터디 상태 변경 팝업
   const handleOpenStatusChangeModal = () => {
-    setActiveModal('status');
-    // console.log('data', data);
+    setActiveModal('status'); 
   };
  
 
@@ -363,6 +364,11 @@ export default function StudyRecruitPage({
   const handleStudyApply = () => { 
     router.push(`/study-recruit/${params.id}/study-apply`); 
   };  
+
+  //모집직무 설정 팝업
+  const handleOpenPositionSettingModal = () => {
+    setActiveModal('positionSetting');
+  };
 
   return (
     <>
@@ -656,9 +662,12 @@ export default function StudyRecruitPage({
         {/* 오른쪽 영역 */}
         <div className="sticky top-[0px] flex w-[380px] flex-shrink-0 flex-col gap-[40px] bg-white pt-[20px]">
           <div className="flex flex-col gap-[30px]">
-            <div className="text-[24px] font-semibold text-black">
-              모집 현황
-            </div>
+            <div className='flex items-center justify-between'>
+              <div className="text-[24px] font-semibold text-black">모집 현황</div>
+              {data?.data?.nickname === user?.data?.nickname && (
+                <button onClick={handleOpenPositionSettingModal} type='button' className='flex gap-[4px] text-[14px] font-medium text-[#a5a5a5] hover:text-link-default'><Image src='/icons/Settings.svg' alt='setting' width={14} height={14} />모집 직무 설정</button>
+              )}
+            </div> 
             <ul>
               {data?.data?.getRecruitmentPositionResponses.map(
                 (item: GetRecruitmentPositionResponse) => (
@@ -758,6 +767,12 @@ export default function StudyRecruitPage({
           onClickOption={handleChangeStatus}
         />
       )} 
+      {activeModal === 'positionSetting' && (
+        <StudyPositionSetting
+          positionOptions={data?.data?.getRecruitmentPositionResponses || []}
+          handleCloseModal={handleCloseModal}
+        />
+      )}
     </>
   );
 }

@@ -20,6 +20,7 @@ interface FilterSelectProps {
   title?: string;
   closeOnSelect?: boolean;
   disabled?: boolean;
+  className?: string;
 }
 
 export default function FilterSelect({
@@ -32,6 +33,7 @@ export default function FilterSelect({
   title = 'default',
   closeOnSelect = true,
   disabled = false,
+  className,
 }: FilterSelectProps) {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -77,9 +79,9 @@ export default function FilterSelect({
     <div className="w-inherit relative h-full" ref={containerRef}>
       <button
         type="button"
-        className={`flex h-full w-full items-center justify-between gap-1 rounded-[8px] border px-[13px] text-[16px] font-semibold text-gray-default ${
+        className={`flex h-full w-full items-center justify-between gap-1 rounded-[8px] border px-[13px]  ${
           isOpen ? 'border-link-default' : 'border-gray-disabled'
-        }`}
+        } ${className ? className : 'text-gray-default text-[16px] font-semibold'}`}
         onClick={(e) => {
           e.stopPropagation();
           onToggle();
@@ -119,6 +121,7 @@ export default function FilterSelect({
       case 'default':
         return (
           <DropDownDefault
+            className={className}
             options={options}
             defaultValue={defaultValue as string}
             onClickOption={onClickOption}
