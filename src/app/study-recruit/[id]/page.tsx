@@ -357,7 +357,15 @@ export default function StudyRecruitPage({
     const statusData: UpdateStudyStatusRequest = {
       status: value,
     };
-    updateStudyStatusMutation(statusData);
+    updateStudyStatusMutation(statusData, {
+      onSuccess: () => {
+        showToast({
+          message: '스터디 상태가 변경되었습니다.',
+        });
+        queryClient.invalidateQueries({ queryKey: ['study', 'studyDetail', params.id] });
+      },
+    });
+    
   };
 
   //스터디 참여하기
