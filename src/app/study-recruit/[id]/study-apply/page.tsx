@@ -82,19 +82,25 @@ export default function StudyApplyPage() {
         const files = e.target.files;
         if (files && files.length > 0) {
           const file = files[0]; 
-          setFileName(file.name);
           const fileSize = file.size;
           const fileType = file.type;
+
           if (fileSize > 15 * 1024 * 1024) {
             showToast({
-                message: '최대 용량 : 15MB',
+                message: '최대 용량을 초과했습니다.',
             });
+            e.target.value = '';
+            return;
           }
+
           if (fileType !== 'application/pdf' && fileType !== 'image/jpeg' && fileType !== 'image/png' && fileType !== 'image/gif' && fileType !== 'image/bmp' && fileType !== 'image/webp') {
             showToast({
                 message: 'jpg, jpeg, png, gif, bmp, webp, pdf만 가능합니다.',
             });
+            e.target.value = '';
+            return; 
           }
+          setFileName(file.name);
           methods.setValue('file', file);
         }
     };
