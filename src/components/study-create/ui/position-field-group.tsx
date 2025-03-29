@@ -2,7 +2,8 @@
 
 import Image from 'next/image';
 import FilterSelect from '@/components/ui/FilterSelect';
-
+import { useState } from 'react';
+import { useToastStore } from '@/store/useToastStore';
 interface Option {
   id: number;
   value: string;
@@ -38,7 +39,35 @@ export default function PositionFieldGroup({
   id: string;
   disabled: boolean;
 }) {
+  const { showToast } = useToastStore();
+  const [selectedPositions, setSelectedPositions] = useState<string | string[]>(value || 'ALL');
+
+
   const handlePositionChange = (value: string | string[]) => {
+    // 새로 선택한 직무가 단일 값인 경우
+    if (typeof value === 'string') {
+      // 이미 선택된 직무인지 확인
+      if (value === selectedPositions) {
+        showToast({
+          message: '이미 선택된 직무입니다.',
+        });
+        return; // 변경하지 않고 종료
+      }
+    } 
+    // 새로 선택한 직무가 배열인 경우
+    else if (Array.isArray(value) && Array.isArray(selectedPositions)) {
+      // 새로 추가된 직무 찾기
+      const newPosition = value.find(pos => !selectedPositions.includes(pos));
+      
+      // 이미 모든 직무가 선택되어 있는 경우
+      if (!newPosition && value.length <= selectedPositions.length) {
+        showToast({
+          message: '이미 선택된 직무입니다.',
+        });
+        return; // 변경하지 않고 종료
+      }
+    }
+    setSelectedPositions(value);
     onChange(value || 'ALL');
   };
 

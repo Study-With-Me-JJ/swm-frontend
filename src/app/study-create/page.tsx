@@ -119,6 +119,15 @@ export default function StudyCreate() {
     if (files) {
       const file = files[0];
 
+      const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif','bmp','webp','pdf'];
+      if(!ALLOWED_EXTENSIONS.includes(file.type.split('/')[1])) {
+        showToast({
+          message: '지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif, bmp, webp, pdf만 가능)',
+        });
+        e.target.value = '';
+        return;
+      }
+
       if (file.size > 5 * 1024 * 1024) {
         showToast({
           message: '이미지 크기는 5MB를 초과할 수 없습니다.',

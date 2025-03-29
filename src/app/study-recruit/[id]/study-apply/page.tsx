@@ -257,19 +257,21 @@ export default function StudyApplyPage() {
                                 )}
                             </div>
                         </li>
-                        <li className="flex items-center justify-start border-t border-gray-disabled py-[16px]">
-                            <div className="text-[16px] font-semibold text-black w-[120px] flex-shrink-0">태그</div>
-                            <div className="flex items-center gap-[4px] flex-wrap">
-                                {data?.data?.getTagResponses.map((item: GetTagResponse) => (
-                                    <div
-                                        key={item.tagId}
-                                        className="rounded-[4px] bg-[#fff] px-[6px] py-[4px] text-sm font-medium text-[#a5a5a5] border border-[#eee]"
-                                    >
-                                        #{item.name}
-                                    </div>
-                                ))}
-                            </div>
-                        </li>
+                        {data?.data?.getTagResponses && data?.data?.getTagResponses.length > 0 && (
+                            <li className="flex items-center justify-start border-t border-gray-disabled py-[16px]">
+                                <div className="text-[16px] font-semibold text-black w-[120px] flex-shrink-0">태그</div>
+                                <div className="flex items-center gap-[4px] flex-wrap">
+                                    {data?.data?.getTagResponses.map((item: GetTagResponse) => (
+                                        <div
+                                            key={item.tagId}
+                                            className="rounded-[4px] bg-[#fff] px-[6px] py-[4px] text-sm font-medium text-[#a5a5a5] border border-[#eee]"
+                                        >
+                                            #{item.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            </li>
+                        )}
                     </ul> 
                 </div>
                 <Link href={`/study-recruit/${params.id}`} className="flex items-center justify-center rounded-[8px] border border-link-default h-[60px] text-[16px] font-semibold text-link-default">

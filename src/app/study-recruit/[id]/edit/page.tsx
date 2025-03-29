@@ -152,6 +152,16 @@ export default function StudyRecruitEditPage({
   ) => {
     // console.log('handleImageEdit 호출됨');
     const file = e.target.files?.[0];
+
+    const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif','bmp','webp','pdf'];
+    if(!ALLOWED_EXTENSIONS.includes(file?.type?.split('/')[1] || '')) {
+      showToast({
+        message: '지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif, bmp, webp, pdf만 가능)',
+      });
+      e.target.value = '';
+      return;
+    }
+
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
         showToast({
@@ -486,7 +496,7 @@ export default function StudyRecruitEditPage({
                     name: image.name,
                     size: image.size,  
                   }))}
-                  msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
+                  msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB"
                   handleOrderEdit={handleOrderEdit}
                   handleImageEdit={handleImageEdit}
                 />
