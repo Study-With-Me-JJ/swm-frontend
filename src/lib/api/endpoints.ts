@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
       `/api/v1/study/bookmark/${bookmarkId}`, //스터디 북마크 취소
     LIKE: (studyId: string) => `/api/v1/study/${studyId}/like`, //스터디 좋아요 추가삭제
     STATUS: (studyId: string) => `/api/v1/study/${studyId}/status`, //스터디 모집 상태수정
+    APPLY: (recruitmentPositionId: string) => `/api/v1/recruitment-position/${recruitmentPositionId}/participation`, //스터디 모집 참여 신청
   },
   FILES: {
     PRESIGNED_URL: '/api/v1/files/presigned-url',

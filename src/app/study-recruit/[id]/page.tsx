@@ -5,7 +5,7 @@ import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import { deleteStudy } from '@/lib/api/study/getStudyDetail';
 import { addStudyBookmark } from '@/lib/api/study/postStudy';
 import { deleteStudyBookmark } from '@/lib/api/study/postStudy';
-import { editRecruitmentPosition, addRecruitmentPosition } from '@/lib/api/study/recruitmentPosition'; 
+import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition'; 
 import { useToastStore } from '@/store/useToastStore';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -64,11 +64,14 @@ export default function StudyRecruitPage({
     gcTime: 0,
   });
 
-  console.log('detail data', data);
+  // console.log('detail data', data);
 
   const router = useRouter();
 
   // console.log('studyBookmarkId:', data?.data?.studyBookmarkId);
+
+  // 스터디참여신청 가능여부 데이터수정후 수정하기
+  const studyApplyStatus = useState<boolean>(false);
 
   const isBookmark = data?.data?.studyBookmarkId !== null;
 
@@ -276,7 +279,7 @@ export default function StudyRecruitPage({
   };
 
   const { mutate: changePosition } = useMutation<
-    ApiResponse,
+    ApiResponse<EditRecruitmentPositionRequest>,
     Error,
     EditRecruitmentPositionRequest
   >({
@@ -322,7 +325,7 @@ export default function StudyRecruitPage({
   };
 
   const {mutate: updateStudyStatusMutation} = useMutation<
-    ApiResponse,
+    ApiResponse<UpdateStudyStatusRequest>,
     Error,
     UpdateStudyStatusRequest
   >({
@@ -715,45 +718,49 @@ export default function StudyRecruitPage({
               )}
             </ul>
           </div>
-          {user?.data?.userId && (
-            <div className="flex flex-col gap-[30px]">
-              <div className="text-[24px] font-semibold text-black">
-                내 신청 현황
-              </div>
-              <ul>
-                <li className="flex w-full items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]">
-                  <div className="flex w-full items-center justify-between gap-[8px]">
-                    <div className="flex items-center gap-[8px]">
-                      <div className="text-[16px] font-semibold text-black">
-                        {
-                          positionList.find(
-                            (position) => position.value === data?.data?.getRecruitmentPositionResponses[0].title,
-                          )?.label || ''
-                        }
+          {user?.data?.userId !== data?.data?.userId && (
+            <>
+              <div className="flex flex-col gap-[30px]">
+                <div className="text-[24px] font-semibold text-black">
+                  내 신청 현황
+                </div>
+                <ul>
+                  <li className="flex w-full items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]">
+                    <div className="flex w-full items-center justify-between gap-[8px]">
+                      <div className="flex items-center gap-[8px]">
+                        <div className="text-[16px] font-semibold text-black">
+                          {
+                            positionList.find(
+                              (position) => position.value === data?.data?.getRecruitmentPositionResponses[0].title,
+                            )?.label || ''
+                          }
+                        </div>
+                        <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
+                          신청완료
+                        </div>
                       </div>
-                      <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
-                        신청완료
-                      </div>
+                      <button
+                        onClick={handleOpenPositionChangeModal}
+                        type="button"
+                        className="cursor-pointer text-sm font-medium text-[#a5a5a5] hover:text-link-default"
+                      >
+                        신청 포지션 변경
+                      </button>
                     </div>
-                    <button
-                      onClick={handleOpenPositionChangeModal}
-                      type="button"
-                      className="cursor-pointer text-sm font-medium text-[#a5a5a5] hover:text-link-default"
-                    >
-                      신청 포지션 변경
-                    </button>
-                  </div>
-                </li>
-              </ul>
-            </div>
+                  </li>
+                </ul>
+              </div>
+          
+              <button
+                onClick={studyApplyStatus ? undefined :handleStudyApply }
+                type="button"
+                disabled={!studyApplyStatus}
+                className={`h-[60px] w-full rounded-[8px] text-[16px] font-semibold text-white ${studyApplyStatus ? 'bg-[#e0e0e0] cursor-default' : 'bg-link-default cursor-pointer'}`}
+              >
+                {studyApplyStatus ? '이미 신청한 스터디입니다' : '스터디 참여하기'}
+              </button>
+            </>
           )}
-          <button
-            onClick={handleStudyApply}
-            type="button"
-            className="h-[60px] w-full cursor-pointer rounded-[8px] bg-link-default text-[16px] font-semibold text-white"
-          >
-            스터디 참여하기
-          </button>
         </div>
       </div>
       {activeModal === 'position' && ( 

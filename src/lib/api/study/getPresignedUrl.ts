@@ -20,11 +20,11 @@ export const getPresignedUrl = async (fileName: string, fileSize: number) => {
   // fileSize를 바이트 단위의 문자열로 변환
   const fileSizeInBytes = Math.floor(fileSize).toString();
 
-  console.log('파일 정보:', {
-    fileName,
-    fileSize: fileSizeInBytes,
-    fileSizeInMB: (fileSize / (1024 * 1024)).toFixed(2) + 'MB'
-  });
+  // console.log('파일 정보:', {
+  //   fileName,
+  //   fileSize: fileSizeInBytes,
+  //   fileSizeInMB: (fileSize / (1024 * 1024)).toFixed(2) + 'MB'
+  // });
   
   const params = new URLSearchParams({
     fileName: fileName,

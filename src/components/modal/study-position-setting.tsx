@@ -46,8 +46,8 @@
     const handleAddPosition = () => {
         setPositionField([...positionField, { 
         id: positionField.length + 1, 
-        position: '필수 선택' as any, 
-        headcount: '' as any
+        position: '필수 선택' as RecruitmentPositionTitle, 
+        headcount: 0
         }]);
         setOpenSelectId(null);
     };
@@ -179,12 +179,12 @@
                                                 onChange={(value) => handlePositionChange(value, field.id)}
                                                 defaultValue={field.position}
                                                 options={positionList} 
-                                                isOpen={openSelectId === `${SELECT_IDS.POSITION}_${field.id}` as any}
+                                                isOpen={openSelectId === `${SELECT_IDS.POSITION}_${field.id}` as keyof typeof SELECT_IDS}
                                                 onToggle={() =>
                                                     setOpenSelectId(
-                                                    openSelectId === `${SELECT_IDS.POSITION}_${field.id}` as any
+                                                    openSelectId === `${SELECT_IDS.POSITION}_${field.id}` as keyof typeof SELECT_IDS
                                                         ? null
-                                                        : `${SELECT_IDS.POSITION}_${field.id}` as any,
+                                                        : `${SELECT_IDS.POSITION}_${field.id}` as keyof typeof SELECT_IDS,
                                                     )
                                                 }
                                             />

@@ -1,9 +1,9 @@
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import axios from 'axios';
-import { ApiResponse, EditRecruitmentPositionRequest } from '@/types/api/study-recruit/recruitmentPosition';
+import { ApiResponse, EditRecruitmentPositionRequest, ApplyRecruitmentPositionRequest } from '@/types/api/study-recruit/recruitmentPosition'; 
 
 // 스터디 모집 포지션 추가
-export const addRecruitmentPosition = async (studyId: string, positionData: EditRecruitmentPositionRequest): Promise<ApiResponse> => {
+export const addRecruitmentPosition = async (studyId: string, positionData: EditRecruitmentPositionRequest): Promise<ApiResponse<EditRecruitmentPositionRequest>> => {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
         const url = `${baseUrl}${API_ENDPOINTS.STUDY.CREATE_POSITION(studyId)}`; 
@@ -24,7 +24,7 @@ export const addRecruitmentPosition = async (studyId: string, positionData: Edit
 };
 
 // 스터디 모집 포지션 수정
-export const editRecruitmentPosition = async (recruitmentPositionId: string, positionData: EditRecruitmentPositionRequest): Promise<ApiResponse> => {
+export const editRecruitmentPosition = async (recruitmentPositionId: string, positionData: EditRecruitmentPositionRequest): Promise<ApiResponse<EditRecruitmentPositionRequest>> => {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
         const url = `${baseUrl}${API_ENDPOINTS.STUDY.EDIT_POSITION(recruitmentPositionId)}`; 
@@ -45,7 +45,7 @@ export const editRecruitmentPosition = async (recruitmentPositionId: string, pos
 };  
 
 // 스터디 모집 포지션 삭제
-export const deleteRecruitmentPosition = async (recruitmentPositionId: string): Promise<ApiResponse> => {
+export const deleteRecruitmentPosition = async (recruitmentPositionId: string): Promise<ApiResponse<EditRecruitmentPositionRequest>> => {
     try {
         const baseUrl = process.env.NEXT_PUBLIC_API_URL;
         const url = `${baseUrl}${API_ENDPOINTS.STUDY.DELETE_POSITION(recruitmentPositionId)}`;
@@ -55,6 +55,23 @@ export const deleteRecruitmentPosition = async (recruitmentPositionId: string): 
                 Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
             },
         });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
+
+// 스터디 모집 참여 신청
+export const applyRecruitmentPosition = async (recruitmentPositionId: string, applyData: ApplyRecruitmentPositionRequest): Promise<ApiResponse<null>> => {
+    try { 
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+        const url = `${baseUrl}${API_ENDPOINTS.STUDY.APPLY(recruitmentPositionId)}`; 
+        const response = await axios.post(url, applyData, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+        }); 
         return response.data;
     } catch (error) {
         console.error(error);
