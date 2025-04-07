@@ -298,11 +298,11 @@ export default function StudyCreate() {
       content: data.content,
       openChatUrl: data.openChatUrl,
       category: data.category,
-      tagList: (data.tagList || [])
+      tags: (data.tagList || [])
         .filter((tag: string) => tag && typeof tag === 'string')
         .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
-      imageUrlList: [],
-      createRecruitmentPositionRequestList: (data.positions || []).map(
+        imageUrls: [],
+      createRecruitmentPositionRequests: (data.positions || []).map(
         (pos: PositionField) => ({
           title: pos.position,
           headcount: pos.capacity,
