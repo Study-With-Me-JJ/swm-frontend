@@ -76,12 +76,12 @@ export default function StudyRecruit() {
           ...(selectPosition !== 'ALL' &&
             Array.isArray(selectPosition) &&
             selectPosition.length > 0 && {
-              recruitmentPositionTitleList:
+              recruitmentPositionTitles:
                 selectPosition as RecruitmentPositionTitle[],
             }),
           ...(selectPosition !== 'ALL' &&
             !Array.isArray(selectPosition) && {
-              recruitmentPositionTitleList: [
+              recruitmentPositionTitles: [
                 selectPosition as RecruitmentPositionTitle,
               ],
             }),
@@ -90,6 +90,7 @@ export default function StudyRecruit() {
             lastSortValue: pageParam.lastSortValue,
           }),
         };
+        console.log('api params', params);
         const response = await getStudy(params);
         if (response?.message === 'Expired Token') {
           localStorage.removeItem('accessToken');
@@ -162,19 +163,27 @@ export default function StudyRecruit() {
   };
 
   const handlePositionChange = (value: string | string[]) => {
-    if (Array.isArray(value)) {
-      if (value.length === 0 || value.includes('ALL')) {
-        setSelectPosition('ALL');
-        return;
-      }
-
-      const positions = value
-        .filter((v) => v !== 'ALL')
-        .map((v) => v as RecruitmentPositionTitle);
-      setSelectPosition(positions);
+    if (Array.isArray(value) && value.length === 0) {
+      setSelectPosition('ALL');
       return;
     }
-    setSelectPosition(value || 'ALL');
+    
+    if (value === '') {
+      setSelectPosition('ALL');
+      return;
+    }
+    
+    if (Array.isArray(value) && value.includes('ALL')) {
+      setSelectPosition('ALL');
+      return;
+    }
+    
+    if (value === 'ALL') {
+      setSelectPosition('ALL');
+      return;
+    }
+    
+    setSelectPosition(value);
   };
 
   const handleStatusChange = (value: string | string[]) => {
