@@ -385,7 +385,7 @@ export default function StudyCreate() {
           .filter((tag: string) => tag && typeof tag === 'string')
           .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
         imageUrls: uploadedUrls,
-        upsertRecruitmentPositionRequests: (data.positions || []).map(
+        createRecruitmentPositionRequests: (data.positions || []).map(
           (pos: PositionField) => ({
             title: pos.position,
             headcount: pos.capacity,
