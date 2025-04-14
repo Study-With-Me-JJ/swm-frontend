@@ -5,13 +5,21 @@ import { useParams } from "next/navigation";
 import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import Loadingbar from '@/components/ui/Loadingbar';
 import { useRouter } from "next/navigation";
+import { getApplyStudyDetail } from "@/lib/api/study/getApplyStudyDetail";
 export default function StudyApplyCompletePage() {
     const router = useRouter();
     const params = useParams();
-    const { data,isLoading} = useQuery({
+    const { data, isLoading} = useQuery({
         queryKey: ['study','studyDetail', params.id],
         queryFn: async () => await getStudyDetail(params.id as string), 
     }); 
+    const { data: applyData, isLoading: applyLoading } = useQuery({
+        queryKey: ['study', 'applyDetail', params.id],
+        queryFn: async () => {
+            const participationId = data?.data?.getStudyParticipationStatusResponse?.participationId;
+            return participationId ? await getApplyStudyDetail(String(participationId)) : null;
+        },
+    });
    if(isLoading) return <div className="flex justify-center items-center h-screen"><Loadingbar /></div>
 
     return (
@@ -25,20 +33,20 @@ export default function StudyApplyCompletePage() {
                         <div className='flex gap-[16px] items-center'>
                             <div className='flex-1 flex gap-[20px]'>
                                 <div className='text-[18px] font-regular text-[#6d6d6d]'>신청 직무</div>
-                                <div className='text-[18px] font-medium text-black'>디자이너</div>
+                                <div className='text-[18px] font-medium text-black'>{data?.data?.getStudyParticipationStatusResponse?.title}</div>
                             </div>
                             <div className='flex-1 flex gap-[10px]'>
                                 <div className='text-[18px] font-regular text-[#6d6d6d]'>카카오톡 아이디</div>
-                                <div className='text-[18px] font-medium text-black'>slkdjltaer</div>
+                                <div className='text-[18px] font-medium text-black'>{applyData?.data?.kakaoId}</div>
                             </div> 
                         </div>
                         <div className='flex gap-[20px] items-center'>
                             <div className='text-[16px] font-regular text-[#6d6d6d]'>URL</div>
-                            <div className='text-[16px] font-medium text-black'>www.dsdaret.com</div>
+                            <div className='text-[16px] font-medium text-black'>{applyData?.data?.links[0]}</div>
                         </div>
                         <div className='flex gap-[20px] items-center'>
                             <div className='text-[16px] font-regular text-[#6d6d6d]'>파일</div>
-                            <div className='text-[16px] font-medium text-black'>design portfolio.pdf</div>
+                            <div className='text-[16px] font-medium text-black'>{applyData?.data?.fileInfo?.fileName}</div>
                         </div>
                     </div>
                 </div>

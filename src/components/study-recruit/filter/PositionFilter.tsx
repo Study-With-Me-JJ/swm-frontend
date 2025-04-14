@@ -25,7 +25,7 @@ export default function PositionFilter({
   const displayOptions = options.filter((option) => option.value !== 'ALL');
 
   const getDisplayValue = () => {
-    console.log('getDisplayValue input:', defaultValue);
+    // console.log('getDisplayValue input:', defaultValue);
 
     if (defaultValue === 'ALL') {
       const allOption = options.find((option) => option.value === 'ALL');
@@ -35,7 +35,7 @@ export default function PositionFilter({
   };
 
   const displayValue = getDisplayValue();
-  console.log('최종 displayValue:', displayValue);
+  // console.log('최종 displayValue:', displayValue);
 
   return (
     <>

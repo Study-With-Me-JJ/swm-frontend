@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
     LIKE: (studyId: string) => `/api/v1/study/${studyId}/like`, //스터디 좋아요 추가삭제
     STATUS: (studyId: string) => `/api/v1/study/${studyId}/status`, //스터디 모집 상태수정
     APPLY: (recruitmentPositionId: string) => `/api/v1/recruitment-position/${recruitmentPositionId}/participation`, //스터디 모집 참여 신청
+    APPLY_DETAIL: (participationId: string) => `/api/v1/recruitment-position/participation/${participationId}`, //스터디 참여신청 상세조회
   },
   FILES: {
     PRESIGNED_URL: '/api/v1/files/presigned-url',

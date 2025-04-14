@@ -64,14 +64,15 @@ export default function StudyRecruitPage({
     gcTime: 0,
   });
 
-  // console.log('detail data', data);
+  console.log('detail data', data);
 
   const router = useRouter();
 
   // console.log('studyBookmarkId:', data?.data?.studyBookmarkId);
 
   // 스터디참여신청 가능여부 데이터수정후 수정하기
-  const studyApplyStatus = useState<boolean>(false);
+  const studyApplyStatus = data?.data?.getStudyParticipationStatusResponse?.status;
+  console.log('studyApplyStatus', studyApplyStatus);
 
   const isBookmark = data?.data?.studyBookmarkId !== null;
 
@@ -710,7 +711,7 @@ export default function StudyRecruitPage({
                     </div>
                     <div>
                       <span className="box-border block h-[30px] min-w-[50px] rounded-[4px] border border-[#eee] px-[6px] py-[4px] text-[14px] font-medium text-[#a5a5a5]">
-                        {item.acceptedCount}명 신청중
+                        {item.participatedCount}명 신청중
                       </span>
                     </div>
                   </li>
@@ -724,43 +725,60 @@ export default function StudyRecruitPage({
                 <div className="text-[24px] font-semibold text-black">
                   내 신청 현황
                 </div>
-                <ul>
-                  <li className="flex w-full items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]">
-                    <div className="flex w-full items-center justify-between gap-[8px]">
-                      <div className="flex items-center gap-[8px]">
-                        <div className="text-[16px] font-semibold text-black">
-                          {
-                            positionList.find(
-                              (position) => position.value === data?.data?.getRecruitmentPositionResponses[0].title,
-                            )?.label || ''
-                          }
+
+                {studyApplyStatus === null ? (
+                  <div className="text-left text-[16px] font-semibold text-[#a5a5a5] border-t border-gray-disabled py-[16px]">
+                    신청한 직무가 없습니다
+                  </div>
+                ) : (
+                  <ul>
+                    <li className="flex w-full items-center justify-between gap-[5px] border-t border-gray-disabled py-[16px]">
+                      <div className="flex w-full items-center justify-between gap-[8px]">
+                        <div className="flex items-center gap-[8px]">
+                          <div className="text-[16px] font-semibold text-black">
+                            {
+                              positionList.find(
+                                (position) => position.value === data?.data?.getStudyParticipationStatusResponse?.title,
+                              )?.label || ''
+                            } 직무
+                          </div>
+                          <div className={`h-[30px] min-w-[40px] rounded-[4px] px-[6px] py-[4px] text-[14px] font-medium ${
+                            data?.data?.getStudyParticipationStatusResponse?.status === 'pending' 
+                              ? 'bg-[#E7F3FF] text-link-default' 
+                              : data?.data?.getStudyParticipationStatusResponse?.status === 'accepted' 
+                                ? 'bg-[#4998E9] text-white' 
+                                : 'bg-[#FFE7E7] text-red-600'
+                          }`}>
+                            {data?.data?.getStudyParticipationStatusResponse?.status === 'pending' 
+                              ? '신청완료' 
+                              : data?.data?.getStudyParticipationStatusResponse?.status === 'accepted' 
+                                ? '승인완료' 
+                                : '거절됨'}
+                          </div>
                         </div>
-                        <div className="h-[30px] min-w-[40px] rounded-[4px] bg-[#E7F3FF] px-[6px] py-[4px] text-[14px] font-medium text-link-default">
-                          신청완료
-                        </div>
+                        <button
+                          onClick={handleOpenPositionChangeModal}
+                          type="button"
+                          className="cursor-pointer text-sm font-medium text-[#a5a5a5] hover:text-link-default"
+                        >
+                          신청 포지션 변경
+                        </button>
                       </div>
-                      <button
-                        onClick={handleOpenPositionChangeModal}
-                        type="button"
-                        className="cursor-pointer text-sm font-medium text-[#a5a5a5] hover:text-link-default"
-                      >
-                        신청 포지션 변경
-                      </button>
-                    </div>
-                  </li>
-                </ul>
-              </div>
-          
+                    </li>
+                  </ul>
+                )}
+              </div> 
+               
               <button
-                onClick={studyApplyStatus ? undefined :handleStudyApply }
+                onClick={studyApplyStatus === 'PENDING' ? undefined :handleStudyApply }
                 type="button"
-                disabled={!studyApplyStatus}
-                className={`h-[60px] w-full rounded-[8px] text-[16px] font-semibold text-white ${studyApplyStatus ? 'bg-[#e0e0e0] cursor-default' : 'bg-link-default cursor-pointer'}`}
-              >
-                {studyApplyStatus ? '이미 신청한 스터디입니다' : '스터디 참여하기'}
-              </button>
+                disabled={studyApplyStatus === 'PENDING'}
+              className={`h-[60px] w-full rounded-[8px] text-[16px] font-semibold text-white ${studyApplyStatus === 'PENDING' ? 'bg-[#e0e0e0] cursor-default' : 'bg-link-default cursor-pointer'}`}
+            >
+              {studyApplyStatus === 'PENDING' ? '이미 신청한 스터디입니다' : '스터디 참여하기'}
+              </button> 
             </>
-          )}
+          )} 
         </div>
       </div>
       {activeModal === 'position' && ( 

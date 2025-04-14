@@ -24,6 +24,7 @@ export interface GetRecruitmentPositionResponse {
   title: RecruitmentPositionTitle;
   headcount: number;
   acceptedCount: number;
+  participatedCount: number;
 }
 
 export interface StudyDetailRequest {
@@ -43,8 +44,7 @@ export interface StudyDetailRequest {
   studyBookmarkId: string | null;
   getTagResponses: GetTagResponse[];
   getImageResponses: GetImageResponse[];
-  getRecruitmentPositionResponses: GetRecruitmentPositionResponse[];
- 
+  getRecruitmentPositionResponses: GetRecruitmentPositionResponse[]; 
   pageCommentResponse: {
     numberOfElements: number;
     totalPages: number;
@@ -60,6 +60,11 @@ export interface StudyDetailRequest {
       updatedAt: string;
       replyCount: number;
     }[];
+  };
+  getStudyParticipationStatusResponse: {
+    participationId: number;
+    status: string;
+    title: string;
   };
   createdAt: string;
   updatedAt: string;

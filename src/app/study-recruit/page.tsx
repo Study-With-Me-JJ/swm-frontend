@@ -90,7 +90,7 @@ export default function StudyRecruit() {
             lastSortValue: pageParam.lastSortValue,
           }),
         };
-        console.log('api params', params);
+        // console.log('api params', params);
         const response = await getStudy(params);
         if (response?.message === 'Expired Token') {
           localStorage.removeItem('accessToken');
