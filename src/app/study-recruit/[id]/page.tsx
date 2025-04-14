@@ -726,7 +726,7 @@ export default function StudyRecruitPage({
                   내 신청 현황
                 </div>
 
-                {studyApplyStatus === null ? (
+                {!studyApplyStatus ? (
                   <div className="text-left text-[16px] font-semibold text-[#a5a5a5] border-t border-gray-disabled py-[16px]">
                     신청한 직무가 없습니다
                   </div>
@@ -743,15 +743,15 @@ export default function StudyRecruitPage({
                             } 직무
                           </div>
                           <div className={`h-[30px] min-w-[40px] rounded-[4px] px-[6px] py-[4px] text-[14px] font-medium ${
-                            data?.data?.getStudyParticipationStatusResponse?.status === 'pending' 
+                            studyApplyStatus === 'PENDING' 
                               ? 'bg-[#E7F3FF] text-link-default' 
-                              : data?.data?.getStudyParticipationStatusResponse?.status === 'accepted' 
+                              : studyApplyStatus === 'ACCEPTED' 
                                 ? 'bg-[#4998E9] text-white' 
                                 : 'bg-[#FFE7E7] text-red-600'
                           }`}>
-                            {data?.data?.getStudyParticipationStatusResponse?.status === 'pending' 
+                            {studyApplyStatus === 'PENDING' 
                               ? '신청완료' 
-                              : data?.data?.getStudyParticipationStatusResponse?.status === 'accepted' 
+                              : studyApplyStatus === 'ACCEPTED' 
                                 ? '승인완료' 
                                 : '거절됨'}
                           </div>
