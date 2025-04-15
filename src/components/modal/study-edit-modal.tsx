@@ -13,6 +13,8 @@ export default function StudyEditModal({
   onClickOption: (value: string) => void;
   handleConfirm: () => void;
 }) {
+  // console.log('options', options);
+  // console.log('defaultValue', defaultValue);
     return (
         <>
           <div className="fixed inset-0 left-1/2 top-1/2 z-20 flex max-h-[400px] min-h-[290px] w-[440px] -translate-x-1/2 -translate-y-1/2 flex-col gap-[10px] overflow-hidden rounded-[8px] bg-white px-[30px] py-[40px]">

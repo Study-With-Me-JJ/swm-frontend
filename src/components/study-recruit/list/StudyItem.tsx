@@ -11,11 +11,19 @@ import { useState } from 'react';
 import { Study } from '@/types/api/study-recruit/study';
 import BookMarkIcon from '@/components/ui/BookMarkIcon';
 import InteractionStatus from '@/components/ui/InteractionStatus';
+import { RecruitmentPositionTitle, POSITION_LABELS } from '@/types/api/study-recruit/study';
 
-export default function StudyItem({ data }: { data: Study }) {
+export default function StudyItem({ data }: { data: Study }) { 
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
   const router = useRouter();
   const queryClient = useQueryClient();
+
+  const positionList = data.getRecruitmentPositionResponses
+    ?.map((pos) => ({
+      value: pos.title,
+      label: POSITION_LABELS[pos.title as keyof typeof RecruitmentPositionTitle],
+      headcount: pos.headcount,
+    }));
 
   const isBookmark = data.studyBookmarkId !== null;
 
@@ -121,12 +129,12 @@ export default function StudyItem({ data }: { data: Study }) {
               {data.title}
             </h3>
             <div className="flex flex-wrap items-center justify-start gap-2">
-              {data.getRecruitmentPositionResponses.map((tag) => (
+              {positionList.map((tag) => (
                 <span
-                  key={`${data.studyId}-${tag.recruitmentPositionId}`}
+                  key={`${tag.value}-${tag.headcount}`}
                   className="flex h-[28px] min-w-[30px] items-center justify-center rounded-[4px] bg-[#eee] px-[7px] text-xs font-[500] text-gray-default"
                 >
-                  {tag.title}
+                  {tag.label}
                   <span className="ml-1 text-link-default">
                     {tag.headcount}
                   </span>

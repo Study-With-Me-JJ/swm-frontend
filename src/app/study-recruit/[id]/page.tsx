@@ -279,6 +279,7 @@ export default function StudyRecruitPage({
     setActiveModal(null);
   };
 
+  // 스터디참여 모집 포지션 수정
   const { mutate: changePosition } = useMutation<
     ApiResponse<EditRecruitmentPositionRequest>,
     Error,
@@ -305,6 +306,7 @@ export default function StudyRecruitPage({
 
   // 신청포지션 수정으로 변경해야함
   const handleChangePosition = (value: string) => {
+    console.log('value', value);
     const token = localStorage.getItem('accessToken');
     if (!token) {
       showToast({
@@ -788,7 +790,7 @@ export default function StudyRecruitPage({
             positionList.find(
               (position) =>
                 position.value === data?.data?.getRecruitmentPositionResponses[0].title,
-            )?.label || ''
+            )?.value || ''
           }
           position={
             data?.data?.getRecruitmentPositionResponses.map(

@@ -78,3 +78,20 @@ export const applyRecruitmentPosition = async (recruitmentPositionId: string, ap
         throw error;
     }
 };
+
+// 스터디 참여신청 포지션 변경
+export const changeRecruitmentPosition = async (recruitmentPositionId: string, participationId: string): Promise<ApiResponse<null>> => {
+    try {
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+        const url = `${baseUrl}${API_ENDPOINTS.STUDY.APPLY_POSITION_CHANGE(recruitmentPositionId, participationId)}`;
+        const response = await axios.patch(url, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+}
