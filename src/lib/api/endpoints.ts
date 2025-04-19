@@ -22,12 +22,12 @@ export const API_ENDPOINTS = {
     REPLY: (parentId: string) => `/api/v1/comment/${parentId}/reply`, //답글조회
     CREATE_REPLY: (studyId: string, parentId: string) =>
       `/api/v1/study/${studyId}/comment/${parentId}`, //답글생성
-    EDIT_POSITION: (recruitmentPositionId: string) =>
-      `/api/v1/study/recruitment-position/${recruitmentPositionId}`, //스터디모집 포지션수정
-    DELETE_POSITION: (recruitmentPositionId: string) =>
-      `/api/v1/study/recruitment-position/${recruitmentPositionId}`, //스터디모집 포지션삭제
-    CREATE_POSITION: (studyId: string) =>
-      `/api/v1/study/${studyId}/recruitment-position`, //스터디모집 포지션 추가 
+    EDIT_POSITION: (studyId: string) =>
+      `/api/v1/study/${studyId}/recruitment-position`, //스터디모집 포지션수정 (추가,삭제,변경)
+    // DELETE_POSITION: (recruitmentPositionId: string) =>
+    //   `/api/v1/study/recruitment-position/${recruitmentPositionId}`, //스터디모집 포지션삭제
+    // CREATE_POSITION: (studyId: string) =>
+    //   `/api/v1/study/${studyId}/recruitment-position`, //스터디모집 포지션 추가 
     BOOKMARK: (studyId: string) => `/api/v1/study/${studyId}/bookmark`, //스터디 북마크 추가
     DELETE_BOOKMARK: (bookmarkId: string) =>
       `/api/v1/study/bookmark/${bookmarkId}`, //스터디 북마크 취소

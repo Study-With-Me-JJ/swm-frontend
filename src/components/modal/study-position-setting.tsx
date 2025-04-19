@@ -8,7 +8,7 @@
     } from '@/types/api/study-recruit/getStudyDetail';
     import { RecruitmentPositionTitle, getPositionOptions } from '@/types/api/study';
     import { useMutation } from '@tanstack/react-query';
-    import { addRecruitmentPosition, deleteRecruitmentPosition } from '@/lib/api/study/recruitmentPosition';
+    import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition';
     import { EditRecruitmentPositionRequest } from '@/types/api/study-recruit/recruitmentPosition';
     import { useToastStore } from '@/store/useToastStore';
     import { useRouter } from 'next/navigation';
@@ -31,42 +31,37 @@
     const { showToast } = useToastStore();
     const router = useRouter();
     const queryClient = useQueryClient();
-        const [positionField, setPositionField] = useState(positionOptions.map((item: GetRecruitmentPositionResponse) => ({
-            id: item.recruitmentPositionId,
-            position: item.title,
-            headcount: item.headcount,
-        }))); 
 
-        const [openSelectId, setOpenSelectId] = useState<keyof typeof SELECT_IDS | null>(null);
-        const [selectPosition, setSelectPosition] = useState<string | string[]>('필수 선택'); 
-    
-        const positionList = getPositionOptions().filter((item) => item.value !== 'ALL');
-        // console.log('positionList', positionList);
+    const [positionField, setPositionField] = useState(positionOptions.map((item: GetRecruitmentPositionResponse) => ({
+        id: item.recruitmentPositionId,
+        title: item.title,
+        headcount: item.headcount,
+    })));  
 
+    const [openSelectId, setOpenSelectId] = useState<keyof typeof SELECT_IDS | null>(null);
+    const [selectPosition, setSelectPosition] = useState<string | string[]>('필수 선택'); 
+
+    const positionList = getPositionOptions().filter((item) => item.value !== 'ALL');
+    // console.log('positionList', positionList);
+
+    //포지션 필드 추가
     const handleAddPosition = () => {
         setPositionField([...positionField, { 
-        id: positionField.length + 1, 
-        position: '필수 선택' as RecruitmentPositionTitle, 
-        headcount: 0
+            id: positionField.map((field) => field.id).length + 1, 
+            title: '필수 선택' as RecruitmentPositionTitle, 
+            headcount: 0
         }]);
         setOpenSelectId(null);
-    };
-
-    const handleRemovePosition = (id: number) => {
-        // if (positionField.length > 1) {
-        //     setPositionField(positionField.filter((field) => field.id !== id));
-        // }  
-        deletePosition(id.toString());
     }; 
 
     // 포지션 변경 핸들러
     const handlePositionChange = (value: string | string[], fieldId: number) => {
         setPositionField(positionField.map(field => 
-        field.id === fieldId ? { ...field, position: value as RecruitmentPositionTitle } : field
+        field.id === fieldId ? { ...field, title: value as RecruitmentPositionTitle, headcount: field.headcount } : field
         ));
         setSelectPosition(value);
-        methods.setValue('position', value);
-        setOpenSelectId(null);
+        methods.setValue('positions', positionField); 
+        setOpenSelectId(null); 
     };
     
     // 인원수 변경 핸들러
@@ -78,58 +73,44 @@
             field.id === fieldId ? { ...field, headcount: parseInt(value) || 0 } : field
         ));
         }
-        methods.setValue('headcount', value);
+        methods.setValue('positions', positionField);
     }; 
 
-    //직무 추가 mutation
-    const { mutate:addPosition } = useMutation({
-        mutationFn: (positionData: EditRecruitmentPositionRequest) => addRecruitmentPosition(studyId, positionData),
+    const handleRemovePosition = (title: string) => {
+        setPositionField(positionField.filter((field) => field.title !== title)); 
+        methods.setValue('positions', positionField); 
+    }; 
+    
+    const { mutate:editPosition } = useMutation({
+        mutationFn: (positionData: EditRecruitmentPositionRequest) => editRecruitmentPosition(studyId, positionData),
         onSuccess: async (response) => {  
-        if (response.message === 'Expired Token') {
+            console.log('직무 수정 response', response);
+            if (response.message === 'Expired Token') {
+                showToast({
+                message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+                });
+                router.push('/login');
+                return;
+            } 
+            //   console.log('response', response);
+
             showToast({
-            message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+                message: '직무 설정이 완료되었습니다.',
             });
-            router.push('/login');
-            return;
-        } 
-        //   console.log('response', response);
 
-        showToast({
-            message: '직무 설정이 완료되었습니다.',
-        });
-
-        await invalidateQueries(); 
-        handleCloseModal();
+            await invalidateQueries(); 
+            handleCloseModal();
         },
-    });
-
-    // 직무 삭제 mutation
-    const { mutate:deletePosition } = useMutation({
-        mutationFn: (recruitmentPositionId: string) => deleteRecruitmentPosition(recruitmentPositionId),
-        onSuccess: async (response) => {
-        if (response.message === 'Expired Token') {
-            showToast({
-            message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
-            });
-            router.push('/login');
-            return;
-        }
-        showToast({
-            message: '직무 삭제가 완료되었습니다.',
-        });
-
-        await invalidateQueries(); 
-        },
-    });
+    }); 
 
     // 공통으로 사용할 쿼리 무효화 함수
-        const invalidateQueries = async () => {
+     const invalidateQueries = async () => {
         await queryClient.invalidateQueries({ 
         queryKey: ['study', 'studyDetail', studyId],
         refetchType: 'active'
-        });
+    });
         
-        await queryClient.refetchQueries({
+    await queryClient.refetchQueries({
         queryKey: ['study', 'studyDetail', studyId],
         exact: true
         });
@@ -138,19 +119,41 @@
     const methods = useForm();  
 
     const onSubmit = methods.handleSubmit(async (data) => {
-        try { 
-        const positionData = {
-            title: data.position,
-            headcount: data.headcount,
-        }; 
-        const positionId = positionField.find((field) => field.position === positionData.title)?.id;
-        console.log('positionId', positionId);
-        addPosition(positionData); 
+        try {  
+            console.log('직무 수정 data', data);
+            const originalPositionField = positionOptions;
+            console.log('originalPositionField', originalPositionField);
+             
+            const currentTitles = positionField.map(field => field.title);
+            const removedPositionField = originalPositionField.filter(
+                (field) => !currentTitles.includes(field.title)
+            );
+            
+            console.log('removedPositionField', removedPositionField);
+            const positionData = {
+                createRecruitmentPositionRequests: positionField
+                    .filter(field => !originalPositionField.some(orig => orig.title === field.title))
+                    .map(field => ({
+                        title: field.title,
+                        headcount: field.headcount
+                    })),
+                updateRecruitmentPositionRequests: positionField
+                    .filter(field => originalPositionField.some(orig => orig.title === field.title))
+                    .map(field => ({
+                        recruitmentPositionId: field.id,
+                        title: field.title,
+                        headcount: field.headcount
+                    })),
+                recruitmentPositionIdsToRemove: removedPositionField.map((field) => field.recruitmentPositionId), 
+            };  
+            
+            console.log('직무 수정 positionData', positionData);
+            editPosition(positionData);
 
-        handleCloseModal();
+            handleCloseModal();
         } catch (error) {
-        console.error(error);
-        throw error;
+            console.error(error);
+            throw error;
         }
     });
     
@@ -177,7 +180,7 @@
                                                 className='text-[#bbb] text-[14px]'
                                                 type="default"
                                                 onChange={(value) => handlePositionChange(value, field.id)}
-                                                defaultValue={field.position}
+                                                defaultValue={field.title}
                                                 options={positionList} 
                                                 isOpen={openSelectId === `${SELECT_IDS.POSITION}_${field.id}` as keyof typeof SELECT_IDS}
                                                 onToggle={() =>
@@ -194,7 +197,7 @@
                                 <div className='flex-shrink-0 w-[120px]'>
                                     <input type='text' placeholder='인원' className='placeholder:text-[#bbb] placeholder:text-[14px] placeholder:font-regular rounded-[8px] border border-[#e0e0e0] h-[48px] px-[10px] w-full ' value={field.headcount} onChange={(e) => handleHeadcountChange(e, field.id)} />
                                 </div> 
-                                <button onClick={() => handleRemovePosition(field.id)} type='button' className='w-[55px] justify-center flex-shrink-0 text-[#b6b6b6] text-[12px] font-semibold flex items-center gap-[4px]'>삭제<Image src='/icons/Clear.svg' alt='' width={14} height={14} /></button>
+                                <button onClick={() => handleRemovePosition(field.title)} type='button' className='w-[55px] justify-center flex-shrink-0 text-[#b6b6b6] text-[12px] font-semibold flex items-center gap-[4px]'>삭제<Image src='/icons/Clear.svg' alt='' width={14} height={14} /></button>
                             </li>
                         ))}
                     </ul>

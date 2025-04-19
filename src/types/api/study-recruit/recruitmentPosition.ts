@@ -4,10 +4,24 @@ export interface ApiResponse<T> {
   data: T;
 }
 
-export interface EditRecruitmentPositionRequest {
+export interface EditRecruitmentPositionResponse {
+  recruitmentPositionId: number;
   title: string;
-  headcount: number; 
+  headcount: number;
 }
+
+export interface EditRecruitmentPositionRequest {
+  createRecruitmentPositionRequests: {
+    title: string;
+    headcount: number;
+  }[];
+  updateRecruitmentPositionRequests: {
+    recruitmentPositionId: number;
+    title: string;
+    headcount: number;
+  }[];
+  recruitmentPositionIdsToRemove: number[]; 
+  }
 
 export interface ApplyRecruitmentPositionRequest {
   kakaoId: string;

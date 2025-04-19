@@ -263,6 +263,11 @@ export default function StudyRecruitPage({
   type ModalType = 'position' | 'status' | 'positionSetting' | null;
   const [activeModal, setActiveModal] = useState<ModalType>(null);
 
+  //모집직무 설정 팝업
+  const handleOpenPositionSettingModal = () => {
+    setActiveModal('positionSetting');
+  };
+
   // 신청 포지션변경 팝업
   const handleOpenPositionChangeModal = () => {
     setActiveModal('position');
@@ -283,7 +288,7 @@ export default function StudyRecruitPage({
   const { mutate: changePosition } = useMutation<
     ApiResponse<EditRecruitmentPositionRequest>,
     Error,
-    EditRecruitmentPositionRequest
+    EditRecruitmentPositionRequest  
   >({
     mutationFn: (positionData: EditRecruitmentPositionRequest) => {
       const positionId = String(
@@ -304,7 +309,6 @@ export default function StudyRecruitPage({
     },
   });
 
-  // 신청포지션 수정으로 변경해야함
   const handleChangePosition = (value: string) => {
     console.log('value', value);
     const token = localStorage.getItem('accessToken');
@@ -379,10 +383,7 @@ export default function StudyRecruitPage({
     router.push(`/study-recruit/${params.id}/study-apply`); 
   };  
 
-  //모집직무 설정 팝업
-  const handleOpenPositionSettingModal = () => {
-    setActiveModal('positionSetting');
-  };
+  
 
   return (
     <>
@@ -783,7 +784,7 @@ export default function StudyRecruitPage({
           )} 
         </div>
       </div>
-      {activeModal === 'position' && ( 
+      {activeModal === 'position' && ( // 신청 포지션 변경 팝업
         <StudyPositionChange
           handleCloseModal={handleCloseModal}
           defaultValue={
@@ -797,10 +798,11 @@ export default function StudyRecruitPage({
               (position: GetRecruitmentPositionResponse) => position.title,
             ) || []
           }
-          onClickOption={handleChangePosition}
+          // onClickOption={handleChangePosition} 
+          onClickOption={() => {}}
         />
       )}
-      {activeModal === 'status' && (
+      {activeModal === 'status' && ( // 스터디 상태 변경 팝업
         <StudyStatusChange
           handleCloseModal={handleCloseModal}
           defaultValue={data?.data?.status || ''}
@@ -808,11 +810,11 @@ export default function StudyRecruitPage({
           onClickOption={handleChangeStatus}
         />
       )} 
-      {activeModal === 'positionSetting' && (
+      {activeModal === 'positionSetting' && ( // 모집 직무 설정 팝업
         <StudyPositionSetting
           studyId={params.id}
           positionOptions={data?.data?.getRecruitmentPositionResponses || []}
-          handleCloseModal={handleCloseModal}
+          handleCloseModal={handleCloseModal} 
         />
       )}
     </>
