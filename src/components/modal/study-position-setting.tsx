@@ -6,7 +6,7 @@
     import {
         GetRecruitmentPositionResponse, 
     } from '@/types/api/study-recruit/getStudyDetail';
-    import { RecruitmentPositionTitle, getPositionOptions } from '@/types/api/study';
+    import { RecruitmentPositionTitle, getPositionOptions, POSITION_LABELS } from '@/types/api/study';
     import { useMutation } from '@tanstack/react-query';
     import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition';
     import { EditRecruitmentPositionRequest } from '@/types/api/study-recruit/recruitmentPosition';
@@ -35,6 +35,7 @@
     const [positionField, setPositionField] = useState(positionOptions.map((item: GetRecruitmentPositionResponse) => ({
         id: item.recruitmentPositionId,
         title: item.title,
+        displayTitle: POSITION_LABELS[item.title as RecruitmentPositionTitle],
         headcount: item.headcount,
     })));  
 
@@ -46,9 +47,22 @@
 
     //포지션 필드 추가
     const handleAddPosition = () => {
+        if (positionField.length >= 10) {
+            showToast({
+                message: '최대 10개의 직무를 설정할 수 있습니다.',
+            });
+            return;
+        }
+        if(positionField.length === positionList.length) {
+            showToast({
+                message: '추가 가능한 직무가 모두 선택되었습니다.',
+            });
+            return;
+        }
         setPositionField([...positionField, { 
             id: positionField.map((field) => field.id).length + 1, 
-            title: '필수 선택' as RecruitmentPositionTitle, 
+            title: '필수 선택' as RecruitmentPositionTitle,
+            displayTitle: '필수 선택',
             headcount: 0
         }]);
         setOpenSelectId(null);
@@ -56,12 +70,22 @@
 
     // 포지션 변경 핸들러
     const handlePositionChange = (value: string | string[], fieldId: number) => {
+        const koreanLabel = typeof value === 'string' 
+            ? POSITION_LABELS[value as RecruitmentPositionTitle] 
+            : value;
+        
         setPositionField(positionField.map(field => 
-        field.id === fieldId ? { ...field, title: value as RecruitmentPositionTitle, headcount: field.headcount } : field
+            field.id === fieldId ? { 
+                ...field, 
+                displayTitle: koreanLabel as string,
+                title: value as RecruitmentPositionTitle,
+                headcount: field.headcount 
+            } : field
         ));
+        
         setSelectPosition(value);
-        methods.setValue('positions', positionField); 
-        setOpenSelectId(null); 
+        methods.setValue('positions', positionField);
+        setOpenSelectId(null);
     };
     
     // 인원수 변경 핸들러
@@ -157,6 +181,14 @@
         }
     });
     
+    // 사용 중인 타이틀 목록
+    const usedTitles = positionField.map(field => field.title);
+
+    // 사용 가능한(아직 선택되지 않은) 포지션 목록
+    const availablePositions = getPositionOptions().filter(
+        item => item.value !== 'ALL' && !usedTitles.includes(item.value as RecruitmentPositionTitle)
+    );
+
     return (
         <>
         <div className='fixed inset-0 left-1/2 top-1/2 z-20 flex max-h-[400px] min-h-[500px] w-[440px] -translate-x-1/2 -translate-y-1/2 flex-col gap-[10px] overflow-hidden rounded-[8px] bg-white px-[30px] py-[40px]'>
@@ -180,8 +212,11 @@
                                                 className='text-[#bbb] text-[14px]'
                                                 type="default"
                                                 onChange={(value) => handlePositionChange(value, field.id)}
-                                                defaultValue={field.title}
-                                                options={positionList} 
+                                                defaultValue={field.displayTitle || field.title}
+                                                options={availablePositions.map(option => ({
+                                                    ...option,
+                                                    label: POSITION_LABELS[option.value as RecruitmentPositionTitle] || option.label
+                                                }))} 
                                                 isOpen={openSelectId === `${SELECT_IDS.POSITION}_${field.id}` as keyof typeof SELECT_IDS}
                                                 onToggle={() =>
                                                     setOpenSelectId(
