@@ -55,7 +55,7 @@
         }
         if(positionField.length === positionList.length) {
             showToast({
-                message: '추가 가능한 직무가 모두 선택되었습니다.',
+                message: '추가 가능한 필드수를 초과했습니다.',
             });
             return;
         }
