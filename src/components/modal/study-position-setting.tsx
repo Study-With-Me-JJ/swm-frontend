@@ -108,7 +108,7 @@
     const { mutate:editPosition } = useMutation({
         mutationFn: (positionData: EditRecruitmentPositionRequest) => editRecruitmentPosition(studyId, positionData),
         onSuccess: async (response) => {  
-            console.log('직무 수정 response', response);
+            // console.log('직무 수정 response', response);
             if (response.message === 'Expired Token') {
                 showToast({
                 message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
@@ -144,16 +144,16 @@
 
     const onSubmit = methods.handleSubmit(async (data) => {
         try {  
-            console.log('직무 수정 data', data);
+            // console.log('직무 수정 data', data);
             const originalPositionField = positionOptions;
-            console.log('originalPositionField', originalPositionField);
+            // console.log('originalPositionField', originalPositionField);
              
             const currentTitles = positionField.map(field => field.title);
             const removedPositionField = originalPositionField.filter(
                 (field) => !currentTitles.includes(field.title)
             );
             
-            console.log('removedPositionField', removedPositionField);
+            // console.log('removedPositionField', removedPositionField);
             const positionData = {
                 createRecruitmentPositionRequests: positionField
                     .filter(field => !originalPositionField.some(orig => orig.title === field.title))
@@ -171,7 +171,7 @@
                 recruitmentPositionIdsToRemove: removedPositionField.map((field) => field.recruitmentPositionId), 
             };  
             
-            console.log('직무 수정 positionData', positionData);
+            // console.log('직무 수정 positionData', positionData);
             editPosition(positionData);
 
             handleCloseModal();
