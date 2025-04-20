@@ -5,7 +5,7 @@ import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import { deleteStudy } from '@/lib/api/study/getStudyDetail';
 import { addStudyBookmark } from '@/lib/api/study/postStudy';
 import { deleteStudyBookmark } from '@/lib/api/study/postStudy';
-import { editRecruitmentPosition } from '@/lib/api/study/recruitmentPosition'; 
+import { changeRecruitmentPosition } from '@/lib/api/study/recruitmentPosition'; 
 import { useToastStore } from '@/store/useToastStore';
 import { useQuery } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -22,7 +22,6 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { NavigationOptions } from 'swiper/types';
 import {
   ApiResponse,
-  EditRecruitmentPositionRequest,
 } from '@/types/api/study-recruit/recruitmentPosition';
 import { getPositionOptions } from '@/types/api/study-recruit/study';
 import StudyPositionChange from '@/components/modal/study-position-change';
@@ -286,26 +285,56 @@ export default function StudyRecruitPage({
 
   // 스터디참여 모집 포지션 수정
   const { mutate: changePosition } = useMutation<
-    ApiResponse<EditRecruitmentPositionRequest>,
+    ApiResponse<null>,
     Error,
-    EditRecruitmentPositionRequest  
+    string
   >({
-    mutationFn: (positionData: EditRecruitmentPositionRequest) => {
-      const positionId = String(
-        data?.data?.getRecruitmentPositionResponses[0].recruitmentPositionId,
+    mutationFn: (value: string) => {
+      // 인증 확인
+      const token = localStorage.getItem('accessToken');
+      if (!token) {
+        throw new Error('로그인이 필요합니다');
+      }
+      
+      // 주의: 여기서 순서가 중요합니다. participationId와 recruitmentPositionId의 순서가 올바른지 확인
+      const participationId = String(
+        data?.data?.getStudyParticipationStatusResponse?.participationId
       );
-      if (!positionId) throw new Error('Position ID not found');
-      return editRecruitmentPosition(positionId, positionData);
+      
+      if (!participationId) throw new Error('Participation ID not found');
+      console.log('Current participation ID:', participationId);
+      console.log('New position ID to change to:', value);
+      
+      // 여기서 첫 번째 인자가 recruitmentPositionId, 두 번째 인자가 participationId인지 확인!
+      return changeRecruitmentPosition(value, participationId);
     },
     onSuccess: async (response) => {
-      console.log(response);
+      console.log('Position change success:', response);
+      showToast({
+        message: '신청 포지션이 변경되었습니다.',
+      });
       await queryClient.invalidateQueries({
         queryKey: ['study', 'studyDetail', params.id],
         refetchActive: true,
       });
+      handleCloseModal();
     },
     onError: (error) => {
-      console.error(error);
+      console.error('Position change error details:', error);
+      // 오류 메시지를 더 구체적으로 표시
+      let errorMessage = '신청 포지션 변경에 실패했습니다.';
+      
+      if (error instanceof Error) {
+        if (error.message.includes('401') || error.message.includes('Unauthorized')) {
+          errorMessage = '로그인이 만료되었습니다. 다시 로그인해주세요.';
+        } else if (error.message.includes('404') || error.message.includes('Not Found')) {
+          errorMessage = '해당 참여 정보를 찾을 수 없습니다.';
+        }
+      }
+      
+      showToast({
+        message: errorMessage,
+      });
     },
   });
 
@@ -319,16 +348,12 @@ export default function StudyRecruitPage({
         urlText: '로그인하러 가기',
       });
       return;
-    }
-
-    const positionData: EditRecruitmentPositionRequest = {
-      title: value,
-      headcount:
-        data?.data?.getRecruitmentPositionResponses[0].headcount || 0,
-      // acceptedCount:
-      //   data?.data?.getRecruitmentPositionResponses[0].acceptedCount || 0,
-    };
-    changePosition(positionData);
+    }  
+    
+    const recruitmentPositionId = data?.data?.getRecruitmentPositionResponses.find(
+      (item: GetRecruitmentPositionResponse) => item.title === value
+    )?.recruitmentPositionId;
+    changePosition(String(recruitmentPositionId));
   };
 
   const {mutate: updateStudyStatusMutation} = useMutation<
@@ -798,8 +823,7 @@ export default function StudyRecruitPage({
               (position: GetRecruitmentPositionResponse) => position.title,
             ) || []
           }
-          // onClickOption={handleChangePosition} 
-          onClickOption={() => {}}
+          onClickOption={handleChangePosition} 
         />
       )}
       {activeModal === 'status' && ( // 스터디 상태 변경 팝업
