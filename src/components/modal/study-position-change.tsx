@@ -18,7 +18,7 @@ export default function StudyPositionChange({
   const handleConfirm = () => {
     // handleCloseModal();
     onClickOption(selectedPosition || defaultValue);
-    console.log('selectedPosition', selectedPosition);
+    // console.log('selectedPosition', selectedPosition);
   };
 
   const [selectedPosition, setSelectedPosition] = useState(defaultValue || '');
@@ -34,7 +34,7 @@ export default function StudyPositionChange({
       value: pos,
       label: POSITION_LABELS[pos as keyof typeof RecruitmentPositionTitle] + ' 직무',
     }));
-  console.log('positionList', positionList);
+  // console.log('positionList', positionList);
 
   return (
     <>

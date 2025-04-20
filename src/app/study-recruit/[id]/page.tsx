@@ -71,7 +71,7 @@ export default function StudyRecruitPage({
 
   // 스터디참여신청 가능여부 데이터수정후 수정하기
   const studyApplyStatus = data?.data?.getStudyParticipationStatusResponse?.status;
-  console.log('studyApplyStatus', studyApplyStatus);
+  // console.log('studyApplyStatus', studyApplyStatus);
 
   const isBookmark = data?.data?.studyBookmarkId !== null;
 
@@ -295,17 +295,13 @@ export default function StudyRecruitPage({
       if (!token) {
         throw new Error('로그인이 필요합니다');
       }
-      
-      // 주의: 여기서 순서가 중요합니다. participationId와 recruitmentPositionId의 순서가 올바른지 확인
+        
       const participationId = String(
         data?.data?.getStudyParticipationStatusResponse?.participationId
       );
       
-      if (!participationId) throw new Error('Participation ID not found');
-      console.log('Current participation ID:', participationId);
-      console.log('New position ID to change to:', value);
+      if (!participationId) throw new Error('Participation ID not found'); 
       
-      // 여기서 첫 번째 인자가 recruitmentPositionId, 두 번째 인자가 participationId인지 확인!
       return changeRecruitmentPosition(value, participationId);
     },
     onSuccess: async (response) => {
@@ -815,7 +811,7 @@ export default function StudyRecruitPage({
           defaultValue={
             positionList.find(
               (position) =>
-                position.value === data?.data?.getRecruitmentPositionResponses[0].title,
+                position.value === data?.data?.getStudyParticipationStatusResponse?.title,
             )?.value || ''
           }
           position={
