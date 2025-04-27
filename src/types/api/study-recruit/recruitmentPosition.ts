@@ -39,8 +39,8 @@ export interface EditRecruitmentPositionRequest {
 export interface ApplyRecruitmentPositionRequest {
   kakaoId: string;
   coverLetter: string;
-  links: string[];
-  fileInfo: {
+  links?: string[];
+  fileInfo?: {
     fileUrl: string;
     fileName: string;
   }

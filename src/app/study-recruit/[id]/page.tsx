@@ -195,6 +195,7 @@ export default function StudyRecruitPage({
     queryKey: ['userInfo'],
     queryFn: () => getUserInfo(), 
   });
+  console.log('user', user);
 
   const formatDate = (dateInput: number[] | string) => {
     if (!dateInput) return '날짜 정보 없음';
@@ -800,8 +801,16 @@ export default function StudyRecruitPage({
               className={`h-[60px] w-full rounded-[8px] text-[16px] font-semibold text-white ${studyApplyStatus === 'PENDING' ? 'bg-[#e0e0e0] cursor-default' : 'bg-link-default cursor-pointer'}`}
             >
               {studyApplyStatus === 'PENDING' ? '이미 신청한 스터디입니다' : '스터디 참여하기'}
-              </button> 
-            </>
+              </button>  
+            </> 
+          )} 
+          {user?.data?.userId === data?.data?.userId && (
+            <div className='flex justify-end'>
+              <button onClick={() => router.push(`/study-recruit/${params.id}/recruitStatusDetail`)} type='button' className='flex items-center gap-[4px] text-[14px] font-medium text-[#a5a5a5] hover:text-link-default'>    
+                모집 현황 자세히 보기 
+                <Image src='/icons/icon_gry_18_back.svg' alt='' width={14} height={14} />
+              </button>
+            </div>
           )} 
         </div>
       </div>

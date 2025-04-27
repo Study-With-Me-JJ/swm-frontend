@@ -36,7 +36,7 @@ export default function StudyApplyPage() {
         queryKey: ['study','studyDetail', params.id],
         queryFn: () => getStudyDetail(params.id as string),
     });
-    // console.log('data', data); 
+    console.log('data', data); 
 
     const methods = useForm();
     const { watch } = methods;
@@ -69,11 +69,11 @@ export default function StudyApplyPage() {
 
     const formPosition = positionOptions?.find(option => option.value === selectPosition)?.id;
     const formKakaoId = watch('kakaoId');
-    const formFile = watch('file');
+    // const formFile = watch('file');
     const formIntroduction = watch('introduction');
-    const formUrl_1 = watch('url_1'); 
+    // const formUrl_1 = watch('url_1'); 
 
-    const isFormValid = formPosition && formKakaoId && formUrl_1 && formFile && formIntroduction; 
+    const isFormValid = formPosition && formKakaoId && formIntroduction; 
     
     // 신청 직무 선택
     const handlePositionChange = (value: string | string[]) => {
@@ -88,7 +88,7 @@ export default function StudyApplyPage() {
     // URL 필드 추가 함수 수정
     const addUrlField = () => {
         if (urlFields.length < 3) {
-            setUrlFields([...urlFields, { id: Date.now() }]);
+            setUrlFields([...urlFields, { id: urlFields.length + 1 }]);
         } else { 
             showToast({
                 message: '최대 3개까지만 추가할 수 있습니다.',
@@ -152,17 +152,33 @@ export default function StudyApplyPage() {
 
     const onSubmit = methods.handleSubmit(async (data) => {  
         try {
-            const uploadedFile = await uploadFileToPresignedUrl(data.file);
+            let uploadedFile: string | undefined;
+            if (data.file) {
+                uploadedFile = await uploadFileToPresignedUrl(data.file);
+            }
             
             const formData: ApplyRecruitmentPositionRequest = {
                 kakaoId: data.kakaoId,
                 coverLetter: data.introduction,
-                links: [data.url_1, data.url_2, data.url_3]
-                    .filter(url => url && url.trim() !== ''),
-                fileInfo: {
-                    fileUrl: uploadedFile,
-                    fileName: data.file.name,
-                }   
+                ...(
+                    [data.url_1, data.url_2, data.url_3].some((url: string) => url && url.trim() !== '')
+                        ? {
+                            links: [data.url_1, data.url_2, data.url_3].filter(
+                                (url: string) => url && url.trim() !== ''
+                            ),
+                        }
+                        : {}
+                ),
+                ...(
+                    data.file && data.file
+                        ? {
+                            fileInfo: {
+                                fileUrl: uploadedFile || '',
+                                fileName: data.file.name,
+                            },
+                        }
+                        : {}
+                ),
             };
             // console.log('formData', formData);
             // console.log('selectPositionId', selectPositionId);
@@ -316,7 +332,7 @@ export default function StudyApplyPage() {
                             </div>
                             <div>
                             <span className="box-border block h-[30px] min-w-[50px] rounded-[4px] border border-[#eee] px-[6px] py-[4px] text-[14px] font-medium text-[#a5a5a5]">
-                                {item.acceptedCount}명 신청중
+                                {item.participatedCount}명 신청중
                             </span>
                             </div>
                         </li>

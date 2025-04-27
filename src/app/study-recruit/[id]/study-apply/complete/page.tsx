@@ -6,6 +6,7 @@ import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import Loadingbar from '@/components/ui/Loadingbar';
 import { useRouter } from "next/navigation";
 import { getApplyStudyDetail } from "@/lib/api/study/getApplyStudyDetail";
+import { POSITION_LABELS, RecruitmentPositionTitle } from "@/types/api/study-recruit/study";
 export default function StudyApplyCompletePage() {
     const router = useRouter();
     const params = useParams();
@@ -13,13 +14,16 @@ export default function StudyApplyCompletePage() {
         queryKey: ['study','studyDetail', params.id],
         queryFn: async () => await getStudyDetail(params.id as string), 
     }); 
-    const { data: applyData, isLoading: applyLoading } = useQuery({
+
+    const { data: applyData} = useQuery({
         queryKey: ['study', 'applyDetail', params.id],
         queryFn: async () => {
-            const participationId = data?.data?.getStudyParticipationStatusResponse?.participationId;
+            const participationId = data?.data?.getStudyParticipationStatusResponse?.participationId; 
             return participationId ? await getApplyStudyDetail(String(participationId)) : null;
         },
-    });
+        enabled: !!data?.data?.getStudyParticipationStatusResponse?.participationId,
+    }); 
+    console.log('applyData', applyData);
    if(isLoading) return <div className="flex justify-center items-center h-screen"><Loadingbar /></div>
 
     return (
@@ -33,21 +37,38 @@ export default function StudyApplyCompletePage() {
                         <div className='flex gap-[16px] items-center'>
                             <div className='flex-1 flex gap-[20px]'>
                                 <div className='text-[18px] font-regular text-[#6d6d6d]'>신청 직무</div>
-                                <div className='text-[18px] font-medium text-black'>{data?.data?.getStudyParticipationStatusResponse?.title}</div>
+                                <div className='text-[18px] font-medium text-black'>{POSITION_LABELS[data?.data?.getStudyParticipationStatusResponse?.title as keyof typeof RecruitmentPositionTitle]}</div>
                             </div>
                             <div className='flex-1 flex gap-[10px]'>
                                 <div className='text-[18px] font-regular text-[#6d6d6d]'>카카오톡 아이디</div>
                                 <div className='text-[18px] font-medium text-black'>{applyData?.data?.kakaoId}</div>
                             </div> 
                         </div>
-                        <div className='flex gap-[20px] items-center'>
-                            <div className='text-[16px] font-regular text-[#6d6d6d]'>URL</div>
-                            <div className='text-[16px] font-medium text-black'>{applyData?.data?.links[0]}</div>
-                        </div>
-                        <div className='flex gap-[20px] items-center'>
-                            <div className='text-[16px] font-regular text-[#6d6d6d]'>파일</div>
-                            <div className='text-[16px] font-medium text-black'>{applyData?.data?.fileInfo?.fileName}</div>
-                        </div>
+                        {applyData?.data?.links && applyData?.data?.links.length > 0 && (
+                            <div className='flex gap-[20px] items-start'>
+                                <div className='text-[16px] font-regular text-[#6d6d6d]'>URL</div>
+                                <div className='text-[16px] font-medium text-black'>
+                                    {applyData?.data?.links.map((link, index) => (
+                                        <a key={index} href={link} target="_blank" rel="noopener noreferrer" className="hover:underline text-link-default flex">{link}</a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                        {applyData?.data?.fileInfo && (
+                            <div className='flex gap-[20px] items-center'>
+                                <div className='text-[16px] font-regular text-[#6d6d6d]'>파일</div>
+                                <div className='text-[16px] font-medium text-black'>
+                                    <a
+                                        href={applyData?.data?.fileInfo?.fileUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        download={applyData?.data?.fileInfo?.fileName}
+                                    >
+                                        {applyData?.data?.fileInfo?.fileName}
+                                    </a>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className='flex gap-[24px] flex-col'>
