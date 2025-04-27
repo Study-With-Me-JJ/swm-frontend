@@ -23,7 +23,7 @@ export default function StudyApplyCompletePage() {
         },
         enabled: !!data?.data?.getStudyParticipationStatusResponse?.participationId,
     }); 
-    console.log('applyData', applyData);
+    // console.log('applyData', applyData);
    if(isLoading) return <div className="flex justify-center items-center h-screen"><Loadingbar /></div>
 
     return (

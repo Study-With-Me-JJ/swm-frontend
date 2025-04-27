@@ -63,7 +63,7 @@ export default function StudyRecruitPage({
     gcTime: 0,
   });
 
-  console.log('detail data', data);
+  // console.log('detail data', data);
 
   const router = useRouter();
 
@@ -195,7 +195,7 @@ export default function StudyRecruitPage({
     queryKey: ['userInfo'],
     queryFn: () => getUserInfo(), 
   });
-  console.log('user', user);
+  // console.log('user', user);
 
   const formatDate = (dateInput: number[] | string) => {
     if (!dateInput) return '날짜 정보 없음';
@@ -806,7 +806,7 @@ export default function StudyRecruitPage({
           )} 
           {user?.data?.userId === data?.data?.userId && (
             <div className='flex justify-end'>
-              <button onClick={() => router.push(`/study-recruit/${params.id}/recruitStatusDetail`)} type='button' className='flex items-center gap-[4px] text-[14px] font-medium text-[#a5a5a5] hover:text-link-default'>    
+              <button onClick={() => router.push(`/study-recruit/${params.id}/recruitStatus`)} type='button' className='flex items-center gap-[4px] text-[14px] font-medium text-[#a5a5a5] hover:text-link-default'>    
                 모집 현황 자세히 보기 
                 <Image src='/icons/icon_gry_18_back.svg' alt='' width={14} height={14} />
               </button>

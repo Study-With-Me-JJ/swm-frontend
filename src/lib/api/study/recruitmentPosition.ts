@@ -1,6 +1,6 @@
 import { API_ENDPOINTS } from '@/lib/api/endpoints';
 import axios from 'axios';
-import { ApiResponse, EditRecruitmentPositionResponse, EditRecruitmentPositionRequest, ApplyRecruitmentPositionRequest } from '@/types/api/study-recruit/recruitmentPosition';  
+import { ApiResponse, EditRecruitmentPositionResponse, EditRecruitmentPositionRequest, ApplyRecruitmentPositionRequest, GetStudyParticipationResponse, GetStudyParticipationRequest } from '@/types/api/study-recruit/recruitmentPosition';  
 
 // 스터디 모집 포지션 수정
 export const editRecruitmentPosition = async (studyId: string, positionData: EditRecruitmentPositionRequest): Promise<ApiResponse<EditRecruitmentPositionResponse>> => {
@@ -102,6 +102,25 @@ export const changeRecruitmentPosition = async (
     } else {
       console.error('Unknown error:', error);
     }
+    throw error;
+  }
+};
+
+// 스터디 참여 조회 (작성자전용)
+export const getStudyParticipation = async (recruitmentPositionId: string, queryData: GetStudyParticipationRequest): Promise<ApiResponse<GetStudyParticipationResponse>> => {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL;
+    const url = `${baseUrl}${API_ENDPOINTS.STUDY.APPLY(recruitmentPositionId)}`;
+
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+      params: queryData,
+    });
+    return response.data;
+  } catch (error) {
+    console.error(error);
     throw error;
   }
 };

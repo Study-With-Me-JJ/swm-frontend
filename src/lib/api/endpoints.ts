@@ -24,16 +24,12 @@ export const API_ENDPOINTS = {
       `/api/v1/study/${studyId}/comment/${parentId}`, //답글생성
     EDIT_POSITION: (studyId: string) =>
       `/api/v1/study/${studyId}/recruitment-position`, //스터디모집 포지션수정 (추가,삭제,변경)
-    // DELETE_POSITION: (recruitmentPositionId: string) =>
-    //   `/api/v1/study/recruitment-position/${recruitmentPositionId}`, //스터디모집 포지션삭제
-    // CREATE_POSITION: (studyId: string) =>
-    //   `/api/v1/study/${studyId}/recruitment-position`, //스터디모집 포지션 추가 
     BOOKMARK: (studyId: string) => `/api/v1/study/${studyId}/bookmark`, //스터디 북마크 추가
     DELETE_BOOKMARK: (bookmarkId: string) =>
       `/api/v1/study/bookmark/${bookmarkId}`, //스터디 북마크 취소
     LIKE: (studyId: string) => `/api/v1/study/${studyId}/like`, //스터디 좋아요 추가삭제
     STATUS: (studyId: string) => `/api/v1/study/${studyId}/status`, //스터디 모집 상태수정
-    APPLY: (recruitmentPositionId: string) => `/api/v1/recruitment-position/${recruitmentPositionId}/participation`, //스터디 모집 참여 신청
+    APPLY: (recruitmentPositionId: string) => `/api/v1/recruitment-position/${recruitmentPositionId}/participation`, //스터디 모집 참여 신청, 참여조회
     APPLY_DETAIL: (participationId: string) => `/api/v1/recruitment-position/participation/${participationId}`, //스터디 참여신청 상세조회
     APPLY_POSITION_CHANGE: (recruitmentPositionId: string, participationId: string) => `/api/v1/recruitment-position/${recruitmentPositionId}/participation/${participationId}/position`, //스터디 참여신청 포지션 변경
   },
