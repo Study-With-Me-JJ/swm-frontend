@@ -32,6 +32,7 @@ export const API_ENDPOINTS = {
     APPLY: (recruitmentPositionId: string) => `/api/v1/recruitment-position/${recruitmentPositionId}/participation`, //스터디 모집 참여 신청, 참여조회
     APPLY_DETAIL: (participationId: string) => `/api/v1/recruitment-position/participation/${participationId}`, //스터디 참여신청 상세조회
     APPLY_POSITION_CHANGE: (recruitmentPositionId: string, participationId: string) => `/api/v1/recruitment-position/${recruitmentPositionId}/participation/${participationId}/position`, //스터디 참여신청 포지션 변경
+    APPLY_STATUS_CHANGE: (participationId: string) => `/api/v1/recruitment-position/participation/${participationId}/status`, //스터디 참여상태 수정
   },
   FILES: {
     PRESIGNED_URL: '/api/v1/files/presigned-url',

@@ -10,10 +10,15 @@ import {
   } from '@/types/api/study-recruit/getStudyDetail';
 import { getPositionOptions } from '@/types/api/study-recruit/study';
 import { getStudyParticipation } from '@/lib/api/study/recruitmentPosition';
-import { StudyParticipationStatus, STATUS_LABELS } from '@/types/api/study-recruit/recruitmentPosition';
+import { StudyParticipationStatus, STATUS_LABELS, getStatusSortOptions } from '@/types/api/study-recruit/recruitmentPosition';
 import Loadingbar from '@/components/ui/Loadingbar';
 import Image from 'next/image';
 import { useState } from 'react';
+import SortFilter from '@/components/study-recruit/filter/SortFilter';
+
+const SELECT_IDS = {
+    SORT: 'SORT',
+  } as const;
 
 export default function StudyRecruitStatusPage() { 
     const params = useParams();  
@@ -23,7 +28,7 @@ export default function StudyRecruitStatusPage() {
     });
     
     const positionList = getPositionOptions(); 
-    const statusList = [StudyParticipationStatus.PENDING, StudyParticipationStatus.APPROVED, StudyParticipationStatus.REJECTED, StudyParticipationStatus.CANCEL];
+    const statusList = [StudyParticipationStatus.PENDING, StudyParticipationStatus.ACCEPTED, StudyParticipationStatus.REJECTED, StudyParticipationStatus.CANCEL];
 
     const positionTitle = positionList.find(
         (position) => position.value === data?.data?.getRecruitmentPositionResponses[0].title,
@@ -34,17 +39,36 @@ export default function StudyRecruitStatusPage() {
 
     const recruitmentPositionId = data?.data?.getRecruitmentPositionResponses[0]?.recruitmentPositionId;
 
-    const { data: participationData, isLoading: participationLoading } = useQuery({
-        queryKey: ['study', 'studyParticipation', params.id, pageNo],
-        queryFn: () =>
-            getStudyParticipation(String(recruitmentPositionId), {
-                status: StudyParticipationStatus.PENDING,
-                pageNo,
-            }),
-        enabled: !!recruitmentPositionId,
+    const [selectedStatus, setSelectedStatus] = useState('ALL');
+    const [openSelectId, setOpenSelectId] = useState<
+        keyof typeof SELECT_IDS | null
+    >(null);
+
+    const handleSortChange = (value: string | string[]) => {
+        setSelectedStatus(value as StudyParticipationStatus);
+    };
+
+    const sortOptions = [
+        { id: 0, value: 'ALL', label: '전체' },
+        ...getStatusSortOptions(),
+    ];
+
+    const { data: participationData } = useQuery({
+        queryKey: ['study', 'participation', params.id, selectedStatus, pageNo],
+        queryFn: () => {
+            if (selectedStatus === 'ALL') {
+                // status 파라미터 없이 요청
+                return getStudyParticipation(String(recruitmentPositionId ?? 0), { status: StudyParticipationStatus.PENDING, pageNo: 0 });
+            }
+            // status 파라미터 포함
+            return getStudyParticipation(String(recruitmentPositionId ?? 0), {
+                status: selectedStatus as StudyParticipationStatus,
+                pageNo
+            });
+        },
+        enabled: !!recruitmentPositionId
     });
-    // console.log('data', data);
-    // console.log('participationData', participationData); 
+    console.log('participationData', participationData);
 
     const totalPages = participationData?.data?.totalPages || 1;
     let startPage = Math.max(0, pageNo - Math.floor(maxPageButtons / 2));
@@ -65,25 +89,48 @@ export default function StudyRecruitStatusPage() {
           <div className="mx-auto flex max-w-screen-xl items-start justify-between gap-[40px] px-5 pb-[100px] pt-[40px] xl:px-0">
             {/* 왼쪽 영역 */}
             <div className="flex flex-col flex-auto pt-[20px] min-h-[calc(100vh-100px)] overflow-y-auto justify-between"> 
-                <div className='flex w-full flex-col gap-[40px] items-center justify-center'> 
+                <div className='flex w-full flex-col items-center justify-center'> 
                     <div className='text-[24px] font-semibold text-black'>{positionTitle} <span className='text-link-default'>{data?.data?.getRecruitmentPositionResponses[0].headcount}명</span> 모집중</div>
-                    {participationLoading ? <Loadingbar /> : (
-                    <table className='w-full'>
+                    <div className='mt-[32px] mb-[16px] flex justify-start items-start w-full'> 
+                        <div className="flex items-center gap-1"> 
+                            <SortFilter
+                                type="default"
+                                onChange={handleSortChange}
+                                defaultValue={selectedStatus}
+                                options={sortOptions.map((sort) => ({
+                                    id: sort.id,
+                                    value: sort.value,
+                                    label: sort.label,
+                                }))}
+                                isOpen={openSelectId === SELECT_IDS.SORT}
+                                onToggle={() =>
+                                setOpenSelectId(
+                                    openSelectId === SELECT_IDS.SORT ? null : SELECT_IDS.SORT,
+                                )
+                                }
+                                filterName={sortOptions.find(
+                                    (sort) => sort.value === selectedStatus
+                                )?.label || '전체'}
+                            />
+                        </div>
+                    </div>
+                    {participationData?.data?.data?.length && participationData?.data?.data?.length > 0 ? (
+                    <table className='w-full border-collapse'>
                         <colgroup>
-                            <col width="10%" />
+                            <col width="8%" />
                             <col width="15%" />
                             <col width="15%" />
-                            <col width="*" />
+                            <col width="57%" />
                         </colgroup>
                         <thead>
                             <tr>
-                                <th className='text-[16px] font-semibold text-black h-[56px] py-[16px] border-b border-[#e0e0e0] pr-[28px] text-center'>상태</th>
-                                <th className='text-[16px] font-semibold text-black h-[56px] py-[16px] border-b border-[#e0e0e0] pr-[28px] text-left'>닉네임</th>
-                                <th className='text-[16px] font-semibold text-black h-[56px] py-[16px] border-b border-[#e0e0e0] pr-[28px] text-left'>직무</th> 
-                                <th className='text-[16px] font-semibold text-black h-[56px] py-[16px] border-b border-[#e0e0e0] text-left'>자기소개</th>
+                                <th className='text-[14px] font-regular text-[#000] border-b border-[#e0e0e0] pr-[28px] h-[56px] text-center'>상태</th>
+                                <th className='text-[14px] font-regular text-[#000] border-b border-[#e0e0e0] pr-[28px] h-[56px] text-left'>닉네임</th>
+                                <th className='text-[14px] font-regular text-[#000] border-b border-[#e0e0e0] pr-[28px] h-[56px] text-left'>직무</th>
+                                <th className='text-[14px] font-regular text-[#000] border-b border-[#e0e0e0] pr-[28px] h-[56px] text-left'>자기소개</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody> 
                             {participationData?.data?.data?.map((item, index: number) => (
                             <tr key={index}>
                                 <td className='text-[14px] font-regular text-[#000]  border-b border-[#e0e0e0] pr-[28px] '>
@@ -92,7 +139,7 @@ export default function StudyRecruitStatusPage() {
                                     </div>
                                 </td>
                                 <td className='text-[14px] font-regular text-[#000] border-b border-[#e0e0e0] pr-[28px] '>
-                                    <div className='flex items-center justify-start h-[56px]'>
+                                    <div className='flex items-center justify-start h-[56px] gap-[6px]'>
                                         <p className='flex items-center gap-[8px] w-[18px] h-[18px] rounded-full overflow-hidden'>
                                         <Image src={item.profileImageUrl || '/icons/icon_no_profile.svg'} alt="profile" width={18} height={18} />
                                         </p>
@@ -106,13 +153,17 @@ export default function StudyRecruitStatusPage() {
                                 </td>
                                 <td className='text-[14px] font-regular text-[#000] border-b border-[#e0e0e0] text-left line-clamp-1'>
                                     <div className='flex items-center justify-start h-[56px]'>
-                                        <Link href={`/study-recruit/${params.id}/recruitStatus/detail`} className='hover:text-link-default'>{item.coverLetter}</Link>
+                                        <Link href={`/study-recruit/${params.id}/recruitStatus/${item.participationId}/detail`} className='hover:text-link-default'>{item.coverLetter}</Link>
                                     </div>
                                 </td>
                             </tr>
                             ))}
                         </tbody>
                     </table>
+                    ) : (
+                        <div className='flex items-center justify-center h-[500px]'>
+                            <Loadingbar />
+                        </div>
                     )}
                 </div>
                 <div className='flex items-center justify-center gap-2 mt-4'>

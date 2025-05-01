@@ -11,10 +11,26 @@ import {
   import { getPositionOptions } from '@/types/api/study-recruit/study'; 
   import { getApplyStudyDetail } from '@/lib/api/study/getApplyStudyDetail'; 
   import { getStudyParticipation } from '@/lib/api/study/recruitmentPosition';
-  import { StudyParticipationStatus } from '@/types/api/study-recruit/recruitmentPosition';
+  import { StudyParticipationStatus, STATUS_LABELS } from '@/types/api/study-recruit/recruitmentPosition';
   import { useState } from 'react';
 
 import Image from 'next/image';
+
+function getStatusClass(status: StudyParticipationStatus) {
+  switch (status) {
+    case StudyParticipationStatus.PENDING:
+      return 'bg-[#E7F3FF] text-[#4998E9]';
+    case StudyParticipationStatus.ACCEPTED:
+      return 'bg-[#4998E9] text-white';
+    case StudyParticipationStatus.REJECTED:
+      return 'bg-[#e9e9e9] text-[#565656]';
+    case StudyParticipationStatus.CANCEL:
+      return 'bg-[#FFCFD8] text-[#E0143C]'; 
+    default:
+      return 'bg-gray-200 text-gray-500';
+  }
+}
+
 export default function StudyRecruitStatusDetailPage() { 
     const params = useParams();  
     const { data} = useQuery({
@@ -25,7 +41,7 @@ export default function StudyRecruitStatusDetailPage() {
 
     const recruitmentPositionId = data?.data?.getRecruitmentPositionResponses[0]?.recruitmentPositionId;
     const { data: participationData, isLoading: participationLoading } = useQuery({
-        queryKey: ['study', 'studyParticipation', params.id, pageNo],
+        queryKey: ['study', 'participation', params.id, pageNo],
         queryFn: () =>
             getStudyParticipation(String(recruitmentPositionId), {
                 status: StudyParticipationStatus.PENDING,
@@ -33,10 +49,11 @@ export default function StudyRecruitStatusDetailPage() {
             }),
         enabled: !!recruitmentPositionId,
     });
+    console.log('participationData', participationData);
 
     const participationId = participationData?.data?.data[0].participationId as string | undefined;
-    const {data:applyDetailData} = useQuery({ 
-        queryKey: ['study','studyApplyDetail', params.id],
+    const {data:participationDetailData} = useQuery({ 
+        queryKey: ['study','participation', params.id, participationId],
         queryFn: () => getApplyStudyDetail(participationId as string),
         enabled: !!participationId,
     });
@@ -48,7 +65,7 @@ export default function StudyRecruitStatusDetailPage() {
     )?.label; 
  
     // console.log('data', data);  
-    console.log('applyDetailData', applyDetailData);
+    console.log('participationDetailData', participationDetailData);
 
     return (
         <>
@@ -69,7 +86,19 @@ export default function StudyRecruitStatusDetailPage() {
                                 <div className='flex gap-[10px] items-center w-full'>
                                     <div className='flex-1 flex items-center gap-[20px]'>
                                         <div className='text-[16px] font-regular text-[#6d6d6d]'>닉네임</div>
-                                        <div className='text-[16px] font-medium text-[#000]'>{applyDetailData?.data?.nickname}</div>
+                                        <div className='flex items-center gap-[6px] text-[16px] font-medium text-[#000]'>
+                                            <p>
+                                                <Image
+                                                    src={
+                                                    participationDetailData?.data?.profileImageUrl || '/icons/icon_no_profile.svg'
+                                                    }
+                                                    alt="profile"
+                                                    width={18}
+                                                    height={18}
+                                                />
+                                            </p>
+                                            {participationDetailData?.data?.nickname}
+                                        </div>
                                     </div>
                                     <div className='flex-1 flex items-center gap-[20px]'>
                                         <div className='text-[16px] font-regular text-[#6d6d6d]'>직무</div>
@@ -81,31 +110,48 @@ export default function StudyRecruitStatusDetailPage() {
                                 <div className='flex gap-[10px] items-center w-full'>
                                     <div className='flex-1 flex items-center gap-[20px]'>
                                         <div className='text-[16px] font-regular text-[#6d6d6d]'>상태</div>
-                                        <div className='text-[16px] font-medium text-[#000]'>송지윤</div>
+                                        <div className='text-[16px] font-medium text-[#000]'><span className={`text-[12px] font-medium py-[4px] px-[9px] rounded-[4px] ${getStatusClass(participationDetailData?.data?.status as StudyParticipationStatus)}`}>{STATUS_LABELS[participationDetailData?.data?.status as keyof typeof STATUS_LABELS]}</span></div>
                                     </div>
                                     <div className='flex-1 flex items-center gap-[20px]'>
                                         <div className='text-[16px] font-regular text-[#6d6d6d]'>카카오 ID</div>
                                         <div className='text-[16px] font-medium text-link-default'>신청승인 시 확인 가능합니다.</div>
                                     </div>
                                 </div>
+                                {participationDetailData?.data?.links && participationDetailData?.data?.links.length > 0 && (
                                 <div className='flex gap-[10px] items-center w-full'>
                                     <div className='flex-1 flex items-center gap-[20px]'>
                                         <div className='text-[16px] font-regular text-[#6d6d6d]'>URL</div>
-                                        <div className='text-[16px] font-medium text-[#000]'>www.dsdaret.com</div>
+                                        {participationDetailData?.data?.links.map((link) => (
+                                            <div key={link} className='text-[16px] font-medium text-[#000]'>
+                                                <a href={link} target='_blank' rel='noreferrer' className='hover:text-link-default'>{link}</a>
+                                            </div>
+                                        ))}
                                     </div> 
                                 </div>
+                                )} 
+                                {participationDetailData?.data?.fileInfo && (
                                 <div className='flex gap-[10px] items-center w-full'>
                                     <div className='flex-1 flex items-center gap-[20px]'>
-                                        <div className='text-[16px] font-regular text-[#6d6d6d]'>파일</div>
-                                        <div className='text-[16px] font-medium text-[#000]'>design portfolio.pdf</div>
-                                        <a href="" download className='w-[22px] h-[22px] flex items-center justify-center rounded-[4px] border border-link-default'><Image src='/icons/File-download.svg' alt='다운로드' width={10} height={10} /></a>
+                                        <div className='text-[16px] font-regular text-[#6d6d6d]'>파일</div> 
+                                        <div className='flex items-center gap-[10px] text-[16px] font-medium text-[#000]'>
+                                            <div className='text-[16px] font-medium text-[#000]'>{participationDetailData?.data?.fileInfo.fileName}</div>
+                                            <a href={participationDetailData?.data?.fileInfo.fileUrl} download className='w-[22px] h-[22px] flex items-center justify-center rounded-[4px] border border-link-default'><Image src='/icons/File-download.svg' alt='다운로드' width={10} height={10} /></a>
+                                        </div> 
                                     </div> 
-                                </div>
+                                </div> 
+                                )}
                             </div>
                             <div className='pt-[32px] flex flex-col gap-[16px]'>
                                 <div className='text-[16px] font-regular text-[#6d6d6d]'>자기소개서</div>
-                                <div className='text-[14px] font-regular text-[#6d6d6d]'>자기소개글 내용</div>
+                                <div className='text-[14px] font-regular text-[#6d6d6d]'>{participationDetailData?.data?.coverLetter}</div>
                             </div>
+                        </div>
+                    </div>
+                    <div className='flex justify-between items-center w-full px-[20px]'>
+                        <Link href={`/study-recruit/${params.id}/recruitStatus`} className='text-[16px] font-semibold text-link-default flex items-center gap-[6px]'><Image src='/icons/icon_blue_18_back.svg' alt='뒤로가기' width={18} height={18} className='' /><span>목록</span></Link>  
+                        <div className='flex items-center gap-[10px]'>
+                            <button className='rounded-[4px] bg-[#E7F3FF] w-[120px] h-[60px] text-[16px] font-semibold text-link-default'>거절</button>
+                            <button className='rounded-[4px] bg-link-default w-[240px] h-[60px] text-[16px] font-semibold text-white'>신청승인</button>
                         </div>
                     </div>
                 </div> 

@@ -1,18 +1,25 @@
 // 스터디 참여 신청 상태
 export enum StudyParticipationStatus {
   PENDING = 'PENDING', // 신청대기
-  APPROVED = 'APPROVED', // 신청승인
+  ACCEPTED = 'ACCEPTED', // 신청승인
   REJECTED = 'REJECTED', // 거절
   CANCEL = 'CANCEL', // 취소
 }
 
 export const STATUS_LABELS: Record<StudyParticipationStatus, string> = {
   [StudyParticipationStatus.PENDING]: '신청대기',
-  [StudyParticipationStatus.APPROVED]: '신청승인',
+  [StudyParticipationStatus.ACCEPTED]: '신청승인',
   [StudyParticipationStatus.REJECTED]: '거절',
   [StudyParticipationStatus.CANCEL]: '취소',
 };
 
+export const getStatusSortOptions = () => [
+  ...Object.entries(STATUS_LABELS).map(([value, label], index) => ({
+    id: index + 1,
+    value,
+    label,
+  })),
+];
 export interface ApiResponse<T> {
   message: string;
   data: T;
@@ -70,4 +77,9 @@ export interface GetStudyParticipationResponse {
 export interface GetStudyParticipationRequest {
   status: StudyParticipationStatus;
   pageNo: number; 
+}
+
+// 스터디 참여 상태 수정 요청
+export interface ChangeStudyParticipationStatusRequest {
+  kakaoId: string; 
 }
