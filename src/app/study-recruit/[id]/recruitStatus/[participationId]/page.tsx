@@ -37,25 +37,11 @@ export default function StudyRecruitStatusDetailPage() {
         queryKey: ['study','studyDetail', params.id],
         queryFn: () => getStudyDetail(params.id as string),
     });
-    const [pageNo, setPageNo] = useState(0);
 
-    const recruitmentPositionId = data?.data?.getRecruitmentPositionResponses[0]?.recruitmentPositionId;
-    const { data: participationData, isLoading: participationLoading } = useQuery({
-        queryKey: ['study', 'participation', params.id, pageNo],
-        queryFn: () =>
-            getStudyParticipation(String(recruitmentPositionId), {
-                status: StudyParticipationStatus.PENDING,
-                pageNo,
-            }),
-        enabled: !!recruitmentPositionId,
-    });
-    console.log('participationData', participationData);
-
-    const participationId = participationData?.data?.data[0].participationId as string | undefined;
     const {data:participationDetailData} = useQuery({ 
-        queryKey: ['study','participation', params.id, participationId],
-        queryFn: () => getApplyStudyDetail(participationId as string),
-        enabled: !!participationId,
+        queryKey: ['study','participation', params.id, params.participationId],
+        queryFn: () => getApplyStudyDetail(params.participationId as string),
+        enabled: !!params.participationId,
     });
 
     const positionList = getPositionOptions();  
@@ -65,7 +51,7 @@ export default function StudyRecruitStatusDetailPage() {
     )?.label; 
  
     // console.log('data', data);  
-    console.log('participationDetailData', participationDetailData);
+    // console.log('participationDetailData', participationDetailData);
 
     return (
         <>

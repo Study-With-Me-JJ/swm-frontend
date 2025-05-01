@@ -153,7 +153,7 @@ export default function StudyRecruitStatusPage() {
                                 </td>
                                 <td className='text-[14px] font-regular text-[#000] border-b border-[#e0e0e0] text-left line-clamp-1'>
                                     <div className='flex items-center justify-start h-[56px]'>
-                                        <Link href={`/study-recruit/${params.id}/recruitStatus/${item.participationId}/detail`} className='hover:text-link-default'>{item.coverLetter}</Link>
+                                        <Link href={`/study-recruit/${params.id}/recruitStatus/${item.participationId}`} className='hover:text-link-default'>{item.coverLetter}</Link>
                                     </div>
                                 </td>
                             </tr>
