@@ -42,8 +42,7 @@ export default function StudyRecruitStatusPage() {
         queryFn: () => getStudyDetail(params.id as string),
     });
     
-    const positionList = getPositionOptions(); 
-    const statusList = [StudyParticipationStatus.PENDING, StudyParticipationStatus.ACCEPTED, StudyParticipationStatus.REJECTED, StudyParticipationStatus.CANCEL];
+    const positionList = getPositionOptions();  
 
     const positionTitle = positionList.find(
         (position) => position.value === data?.data?.getRecruitmentPositionResponses[0].title,
