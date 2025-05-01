@@ -10,7 +10,7 @@ import {
   } from '@/types/api/study-recruit/getStudyDetail';
 import { getPositionOptions } from '@/types/api/study-recruit/study';
 import { getStudyParticipation } from '@/lib/api/study/recruitmentPosition';
-import { StudyParticipationStatus, STATUS_LABELS, getStatusSortOptions } from '@/types/api/study-recruit/recruitmentPosition';
+import { StudyParticipationStatus, STATUS_LABELS, getStatusSortOptions, getStatusClass } from '@/types/api/study-recruit/recruitmentPosition';
 import Loadingbar from '@/components/ui/Loadingbar';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -19,21 +19,6 @@ import SortFilter from '@/components/study-recruit/filter/SortFilter';
 const SELECT_IDS = {
     SORT: 'SORT',
   } as const;
-
-function getStatusClass(status: StudyParticipationStatus) {
-    switch (status) {   
-        case StudyParticipationStatus.PENDING:
-        return 'bg-[#E7F3FF] text-[#4998E9]';
-        case StudyParticipationStatus.ACCEPTED:
-        return 'bg-[#4998E9] text-white';
-        case StudyParticipationStatus.REJECTED:
-        return 'bg-[#e9e9e9] text-[#565656]';
-        case StudyParticipationStatus.CANCEL:
-        return 'bg-[#FFCFD8] text-[#E0143C]'; 
-        default:
-        return 'bg-gray-200 text-gray-500';
-    }
-}
 
 export default function StudyRecruitStatusPage() { 
     const params = useParams();  
