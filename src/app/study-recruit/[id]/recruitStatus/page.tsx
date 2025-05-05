@@ -11,7 +11,6 @@ import {
 import { getPositionOptions } from '@/types/api/study-recruit/study';
 import { getStudyParticipation } from '@/lib/api/study/recruitmentPosition';
 import { StudyParticipationStatus, STATUS_LABELS, getStatusSortOptions, getStatusClass } from '@/types/api/study-recruit/recruitmentPosition';
-import Loadingbar from '@/components/ui/Loadingbar';
 import Image from 'next/image';
 import { useState } from 'react';
 import SortFilter from '@/components/study-recruit/filter/SortFilter';
@@ -56,13 +55,11 @@ export default function StudyRecruitStatusPage() {
         queryKey: ['study', 'participation', params.id, selectedStatus, pageNo],
         queryFn: () => {
             if (selectedStatus === 'ALL') {
-                // status 파라미터 없이 요청
-                return getStudyParticipation(String(recruitmentPositionId ?? 0), { status: StudyParticipationStatus.PENDING, pageNo: 0 });
+                return getStudyParticipation(String(recruitmentPositionId ?? 0), { pageNo: 0 });
             }
-            // status 파라미터 포함
             return getStudyParticipation(String(recruitmentPositionId ?? 0), {
                 status: selectedStatus as StudyParticipationStatus,
-                pageNo
+                pageNo: 0
             });
         },
         enabled: !!recruitmentPositionId
@@ -161,7 +158,7 @@ export default function StudyRecruitStatusPage() {
                     </table>
                     ) : (
                         <div className='flex items-center justify-center h-[500px]'>
-                            <Loadingbar />
+                            <p className='text-[16px] font-medium text-[#a5a5a5]'>신청자가 없습니다.</p>
                         </div>
                     )}
                 </div>

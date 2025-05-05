@@ -2,20 +2,37 @@
 
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { getStudyDetail } from '@/lib/api/study/getStudyDetail';
 import {
     GetRecruitmentPositionResponse,
     GetTagResponse,
   } from '@/types/api/study-recruit/getStudyDetail';
-  import { getPositionOptions } from '@/types/api/study-recruit/study'; 
-  import { getApplyStudyDetail } from '@/lib/api/study/getApplyStudyDetail'; 
-  import { StudyParticipationStatus, STATUS_LABELS, getStatusClass } from '@/types/api/study-recruit/recruitmentPosition'; 
-
+import { getPositionOptions } from '@/types/api/study-recruit/study'; 
+import { getApplyStudyDetail } from '@/lib/api/study/getApplyStudyDetail'; 
+import { StudyParticipationStatus, STATUS_LABELS, getStatusClass} from '@/types/api/study-recruit/recruitmentPosition'; 
+import { useToastStore } from '@/store/useToastStore';
+import { changeStudyParticipationStatus } from '@/lib/api/study/recruitmentPosition';
 import Image from 'next/image';
+import { useQueryClient } from '@tanstack/react-query';
+
+function getKakaoText(status: StudyParticipationStatus, kakaoId?: string) {
+  switch (status) {
+    case StudyParticipationStatus.ACCEPTED:
+      return kakaoId;
+    case StudyParticipationStatus.REJECTED:
+      return '거절된 사용자입니다.';
+    case StudyParticipationStatus.PENDING:
+      return '신청승인 시 확인가능합니다.';
+    default:
+      return '';
+  }
+}
 
 export default function StudyRecruitStatusDetailPage() { 
     const params = useParams();  
+    const { showToast } = useToastStore();
+    const queryClient = useQueryClient();
     const { data} = useQuery({
         queryKey: ['study','studyDetail', params.id],
         queryFn: () => getStudyDetail(params.id as string),
@@ -34,7 +51,36 @@ export default function StudyRecruitStatusDetailPage() {
     )?.label; 
  
     // console.log('data', data);  
-    // console.log('participationDetailData', participationDetailData);
+    console.log('participationDetailData', participationDetailData); 
+
+    const handleReject = useMutation({
+        mutationFn: () => changeStudyParticipationStatus(params.participationId as string, StudyParticipationStatus.REJECTED), 
+        onSuccess: () => {
+            showToast({
+                message: '거절 처리되었습니다.',
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['study', 'participation', params.id, params.participationId],
+            });
+        },
+        onError: () => {
+            showToast({
+                message: '거절 처리에 실패했습니다.',
+            });
+        },
+    });
+
+    const handleAccept = useMutation({
+        mutationFn: () => changeStudyParticipationStatus(params.participationId as string, StudyParticipationStatus.ACCEPTED),
+        onSuccess: () => {
+            showToast({
+                message: '신청승인 처리되었습니다.',
+            });
+            queryClient.invalidateQueries({
+                queryKey: ['study', 'participation', params.id, params.participationId],
+            });
+        },
+    });
 
     return (
         <>
@@ -83,18 +129,20 @@ export default function StudyRecruitStatusDetailPage() {
                                     </div>
                                     <div className='flex-1 flex items-center gap-[20px]'>
                                         <div className='text-[16px] font-regular text-[#6d6d6d]'>카카오 ID</div>
-                                        <div className='text-[16px] font-medium text-link-default'>신청승인 시 확인 가능합니다.</div>
+                                        <div className='text-[16px] font-medium text-link-default'>{getKakaoText(participationDetailData?.data?.status as StudyParticipationStatus, participationDetailData?.data?.kakaoId)}</div>
                                     </div>
                                 </div>
                                 {participationDetailData?.data?.links && participationDetailData?.data?.links.length > 0 && (
                                 <div className='flex gap-[10px] items-center w-full'>
-                                    <div className='flex-1 flex items-center gap-[20px]'>
+                                    <div className='flex-1 flex items-start gap-[20px]'>
                                         <div className='text-[16px] font-regular text-[#6d6d6d]'>URL</div>
+                                        <div className='flex flex-col gap-[10px]'>
                                         {participationDetailData?.data?.links.map((link) => (
                                             <div key={link} className='text-[16px] font-medium text-[#000]'>
                                                 <a href={link} target='_blank' rel='noreferrer' className='hover:text-link-default'>{link}</a>
                                             </div>
                                         ))}
+                                        </div>
                                     </div> 
                                 </div>
                                 )} 
@@ -119,8 +167,8 @@ export default function StudyRecruitStatusDetailPage() {
                     <div className='flex justify-between items-center w-full px-[20px]'>
                         <Link href={`/study-recruit/${params.id}/recruitStatus`} className='text-[16px] font-semibold text-link-default flex items-center gap-[6px]'><Image src='/icons/icon_blue_18_back.svg' alt='뒤로가기' width={18} height={18} className='' /><span>목록</span></Link>  
                         <div className='flex items-center gap-[10px]'>
-                            <button className='rounded-[4px] bg-[#E7F3FF] w-[120px] h-[60px] text-[16px] font-semibold text-link-default'>거절</button>
-                            <button className='rounded-[4px] bg-link-default w-[240px] h-[60px] text-[16px] font-semibold text-white'>신청승인</button>
+                            <button onClick={() => handleReject.mutate()} className={`rounded-[4px] bg-[#E7F3FF] w-[120px] h-[60px] text-[16px] font-semibold text-link-default ${participationDetailData?.data?.status === StudyParticipationStatus.REJECTED || participationDetailData?.data?.status === StudyParticipationStatus.ACCEPTED ? 'bg-[#e9e9e9] text-[#b9b9b9] cursor-not-allowed' : ''}`}>거절</button>
+                            <button onClick={() => handleAccept.mutate()} className={`rounded-[4px] bg-[#4998E9] text-white w-[240px] h-[60px] text-[16px] font-semibold ${participationDetailData?.data?.status === StudyParticipationStatus.REJECTED || participationDetailData?.data?.status === StudyParticipationStatus.ACCEPTED ? 'bg-[#e9e9e9] text-[#b9b9b9] cursor-not-allowed' : ''}`}>신청승인</button>
                         </div>
                     </div>
                 </div> 

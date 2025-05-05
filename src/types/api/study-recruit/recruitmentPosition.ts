@@ -3,7 +3,6 @@ export enum StudyParticipationStatus {
   PENDING = 'PENDING', // 신청대기
   ACCEPTED = 'ACCEPTED', // 신청승인
   REJECTED = 'REJECTED', // 거절
-  CANCEL = 'CANCEL', // 취소
 }
 
 export function getStatusClass(status: StudyParticipationStatus) {
@@ -14,8 +13,6 @@ export function getStatusClass(status: StudyParticipationStatus) {
       return 'bg-[#4998E9] text-white';
       case StudyParticipationStatus.REJECTED:
       return 'bg-[#e9e9e9] text-[#565656]';
-      case StudyParticipationStatus.CANCEL:
-      return 'bg-[#FFCFD8] text-[#E0143C]'; 
       default:
       return 'bg-gray-200 text-gray-500';
   }
@@ -25,7 +22,6 @@ export const STATUS_LABELS: Record<StudyParticipationStatus, string> = {
   [StudyParticipationStatus.PENDING]: '신청대기',
   [StudyParticipationStatus.ACCEPTED]: '신청승인',
   [StudyParticipationStatus.REJECTED]: '거절',
-  [StudyParticipationStatus.CANCEL]: '취소',
 };
 
 export const getStatusSortOptions = () => [
@@ -90,7 +86,7 @@ export interface GetStudyParticipationResponse {
 
 // 스터디 참여 조회 요청 (작성자전용)
 export interface GetStudyParticipationRequest {
-  status: StudyParticipationStatus;
+  status?: StudyParticipationStatus;
   pageNo: number; 
 }
 
