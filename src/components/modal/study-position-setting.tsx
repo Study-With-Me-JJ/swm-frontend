@@ -40,7 +40,7 @@ export default function StudyPositionSetting({
     })));  
 
   const [openSelectId, setOpenSelectId] = useState<keyof typeof SELECT_IDS | null>(null);
-  const [selectPosition, setSelectPosition] = useState<string | string[]>('필수 선택');
+  const [, setSelectPosition] = useState<string | string[]>('필수 선택');
 
     const positionList = getPositionOptions().filter((item) => item.value !== 'ALL');
     // console.log('positionList', positionList);
@@ -142,9 +142,8 @@ export default function StudyPositionSetting({
 
   const methods = useForm();
 
-  const onSubmit = methods.handleSubmit(async (data) => {
-        try {  
-            // console.log('직무 수정 data', data);
+  const onSubmit = methods.handleSubmit(async () => {
+        try {   
             const originalPositionField = positionOptions;
             // console.log('originalPositionField', originalPositionField);
              

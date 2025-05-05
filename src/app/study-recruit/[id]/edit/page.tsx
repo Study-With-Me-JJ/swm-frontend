@@ -88,7 +88,7 @@ export default function StudyRecruitEditPage({
         imageUrls: imageUrlList,
       });
     }
-  }, [studyDetail]);
+  }, [studyDetail, methods]);
 
   //필수입력값 유효성검사
   const formTitle = watch('title');
