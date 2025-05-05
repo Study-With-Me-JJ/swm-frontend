@@ -16,8 +16,8 @@ export default function InteractionStatus({
   likeStatus,
 }: InteractionStatusProps) {
   const { showToast, hideToast } = useToastStore();
-  const [localLikeCount, setLocalLikeCount] = useState(likeCount);
-  const [localLikeStatus, setLocalLikeStatus] = useState(likeStatus);
+  const [, setLocalLikeCount] = useState(likeCount);
+  const [, setLocalLikeStatus] = useState(likeStatus);
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null);
 
   const queryClient = useQueryClient();
