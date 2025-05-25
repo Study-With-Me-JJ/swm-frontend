@@ -376,22 +376,22 @@ export default function StudyCreate() {
         }),
       );
 
-    const studyData = {
-      title: data.title,
-      content: data.content,
-      openChatUrl: data.openChatUrl,
-      category: data.category,
-      tagList: (data.tagList || [])
-        .filter((tag: string) => tag && typeof tag === 'string')
-        .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
-      imageUrlList: [],
-      createRecruitmentPositionRequestList: (data.positions || []).map(
-        (pos: PositionField) => ({
-          title: pos.position,
-          headcount: pos.capacity,
-        }),
-      ),
-    };
+      const studyData = {
+        title: data.title,
+        content: data.content,
+        openChatUrl: data.openChatUrl,
+        category: data.category,
+        tags: (data.tagList || [])
+          .filter((tag: string) => tag && typeof tag === 'string')
+          .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
+        imageUrls: uploadedUrls,
+        createRecruitmentPositionRequests: (data.positions || []).map(
+          (pos: PositionField) => ({
+            title: pos.position,
+            headcount: pos.capacity,
+          }),
+        ),
+      };
 
       // console.log('create studyData', studyData);
       mutate(studyData);
