@@ -1,5 +1,6 @@
 'use client';
 
+import { uploadFileToPresignedUrl } from '@/lib/api/study/getPresignedUrl';
 import { postStudy } from '@/lib/api/study/postStudy';
 import { useMutation } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -7,24 +8,20 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { getCategoryList, getPositionOptions } from '@/types/api/study';
+import {
+  getCategoryList,
+  getPositionOptions,
+} from '@/types/api/study-recruit/study';
 import { InputField } from '@/components/InputField';
 import ImageUploader from '@/components/study-create/ui/image-uploader';
 import PositionFieldGroup from '@/components/study-create/ui/position-field-group';
-import RadioSelectGroup from '@/components/study-create/ui/radio-select-group';
-import Toast from '@/components/ui/Toast';
-
+import RadioSelectGroup from '@/components/study-create/ui/radio-select-group'; 
+import { useToastStore } from '@/store/useToastStore';
+import type { CreateStudyRequest } from '@/types/api/study-recruit/postStudy';
 interface PositionField {
   id: string;
   position: string;
   capacity: number | undefined;
-}
-interface ImageFile {
-  url: string;
-  file: File;
-  width: number;
-  height: number;
-  name: string;
 }
 
 export default function StudyCreate() {
@@ -39,15 +36,17 @@ export default function StudyCreate() {
       width: number;
       height: number;
       name: string;
+      file: File;
+      size: number;
+      imageId?: number;
     }[]
   >([]);
 
   const [positionFields, setPositionFields] = useState<PositionField[]>([
     { id: '1', position: 'ALL', capacity: undefined },
   ]);
-
-  const [isToast, setIsToast] = useState(false);
-  const [message, setMessage] = useState('');
+ 
+  const { showToast } = useToastStore(); 
 
   const positionOptions = getPositionOptions();
 
@@ -56,34 +55,37 @@ export default function StudyCreate() {
   const [tagList, setTagList] = useState<string[]>([]);
 
   const { mutate } = useMutation({
-    mutationFn: (formData: FormData) => postStudy(formData),
+    mutationFn: (studyData: CreateStudyRequest) => postStudy(studyData),
     onSuccess: async (response) => {
       if (response.message === 'Expired Token') {
-        setIsToast(true);
-        setMessage('로그인이 만료되었습니다. 다시 로그인해주세요.');
+        showToast({
+          message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+        });
         router.push('/login');
         return;
       }
 
-      console.log('생성 성공 응답:', response);
+      showToast({
+        message: '스터디 생성이 완료되었습니다.',
+      });
 
-      setIsToast(true);
-      setMessage('스터디 생성 요청이 완료되었습니다.');
- 
-      const studyId = response;
-      console.log('생성된 스터디 ID:', studyId);
+      // 캐시 무효화 전에 지연 추가
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
-      await queryClient.invalidateQueries({ queryKey: ['study'] });
-      await queryClient.refetchQueries({ queryKey: ['study'] });
+      // 스터디 목록 데이터만 갱신
+      await queryClient.invalidateQueries({ 
+        queryKey: ['study'],
+        refetchType: 'none' // 자동 리패치 비활성화
+      });
 
-      setTimeout(() => {
-        router.push('/study-recruit');
-      }, 500);
+      // 목록 페이지로 즉시 이동
+      router.push('/study-recruit');
     },
-    onError: (error) => {
+    onError: (error: unknown) => {
       console.error('생성 실패:', error);
-      setIsToast(true);
-      setMessage('스터디 생성 요청에 실패했습니다.');
+      showToast({
+        message: '스터디 생성에 실패했습니다.',
+      });
     },
   });
 
@@ -110,46 +112,99 @@ export default function StudyCreate() {
     methods.setValue('category', value);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
 
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setIsToast(true);
-        setMessage('이미지 크기는 5MB를 초과할 수 없습니다.');
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    
+    if (files) {
+      const file = files[0];
+
+      const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif','bmp','webp','pdf'];
+      if(!ALLOWED_EXTENSIONS.includes(file.type.split('/')[1])) {
+        showToast({
+          message: '지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif, bmp, webp, pdf만 가능)',
+        });
         e.target.value = '';
         return;
       }
+
+      if (file.size > 5 * 1024 * 1024) {
+        showToast({
+          message: '이미지 크기는 5MB를 초과할 수 없습니다.',
+        });
+        e.target.value = '';
+        return;
+      }
+
+      if (previewImages.length >= 10) {
+        showToast({
+          message: '이미지는 최대 10개까지만 추가할 수 있습니다.',
+        });
+        e.target.value = '';
+        return;
+      }
+
       const imageUrl = URL.createObjectURL(file);
-      const newImage = {
-        url: imageUrl,
-        file: file,
-        width: 200,
-        height: 200,
-        name: file.name,
-      };
-      const newImages = [...previewImages, newImage];
-      setPreviewImages(newImages);
-      methods.setValue('image', newImages);
+       
+
+      // 기존 이미지 배열을 복사하고 새 이미지 추가
+      const updatedPreviewImages = [
+        ...previewImages,
+        {
+          url: imageUrl,
+          width: 200,
+          height: 200,
+          name: file.name,
+          size: file.size,
+          file: file
+        }
+      ];
+
+      // 상태 업데이트
+      setPreviewImages(updatedPreviewImages);
+ 
+
+      // imageFiles 업데이트
+      const currentImageFiles = methods.getValues('imageFiles') || [];
+      methods.setValue('imageFiles', [...currentImageFiles, file]);
     }
   };
 
   const handleOrderEdit = (
-    newOrder: { url: string; width: number; height: number; name: string }[],
+    newOrder: {
+      url: string;
+      width: number;
+      height: number;
+      name: string;
+      size: number;
+      imageId?: number;
+    }[],
   ) => {
-    setPreviewImages(newOrder);
+    const updatedOrder = newOrder.map((item) => ({
+      ...item,
+      file: previewImages.find((img) => img.url === item.url)?.file as File,
+    }));
+    setPreviewImages(updatedOrder);
+    methods.setValue('image', updatedOrder);
   };
 
   const handleImageEdit = (
     oldUrl: string,
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    // console.log('handleImageEdit 호출됨');
     const file = e.target.files?.[0];
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
-        setIsToast(true);
-        setMessage('이미지 크기는 5MB를 초과할 수 없습니다.');
+        showToast({
+          message: '이미지 크기는 5MB를 초과할 수 없습니다.',
+        });
+        e.target.value = '';
+        return;
+      }
+      if (previewImages.length >= 10) {
+        showToast({
+          message: '이미지는 최대 10개까지만 추가할 수 있습니다.',
+        });
         e.target.value = '';
         return;
       }
@@ -161,13 +216,16 @@ export default function StudyCreate() {
       const imageUrl = URL.createObjectURL(file);
       const newImage = {
         url: imageUrl,
+        file: file,
         width: 200,
         height: 200,
         name: file.name,
-      };
+        size: file.size,
+      }; 
       setPreviewImages((prev) =>
         prev.map((img) => (img.url === oldUrl ? newImage : img)),
       );
+      methods.setValue('image', [...previewImages, newImage]);
     }
   };
 
@@ -222,8 +280,9 @@ export default function StudyCreate() {
       const tagValue = value.replace(',', '').trim();
       if (tagValue) {
         if (tagList.length >= 10) {
-          setIsToast(true);
-          setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+          showToast({
+            message: '태그는 최대 10개까지만 입력할 수 있습니다.',
+          });
           setInputValue('');
           return;
         }
@@ -250,8 +309,9 @@ export default function StudyCreate() {
       if (!value) return;
 
       if (tagList.length >= 10) {
-        setIsToast(true);
-        setMessage('태그는 최대 10개까지만 입력할 수 있습니다.');
+        showToast({
+          message: '태그는 최대 10개까지만 입력할 수 있습니다.',
+        });
         return;
       }
 
@@ -290,19 +350,42 @@ export default function StudyCreate() {
     }
   };
 
-  const onSubmit = methods.handleSubmit((data) => {
-    const formData = new FormData();
+  const onSubmit = methods.handleSubmit(async (data) => {
+    try {
+      const imagesToUpload = previewImages.filter((img) => img && img.file);
+
+      const uploadedUrls = await Promise.all(
+        imagesToUpload.map(async (img) => {
+          if (!img.file) {
+            throw new Error('파일이 존재하지 않습니다.');
+          }
+          try {
+            return await uploadFileToPresignedUrl(img.file);
+          } catch (error) {
+            if (error instanceof Error && error.message === 'TOKEN_EXPIRED') {
+              showToast({
+                message: '로그인이 만료되었습니다. 다시 로그인해주세요.',
+                url: '/login',
+                urlText: '로그인하러 가기',
+              });
+              router.push('/login');
+              throw error;
+            }
+            throw error;
+          }
+        }),
+      );
 
     const studyData = {
       title: data.title,
       content: data.content,
       openChatUrl: data.openChatUrl,
       category: data.category,
-      tags: (data.tagList || [])
+      tagList: (data.tagList || [])
         .filter((tag: string) => tag && typeof tag === 'string')
         .map((tag: string) => (tag.startsWith('#') ? tag.slice(1) : tag)),
-        imageUrls: [],
-      createRecruitmentPositionRequests: (data.positions || []).map(
+      imageUrlList: [],
+      createRecruitmentPositionRequestList: (data.positions || []).map(
         (pos: PositionField) => ({
           title: pos.position,
           headcount: pos.capacity,
@@ -310,29 +393,24 @@ export default function StudyCreate() {
       ),
     };
 
-    formData.append(
-      'request',
-      new Blob([JSON.stringify(studyData)], { type: 'application/json' }),
-    );
+      // console.log('create studyData', studyData);
+      mutate(studyData);
+    } catch (error) {
+      if (error instanceof Error && error.message !== 'TOKEN_EXPIRED') {
+        console.error('이미지 업로드 실패:', error);
+        showToast({
+          message: '이미지 업로드에 실패했습니다.',
+        });
+      }
 
-    data.image?.forEach((img: ImageFile) => {
-      formData.append('files', img.file);
-    });
-
-    mutate(formData);
-
-    // Array.from(formData.entries()).forEach(([key, value]) => {
-    //   if (key === 'request') {
-    //     const reader = new FileReader();
-    //     reader.onload = () => {
-    //       const jsonContent = JSON.parse(reader.result as string);
-    //       console.log('Study Data:', jsonContent);
-    //     };
-    //     reader.readAsText(value as Blob);
-    //   } else if (key === 'files') {
-    //     console.log('File:', (value as File).name);
-    //   }
-    // });
+      if (error instanceof Error && error.message.includes('지원하지 않는 파일 형식')) {
+        showToast({
+          message: '지원하지 않는 파일 형식입니다. (jpg, jpeg, png, gif, bmp, webp, pdf만 가능)',
+        });
+        return;
+      }
+      throw error;
+    }
   });
 
   return (
@@ -366,6 +444,7 @@ export default function StudyCreate() {
                 name="category"
                 options={category}
                 onOptionChange={(value) => handleCategoryChange(value)}
+                value={methods.watch('category') || ''}
               />
               <div className="flex flex-col gap-[12px]">
                 <div className="flex items-center gap-[12px]">
@@ -383,7 +462,7 @@ export default function StudyCreate() {
                       >
                         {tag}
                         <button
-                          type="button" 
+                          type="button"
                           onClick={() => handleTagDelete(index)}
                           className="ml-2 text-gray-500 hover:text-gray-700"
                         >
@@ -426,6 +505,8 @@ export default function StudyCreate() {
                     width: image.width,
                     height: image.height,
                     name: image.name,
+                    size: image.size,
+                      imageId: image.imageId
                   }))}
                   msg="사진 별 권장 사이즈 및 용량 : 1장당 최대 크기 5MB)"
                   handleOrderEdit={handleOrderEdit}
@@ -441,6 +522,7 @@ export default function StudyCreate() {
                       name="positions"
                       type="default"
                       value={field.position}
+                      disabled={false}
                       capacity={field.capacity || 0}
                       onChange={(value) =>
                         handlePositionChange(
@@ -480,7 +562,6 @@ export default function StudyCreate() {
           </form>
         </FormProvider>
       </section>
-      {isToast && <Toast isToast={isToast} message={message} />}
     </>
   );
 }

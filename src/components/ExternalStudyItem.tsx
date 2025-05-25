@@ -127,9 +127,9 @@ export default function ExternalStudyItem({ slideData, useSlider=false }: SlideI
                     ))}
                 </Swiper>
                 )}
-            <div className="swiper-navigation top-4">
-                <button ref={prevRef} className="swiper-button-prev"></button>
-                <button ref={nextRef} className="swiper-button-next"></button>
+            <div className="swiper-navigation absolute right-0 top-4 !gap-[10px] !h-[24px]">
+                <button ref={prevRef} className="swiper-button-prev !h-[24px] !w-[24px] !mt-[0]"></button>
+                <button ref={nextRef} className="swiper-button-next !h-[24px] !w-[24px] !mt-[0]"></button>
                 </div>
             </div>
         ) 

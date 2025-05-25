@@ -18,11 +18,12 @@ export default function ImageUploader({
     url: string;
     width: number;
     height: number;
-    name: string;
+    name: string; 
+    size: number;
   }[];
   msg?: string;
   handleOrderEdit: (
-    newOrder: { url: string; width: number; height: number; name: string }[],
+    newOrder: { url: string; width: number; height: number; name: string; size: number; }[],
   ) => void;
   handleImageEdit: (
     oldUrl: string,
@@ -99,7 +100,7 @@ export default function ImageUploader({
                     }}
                     className="h-[60px] w-[116px] rounded-[8px] border border-[#E0E0E0] bg-[#F9F9F9] text-center text-[16px] font-semibold text-[#6e6e6e]"
                   >
-                    순서 편집
+                    이미지 편집
                   </button>
                 )}
               </div>
@@ -115,7 +116,7 @@ export default function ImageUploader({
           images={
             previewImages?.map((image) => ({
               ...image,
-              name: image.name.split('/').pop() || '',
+              name: image.url.split('/').pop() || '',
             })) || []
           }
           handleOrderEdit={handleOrderEdit}

@@ -5,6 +5,7 @@ import "@/styles/globals.css";
 import Header from "@/components/Header";     
 import { Toaster } from "react-hot-toast";
 import Footer from "@/components/Footer";
+import ToastContainer from "@/components/ui/ToastContainer";
 
 const pretendard = localFont({
   src: "../../public/fonts/PretendardVariable.woff2",
@@ -40,9 +41,10 @@ export default function RootLayout({
               }
             }}
           />
-            <Header />
-            {children}  
-            <Footer />
+          <ToastContainer />
+          <Header />
+          {children}  
+          <Footer />
         </RootProvider>
       </body>
     </html>

@@ -4,6 +4,7 @@ interface DropDownDefaultProps {
   onClickOption: (value: string) => void;
   onToggle: () => void;
   filterType?: string;
+  className?: string;
 }
 
 export default function DropDownDefault({
@@ -11,16 +12,17 @@ export default function DropDownDefault({
   defaultValue,
   onClickOption,
   filterType,
+  className,
 }: DropDownDefaultProps) {
   return (
     <>
       <ul
-        className={`absolute left-0 top-full z-10 mt-[10px] h-auto w-full rounded-[8px] border bg-white p-1 ${filterType === 'text' ? 'border-[#e0e0e0]' : 'border-link-default'}`}
+        className={`absolute left-0 top-full z-20 mt-[10px] h-auto w-full rounded-[8px] border bg-white p-1 ${filterType === 'text' ? 'border-[#e0e0e0]' : 'border-link-default'}`}
         role="listbox"
       >
         {options.map((option) => (
           <li
-            className={`${filterType === 'text' ? 'px-[16px] py-[6px] text-xs font-semibold text-[#c8c8c8] hover:text-link-default' : 'font-regular hover:text-semibold px-[13px] py-[16px] text-[16px] text-gray-default'} relative my-[2px] flex flex-row-reverse items-center justify-between gap-2 hover:cursor-pointer hover:rounded-[4px] hover:bg-[#f2f2f2]`}
+            className={`${filterType === 'text' ? 'px-[16px] py-[6px] text-xs font-semibold text-[#c8c8c8] hover:text-link-default' : 'font-regular hover:text-semibold px-[13px] py-[16px] '} relative my-[2px] flex flex-row-reverse items-center justify-between gap-2 hover:cursor-pointer hover:rounded-[4px] hover:bg-[#f2f2f2] ${className ? className : 'text-[16px] text-gray-default'}`}
             key={option.id}
           >
             <input

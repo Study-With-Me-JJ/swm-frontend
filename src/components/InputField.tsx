@@ -104,7 +104,7 @@ export function InputField({ ...props }: InputFieldProps) {
             const isValid = !errors[name] && field.value;
             return (
               <Input
-                {...field}
+                {...field}   
                 value={field.value ?? ''}
                 type={type}
                 placeholder={placeholder}

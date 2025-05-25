@@ -108,10 +108,7 @@ body {
   }
 
   .swiper-navigation {
-    @apply flex items-center justify-center gap-[5px];
-    position: absolute;
-    top: 0;
-    right: 0;
+    @apply flex items-center justify-center gap-[5px]; 
   } 
 
   .swiper-button-prev,
@@ -120,7 +117,7 @@ body {
     background-color: transparent;
     border: none;
     cursor: pointer;
-    color:#a5a5a5 !important;
+    color:#a5a5a5 !important; 
   } 
 
   .swiper-button-prev:after,

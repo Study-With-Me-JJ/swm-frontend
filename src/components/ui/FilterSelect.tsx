@@ -10,7 +10,6 @@ interface Option {
   value: string;
   label: string;
 }
-
 interface FilterSelectProps {
   onChange: (value: string | string[]) => void;
   defaultValue: string | string[];
@@ -20,6 +19,8 @@ interface FilterSelectProps {
   type?: 'default' | 'button';
   title?: string;
   closeOnSelect?: boolean;
+  disabled?: boolean;
+  className?: string;
 }
 
 export default function FilterSelect({
@@ -31,6 +32,8 @@ export default function FilterSelect({
   type = 'default',
   title = 'default',
   closeOnSelect = true,
+  disabled = false,
+  className,
 }: FilterSelectProps) {
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,9 +79,9 @@ export default function FilterSelect({
     <div className="w-inherit relative h-full" ref={containerRef}>
       <button
         type="button"
-        className={`flex h-full w-full items-center justify-between gap-1 rounded-[8px] border px-[13px] text-[16px] font-semibold text-gray-default ${
+        className={`flex h-full w-full items-center justify-between gap-1 rounded-[8px] border px-[13px]  ${
           isOpen ? 'border-link-default' : 'border-gray-disabled'
-        }`}
+        } ${className ? className : 'text-gray-default text-[16px] font-semibold'}`}
         onClick={(e) => {
           e.stopPropagation();
           onToggle();
@@ -89,16 +92,18 @@ export default function FilterSelect({
             ? defaultValue
                 .map(
                   (value) =>
-                    options.find((option) => option.value === value)?.label,
+                    options?.find((option) => option.value === value)?.label,
                 )
                 .join(', ')
             : typeof defaultValue === 'string' && defaultValue.includes('전체')
               ? defaultValue
-              : options.find((option) => option.value === defaultValue)?.label}
+              : typeof defaultValue === 'string' && options && !options.some(option => option.value === defaultValue)
+                ? defaultValue
+                : options?.find((option) => option.value === defaultValue)?.label || defaultValue}
         </span>
         <Image
           src={
-            isOpen
+            isOpen && !disabled
               ? '/icons/icon_select_arrow_up.svg'
               : '/icons/icon_select_arrow.svg'
           }
@@ -107,7 +112,7 @@ export default function FilterSelect({
           height={28}
         />
       </button>
-      {isOpen && renderDropDown()}
+      {isOpen && !disabled && renderDropDown()}
     </div>
   );
 
@@ -116,6 +121,7 @@ export default function FilterSelect({
       case 'default':
         return (
           <DropDownDefault
+            className={className}
             options={options}
             defaultValue={defaultValue as string}
             onClickOption={onClickOption}

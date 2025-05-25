@@ -1,13 +1,13 @@
 export enum RecruitmentPositionTitle {
   BACKEND = 'BACKEND',
   FRONTEND = 'FRONTEND',
-  ETC = 'ETC',
+  ETC = 'ETC', 
 }
 
 export const POSITION_LABELS: Record<RecruitmentPositionTitle, string> = {
   [RecruitmentPositionTitle.BACKEND]: '백엔드',
   [RecruitmentPositionTitle.FRONTEND]: '프론트엔드',
-  [RecruitmentPositionTitle.ETC]: '기타',
+  [RecruitmentPositionTitle.ETC]: '기타', 
 };
 
 export const getPositionOptions = () => [
@@ -118,9 +118,9 @@ export interface Study {
   likeCount: number;
   commentCount: number;
   status: string;
+  liked: boolean;
   viewCount: number;
   studyBookmarkId: number;
-  liked: boolean;
   getTagResponses: getTagResponseList[];
   getRecruitmentPositionResponses: getRecruitmentPositionResponseList[];
 }

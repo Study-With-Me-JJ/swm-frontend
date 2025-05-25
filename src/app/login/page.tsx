@@ -12,6 +12,7 @@ import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { INPUT_ERROR_MESSAGE } from '@/utils/input-error-message';
+import { useQueryClient } from '@tanstack/react-query';
 
 const loginSchema = z.object({
   email: z.string({required_error: INPUT_ERROR_MESSAGE.EMAIL.REQUIRED}).email(INPUT_ERROR_MESSAGE.EMAIL.INVALID_FORMAT),
@@ -31,6 +32,8 @@ export default function Login() {
   const email = watch('email');
   const password = watch('password');
 
+  const queryClient = useQueryClient();
+
   const onSubmit = async (data: {email: string, password: string}) => {
     try {
       const response = await login(data.email, data.password);
@@ -41,6 +44,7 @@ export default function Login() {
         localStorage.setItem('accessToken', accessToken);
         localStorage.setItem('expirationTime', expirationTime);
         window.dispatchEvent(new Event('login'));
+        await queryClient.invalidateQueries({ queryKey: ['userInfo'] });
         router.push('/');
       }
     } catch (error) {

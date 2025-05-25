@@ -69,8 +69,10 @@ export default function FilterText({ options, defaultValue, onChange, onToggle,i
                 switch(filterName) {
                   case '최신순':
                     return "/icons/icon_select_sort.svg"; 
+                  case '태그':
+                    return "/icons/icon_select_tag.svg"; 
                   default:
-                    return "/icons/icon_select_tag.svg";
+                    return "/icons/icon_select_sort.svg";
                 }
               })()} 
               alt="" 
